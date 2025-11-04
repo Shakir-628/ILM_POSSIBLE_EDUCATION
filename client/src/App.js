@@ -55,6 +55,10 @@ import TeacherIDCards from './pages/TeacherIDCards';
 import StudentIDCards from './pages/StudentIDCards';
 import Certificates from './pages/Certificates';
 import CertificateTemplates from './pages/CertificateTemplates';
+import Library from './pages/Library';
+import LibraryIssues from './pages/LibraryIssues';
+import Transport from './pages/Transport';
+import Hostel from './pages/Hostel';
 
 function App() {
   return (
@@ -458,6 +462,38 @@ function App() {
           element={
             <PrivateRoute roles={['admin']}>
               <CertificateTemplates />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/library"
+          element={
+            <PrivateRoute>
+              <Library />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/library/issues"
+          element={
+            <PrivateRoute>
+              <LibraryIssues />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/transport"
+          element={
+            <PrivateRoute roles={['admin', 'superadmin']}>
+              <Transport />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/hostel"
+          element={
+            <PrivateRoute roles={['admin', 'superadmin']}>
+              <Hostel />
             </PrivateRoute>
           }
         />

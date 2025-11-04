@@ -120,32 +120,24 @@ const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
       icon: BookmarkIcon,
       roles: ['admin', 'teacher', 'student'],
       submenu: [
-        { name: 'Books', href: '/library/books', roles: ['admin', 'teacher', 'student'] },
-        { name: 'Issue/Return', href: '/library/issue', roles: ['admin', 'teacher'] },
-        { name: 'My Books', href: '/library/my-books', roles: ['student'] },
-        { name: 'Overdue', href: '/library/overdue', roles: ['admin'] },
+        { name: 'Books', href: '/library', roles: ['admin', 'teacher', 'student'] },
+        { name: 'Issue/Return', href: '/library/issues', roles: ['admin', 'teacher'] },
       ],
     },
     {
       name: 'Transport',
       icon: TruckIcon,
-      roles: ['admin', 'student', 'parent'],
+      roles: ['admin'],
       submenu: [
-        { name: 'Routes & Vehicles', href: '/transport/routes', roles: ['admin'] },
-        { name: 'Drivers', href: '/transport/drivers', roles: ['admin'] },
-        { name: 'Student Routes', href: '/transport/student-routes', roles: ['admin', 'student', 'parent'] },
-        { name: 'Transport Fees', href: '/transport/fees', roles: ['admin'] },
+        { name: 'Manage Transport', href: '/transport', roles: ['admin'] },
       ],
     },
     {
       name: 'Hostel',
       icon: BuildingOfficeIcon,
-      roles: ['admin', 'student'],
+      roles: ['admin'],
       submenu: [
-        { name: 'Rooms', href: '/hostel/rooms', roles: ['admin'] },
-        { name: 'Allocations', href: '/hostel/allocations', roles: ['admin'] },
-        { name: 'My Room', href: '/hostel/my-room', roles: ['student'] },
-        { name: 'Hostel Fees', href: '/hostel/fees', roles: ['admin'] },
+        { name: 'Manage Hostel', href: '/hostel', roles: ['admin'] },
       ],
     },
     {

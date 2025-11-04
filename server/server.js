@@ -43,6 +43,9 @@ import assetRoutes from "./routes/assetRoutes.js";
 import maintenanceRoutes from "./routes/maintenanceRoutes.js";
 import certificateRoutes from "./routes/certificateRoutes.js";
 import certificateTemplateRoutes from "./routes/certificateTemplateRoutes.js";
+import libraryRoutes from "./routes/library.js";
+import transportRoutes from "./routes/transport.js";
+import hostelRoutes from "./routes/hostel.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -120,6 +123,9 @@ app.use("/api/assets", assetRoutes);
 app.use("/api/maintenance", maintenanceRoutes);
 app.use("/api/certificates", certificateRoutes);
 app.use("/api/certificate-templates", certificateTemplateRoutes);
+app.use("/api/library", libraryRoutes);
+app.use("/api/transport", transportRoutes);
+app.use("/api/hostel", hostelRoutes);
 
 // Error handler middleware (must be last)
 app.use(errorHandler);
