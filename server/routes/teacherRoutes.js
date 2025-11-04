@@ -5,6 +5,8 @@ import {
   createTeacher,
   updateTeacher,
   deleteTeacher,
+  generateIDCard,
+  generateBulkIDCards,
 } from "../controllers/teacherController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { authorize } from "../middleware/roleMiddleware.js";
@@ -12,10 +14,16 @@ import { auditLog } from "../middleware/auditMiddleware.js";
 
 const router = express.Router();
 
+// ID Card generation routes (must come before /:id route)
+router.post("/bulk-id-cards", protect, authorize("admin"), generateBulkIDCards);
+
 router
   .route("/")
   .get(protect, getTeachers)
   .post(protect, authorize("admin"), auditLog("Teacher"), createTeacher);
+
+// ID card for single teacher (must come before general /:id route)
+router.get("/:id/id-card", protect, generateIDCard);
 
 router
   .route("/:id")

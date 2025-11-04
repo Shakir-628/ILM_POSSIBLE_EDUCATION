@@ -49,4 +49,4 @@ export const admin = adminOnly;
 export const teacher = teacherOnly;
 export const student = studentOnly;
 export const teacherOrAdmin = teacherOnly;
-
+export const adminOrTeacher = teacherOnly; // Alias for teacherOrAdmin

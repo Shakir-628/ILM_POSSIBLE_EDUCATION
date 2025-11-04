@@ -42,6 +42,44 @@ export const timetableService = {
     const response = await api.post('/timetables/check-conflicts', conflictData);
     return response.data;
   },
+
+  // Export to Excel
+  exportToExcel: async (timetableId) => {
+    const response = await api.get(`/timetables/${timetableId}/export/excel`, {
+      responseType: 'blob',
+    });
+    
+    // Create download link
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `timetable_${new Date().toISOString().split('T')[0]}.xlsx`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+    
+    return response.data;
+  },
+
+  // Export to PDF
+  exportToPDF: async (timetableId) => {
+    const response = await api.get(`/timetables/${timetableId}/export/pdf`, {
+      responseType: 'blob',
+    });
+    
+    // Create download link
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `timetable_${new Date().toISOString().split('T')[0]}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+    
+    return response.data;
+  },
 };
 
 export default timetableService;

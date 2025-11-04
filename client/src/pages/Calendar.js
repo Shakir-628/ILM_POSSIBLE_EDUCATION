@@ -6,14 +6,20 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   CalendarIcon,
+  AcademicCapIcon,
+  TrophyIcon,
+  UserGroupIcon,
 } from '@heroicons/react/24/outline';
 import { eventService } from '../services/eventService';
+import { useToast } from '../context/ToastContext';
 
 const Calendar = () => {
+  const toast = useToast();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState([]);
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedEvents, setSelectedEvents] = useState([]);
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,13 +27,13 @@ const Calendar = () => {
   }, [currentDate]);
 
   const fetchEvents = async () => {
+    setLoading(true);
     try {
-      const month = currentDate.getMonth() + 1;
-      const year = currentDate.getFullYear();
-      const response = await eventService.getAllEvents({ month, year });
-      setEvents(response.data);
+      const response = await eventService.getAllEvents();
+      setEvents(response.data || []);
     } catch (error) {
       console.error('Error fetching events:', error);
+      toast.error('Failed to fetch events');
     } finally {
       setLoading(false);
     }
@@ -43,54 +49,99 @@ const Calendar = () => {
 
     const days = [];
     
-    // Add empty cells for days before month starts
-    for (let i = 0; i < startingDayOfWeek; i++) {
-      days.push({ date: null, isCurrentMonth: false });
+    // Previous month padding
+    const prevMonthLastDay = new Date(year, month, 0).getDate();
+    for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+      days.push({
+        date: prevMonthLastDay - i,
+        isCurrentMonth: false,
+        fullDate: new Date(year, month - 1, prevMonthLastDay - i),
+      });
     }
 
-    // Add days of current month
-    for (let day = 1; day <= daysInMonth; day++) {
+    // Current month
+    for (let i = 1; i <= daysInMonth; i++) {
       days.push({
-        date: new Date(year, month, day),
+        date: i,
         isCurrentMonth: true,
+        fullDate: new Date(year, month, i),
+      });
+    }
+
+    // Next month padding
+    const remainingDays = 42 - days.length; // 6 weeks * 7 days
+    for (let i = 1; i <= remainingDays; i++) {
+      days.push({
+        date: i,
+        isCurrentMonth: false,
+        fullDate: new Date(year, month + 1, i),
       });
     }
 
     return days;
   };
 
-  const getEventsForDay = (date) => {
-    if (!date) return [];
-    
+  const getEventsForDate = (date) => {
     return events.filter((event) => {
-      const eventStart = new Date(event.startDate);
-      const eventEnd = new Date(event.endDate);
-      const dayStart = new Date(date);
-      dayStart.setHours(0, 0, 0, 0);
-      const dayEnd = new Date(date);
-      dayEnd.setHours(23, 59, 59, 999);
-
+      const eventDate = new Date(event.date);
       return (
-        (eventStart <= dayEnd && eventEnd >= dayStart) ||
-        (dayStart >= eventStart && dayStart <= eventEnd)
+        eventDate.getDate() === date.getDate() &&
+        eventDate.getMonth() === date.getMonth() &&
+        eventDate.getFullYear() === date.getFullYear()
       );
     });
   };
 
-  const previousMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+  const handleDateClick = (day) => {
+    if (!day.isCurrentMonth) return;
+    
+    const dayEvents = getEventsForDate(day.fullDate);
+    setSelectedDate(day.fullDate);
+    setSelectedEvents(dayEvents);
+    if (dayEvents.length > 0) {
+      setIsEventModalOpen(true);
+    }
   };
 
-  const nextMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+  const handlePrevMonth = () => {
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
   };
 
-  const goToToday = () => {
+  const handleNextMonth = () => {
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
+  };
+
+  const handleToday = () => {
     setCurrentDate(new Date());
   };
 
+  const getEventColor = (type) => {
+    const colors = {
+      academic: 'bg-blue-500',
+      exam: 'bg-red-500',
+      holiday: 'bg-green-500',
+      sports: 'bg-yellow-500',
+      cultural: 'bg-purple-500',
+      meeting: 'bg-indigo-500',
+      workshop: 'bg-pink-500',
+      celebration: 'bg-orange-500',
+      competition: 'bg-teal-500',
+      other: 'bg-gray-500',
+    };
+    return colors[type] || colors.other;
+  };
+
+  const getEventIcon = (type) => {
+    const icons = {
+      academic: AcademicCapIcon,
+      exam: CalendarIcon,
+      sports: TrophyIcon,
+      meeting: UserGroupIcon,
+    };
+    return icons[type] || CalendarIcon;
+  };
+
   const isToday = (date) => {
-    if (!date) return false;
     const today = new Date();
     return (
       date.getDate() === today.getDate() &&
@@ -99,12 +150,14 @@ const Calendar = () => {
     );
   };
 
-  const days = getDaysInMonth(currentDate);
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December',
+    'July', 'August', 'September', 'October', 'November', 'December'
   ];
-  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  const days = getDaysInMonth(currentDate);
 
   return (
     <Layout>
@@ -112,199 +165,184 @@ const Calendar = () => {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Academic Calendar</h1>
+            <h1 className="text-2xl font-bold text-gray-900">📅 Academic Calendar</h1>
             <p className="mt-1 text-sm text-gray-500">
-              View all school events and important dates
+              View events, exams, and important dates
             </p>
           </div>
-          <Button icon={CalendarIcon} onClick={goToToday}>
+          <Button onClick={handleToday} icon={CalendarIcon}>
             Today
           </Button>
         </div>
 
-        {/* Calendar Navigation */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">
-              {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-            </h2>
-            <div className="flex space-x-2">
-              <button
-                onClick={previousMonth}
-                className="p-2 rounded-md hover:bg-gray-100"
-              >
-                <ChevronLeftIcon className="h-5 w-5 text-gray-600" />
-              </button>
-              <button
-                onClick={nextMonth}
-                className="p-2 rounded-md hover:bg-gray-100"
-              >
-                <ChevronRightIcon className="h-5 w-5 text-gray-600" />
-              </button>
+        {/* Calendar Controls */}
+        <div className="bg-gradient-to-r from-primary-600 to-primary-800 shadow-lg rounded-lg p-6">
+          <div className="flex justify-between items-center">
+            <button
+              onClick={handlePrevMonth}
+              className="p-2 hover:bg-white/20 rounded-full transition-colors"
+            >
+              <ChevronLeftIcon className="h-6 w-6 text-white" />
+            </button>
+            
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-white">
+                {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+              </h2>
+              <p className="text-primary-100 text-sm mt-1">
+                {events.filter(e => {
+                  const eDate = new Date(e.date);
+                  return eDate.getMonth() === currentDate.getMonth() && eDate.getFullYear() === currentDate.getFullYear();
+                }).length} events this month
+              </p>
             </div>
+            
+            <button
+              onClick={handleNextMonth}
+              className="p-2 hover:bg-white/20 rounded-full transition-colors"
+            >
+              <ChevronRightIcon className="h-6 w-6 text-white" />
+            </button>
           </div>
+        </div>
 
-          {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-px bg-gray-200">
-            {/* Week day headers */}
-            {weekDays.map((day) => (
+        {/* Calendar Grid */}
+        <div className="bg-white shadow-xl rounded-lg overflow-hidden">
+          {/* Day Headers */}
+          <div className="grid grid-cols-7 bg-gray-100 border-b-2 border-gray-200">
+            {dayNames.map((day) => (
               <div
                 key={day}
-                className="bg-gray-50 p-2 text-center text-sm font-semibold text-gray-700"
+                className="px-2 py-3 text-center text-sm font-bold text-gray-700 uppercase"
               >
                 {day}
               </div>
             ))}
+          </div>
 
-            {/* Calendar days */}
-            {days.map((day, idx) => {
-              const dayEvents = getEventsForDay(day.date);
-              const today = isToday(day.date);
+          {/* Calendar Days */}
+          <div className="grid grid-cols-7 divide-x divide-y">
+            {days.map((day, index) => {
+              const dayEvents = getEventsForDate(day.fullDate);
+              const isTodayDate = isToday(day.fullDate);
 
               return (
                 <div
-                  key={idx}
-                  className={`bg-white min-h-[120px] p-2 ${
-                    !day.isCurrentMonth ? 'bg-gray-50' : ''
-                  } ${today ? 'ring-2 ring-primary-500' : ''}`}
+                  key={index}
+                  onClick={() => handleDateClick(day)}
+                  className={`min-h-[100px] p-2 cursor-pointer transition-all duration-200 hover:bg-gray-50 ${
+                    !day.isCurrentMonth ? 'bg-gray-50 opacity-50' : 'bg-white'
+                  } ${isTodayDate ? 'bg-blue-50 ring-2 ring-blue-500 ring-inset' : ''}`}
                 >
-                  {day.date && (
-                    <>
-                      <div
-                        className={`text-sm font-semibold mb-1 ${
-                          today
-                            ? 'bg-primary-600 text-white w-7 h-7 rounded-full flex items-center justify-center'
-                            : 'text-gray-900'
-                        }`}
-                      >
-                        {day.date.getDate()}
-                      </div>
-                      <div className="space-y-1">
-                        {dayEvents.slice(0, 3).map((event) => (
-                          <div
-                            key={event._id}
-                            onClick={() => {
-                              setSelectedEvent(event);
-                              setIsDetailModalOpen(true);
-                            }}
-                            className="text-xs p-1 rounded cursor-pointer hover:opacity-80"
-                            style={{ backgroundColor: event.color, color: '#fff' }}
-                            title={event.title}
-                          >
-                            <div className="truncate font-medium">{event.title}</div>
-                          </div>
-                        ))}
-                        {dayEvents.length > 3 && (
-                          <div className="text-xs text-gray-500 pl-1">
-                            +{dayEvents.length - 3} more
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  )}
+                  <div className="flex flex-col h-full">
+                    {/* Date Number */}
+                    <div className={`text-sm font-semibold mb-2 ${
+                      isTodayDate 
+                        ? 'bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center' 
+                        : day.isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
+                    }`}>
+                      {day.date}
+                    </div>
+
+                    {/* Events */}
+                    <div className="space-y-1 flex-1 overflow-y-auto">
+                      {dayEvents.slice(0, 3).map((event, idx) => (
+                        <div
+                          key={idx}
+                          className={`text-xs px-2 py-1 rounded ${getEventColor(event.eventType)} bg-opacity-20 border-l-2 ${getEventColor(event.eventType).replace('bg-', 'border-')} truncate hover:shadow-md transition-shadow`}
+                          title={event.title}
+                        >
+                          <span className="font-medium">{event.title}</span>
+                        </div>
+                      ))}
+                      {dayEvents.length > 3 && (
+                        <div className="text-xs text-gray-500 font-medium px-2">
+                          +{dayEvents.length - 3} more
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               );
             })}
           </div>
+        </div>
 
-          {/* Legend */}
-          <div className="mt-6 flex flex-wrap gap-4 text-xs">
-            <div className="flex items-center">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: '#3b82f6' }}></div>
-              <span className="ml-2">Academic</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: '#10b981' }}></div>
-              <span className="ml-2">Sports</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: '#8b5cf6' }}></div>
-              <span className="ml-2">Cultural</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: '#ef4444' }}></div>
-              <span className="ml-2">Holiday</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: '#f59e0b' }}></div>
-              <span className="ml-2">Exam</span>
-            </div>
+        {/* Event Legend */}
+        <div className="bg-white shadow rounded-lg p-6">
+          <h3 className="text-sm font-semibold text-gray-900 mb-4">Event Types</h3>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {[
+              { type: 'academic', label: 'Academic', icon: AcademicCapIcon },
+              { type: 'exam', label: 'Exam', icon: CalendarIcon },
+              { type: 'holiday', label: 'Holiday', icon: CalendarIcon },
+              { type: 'sports', label: 'Sports', icon: TrophyIcon },
+              { type: 'cultural', label: 'Cultural', icon: UserGroupIcon },
+              { type: 'meeting', label: 'Meeting', icon: UserGroupIcon },
+              { type: 'workshop', label: 'Workshop', icon: AcademicCapIcon },
+              { type: 'celebration', label: 'Celebration', icon: CalendarIcon },
+              { type: 'competition', label: 'Competition', icon: TrophyIcon },
+              { type: 'other', label: 'Other', icon: CalendarIcon },
+            ].map(({ type, label, icon: Icon }) => (
+              <div key={type} className="flex items-center space-x-2">
+                <div className={`w-4 h-4 rounded ${getEventColor(type)}`}></div>
+                <span className="text-sm text-gray-700">{label}</span>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Event Detail Modal */}
+        {/* Event Details Modal */}
         <Modal
-          isOpen={isDetailModalOpen}
-          onClose={() => setIsDetailModalOpen(false)}
-          title="Event Details"
+          isOpen={isEventModalOpen}
+          onClose={() => setIsEventModalOpen(false)}
+          title={selectedDate ? `Events on ${selectedDate.toLocaleDateString()}` : 'Events'}
+          size="large"
         >
-          {selectedEvent && (
+          {selectedEvents.length > 0 ? (
             <div className="space-y-4">
-              <div>
-                <h3 className="text-lg font-bold text-gray-900">{selectedEvent.title}</h3>
-                <p className="text-sm text-gray-600 mt-1">{selectedEvent.description}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="font-semibold text-gray-700">Type:</span>
-                  <span className="ml-2 capitalize">{selectedEvent.eventType}</span>
-                </div>
-                <div>
-                  <span className="font-semibold text-gray-700">Status:</span>
-                  <span className="ml-2 capitalize">{selectedEvent.status}</span>
-                </div>
-                <div>
-                  <span className="font-semibold text-gray-700">Start:</span>
-                  <span className="ml-2">
-                    {new Date(selectedEvent.startDate).toLocaleString()}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-semibold text-gray-700">End:</span>
-                  <span className="ml-2">
-                    {new Date(selectedEvent.endDate).toLocaleString()}
-                  </span>
-                </div>
-                {selectedEvent.venue && (
-                  <div>
-                    <span className="font-semibold text-gray-700">Venue:</span>
-                    <span className="ml-2">{selectedEvent.venue}</span>
+              {selectedEvents.map((event, idx) => {
+                const Icon = getEventIcon(event.eventType);
+                return (
+                  <div
+                    key={idx}
+                    className={`border-l-4 ${getEventColor(event.eventType).replace('bg-', 'border-')} bg-gray-50 p-4 rounded-r-lg hover:shadow-md transition-shadow`}
+                  >
+                    <div className="flex items-start space-x-3">
+                      <div className={`p-2 rounded-full ${getEventColor(event.eventType)} bg-opacity-20`}>
+                        <Icon className={`h-6 w-6 ${getEventColor(event.eventType).replace('bg-', 'text-')}`} />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-gray-900">{event.title}</h3>
+                        <p className="text-sm text-gray-600 mt-1">{event.description}</p>
+                        <div className="mt-3 flex flex-wrap gap-3 text-xs text-gray-500">
+                          <span className="flex items-center">
+                            <CalendarIcon className="h-4 w-4 mr-1" />
+                            {new Date(event.date).toLocaleDateString()}
+                          </span>
+                          {event.startTime && (
+                            <span className="flex items-center">
+                              ⏰ {event.startTime} - {event.endTime}
+                            </span>
+                          )}
+                          {event.location && (
+                            <span className="flex items-center">
+                              📍 {event.location}
+                            </span>
+                          )}
+                          <span className={`px-2 py-1 rounded-full ${getEventColor(event.eventType)} bg-opacity-20 text-xs font-medium capitalize`}>
+                            {event.eventType}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                )}
-                {selectedEvent.organizer && (
-                  <div>
-                    <span className="font-semibold text-gray-700">Organizer:</span>
-                    <span className="ml-2">{selectedEvent.organizer}</span>
-                  </div>
-                )}
-              </div>
-
-              {selectedEvent.contactPerson?.name && (
-                <div className="bg-gray-50 p-3 rounded-md">
-                  <p className="text-sm font-semibold text-gray-900 mb-1">Contact Person:</p>
-                  <p className="text-sm text-gray-700">{selectedEvent.contactPerson.name}</p>
-                  {selectedEvent.contactPerson.phone && (
-                    <p className="text-sm text-gray-600">📞 {selectedEvent.contactPerson.phone}</p>
-                  )}
-                  {selectedEvent.contactPerson.email && (
-                    <p className="text-sm text-gray-600">✉️ {selectedEvent.contactPerson.email}</p>
-                  )}
-                </div>
-              )}
-
-              {selectedEvent.requiresRegistration && (
-                <div className="bg-blue-50 border border-blue-200 p-3 rounded-md">
-                  <p className="text-sm font-semibold text-blue-900">
-                    Registration Required
-                  </p>
-                  {selectedEvent.maxParticipants && (
-                    <p className="text-sm text-blue-700">
-                      {selectedEvent.registeredParticipants?.length || 0} / {selectedEvent.maxParticipants} registered
-                    </p>
-                  )}
-                </div>
-              )}
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              No events scheduled for this date
             </div>
           )}
         </Modal>
@@ -314,4 +352,3 @@ const Calendar = () => {
 };
 
 export default Calendar;
-

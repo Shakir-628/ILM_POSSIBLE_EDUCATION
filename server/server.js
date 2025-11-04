@@ -37,6 +37,12 @@ import reportCardRoutes from "./routes/reportCardRoutes.js";
 import logRoutes from "./routes/logRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import examAnalyticsRoutes from "./routes/examAnalyticsRoutes.js";
+import rolePermissionRoutes from "./routes/rolePermissionRoutes.js";
+import assetRoutes from "./routes/assetRoutes.js";
+import maintenanceRoutes from "./routes/maintenanceRoutes.js";
+import certificateRoutes from "./routes/certificateRoutes.js";
+import certificateTemplateRoutes from "./routes/certificateTemplateRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -44,6 +50,9 @@ const __dirname = path.dirname(__filename);
 dotenv.config();
 
 const app = express();
+
+// Trust proxy to get correct IP addresses
+app.set('trust proxy', true);
 
 // Middleware
 app.use(cors());
@@ -63,7 +72,7 @@ connectDB();
 // Routes
 app.get("/", (req, res) => {
   res.json({ 
-    message: "Student Management API Running",
+    message: "School Management API Running",
     version: "2.0.0",
     features: [
       "Authentication",
@@ -105,7 +114,12 @@ app.use("/api/report-cards", reportCardRoutes);
 app.use("/api/logs", logRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/notifications", notificationRoutes);
-app.use("/api/announcements", announcementRoutes);
+app.use("/api/exam-analytics", examAnalyticsRoutes);
+app.use("/api/role-permissions", rolePermissionRoutes);
+app.use("/api/assets", assetRoutes);
+app.use("/api/maintenance", maintenanceRoutes);
+app.use("/api/certificates", certificateRoutes);
+app.use("/api/certificate-templates", certificateTemplateRoutes);
 
 // Error handler middleware (must be last)
 app.use(errorHandler);

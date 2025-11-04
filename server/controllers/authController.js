@@ -117,9 +117,8 @@ export const updateUserProfile = async (req, res) => {
       user.phone = req.body.phone || user.phone;
       user.address = req.body.address || user.address;
 
-      if (req.body.password) {
-        user.password = req.body.password;
-      }
+      // Don't allow password change through profile update for security
+      // Use dedicated change-password endpoint instead
 
       const updatedUser = await user.save();
 
@@ -135,6 +134,50 @@ export const updateUserProfile = async (req, res) => {
     } else {
       res.status(404).json({ message: "User not found" });
     }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Change password
+// @route   PUT /api/auth/change-password
+// @access  Private
+export const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: "Please provide current and new password" });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "New password must be at least 6 characters" });
+    }
+
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Verify current password
+    const isPasswordCorrect = await user.matchPassword(currentPassword);
+    if (!isPasswordCorrect) {
+      return res.status(401).json({ message: "Current password is incorrect" });
+    }
+
+    // Set new password
+    user.password = newPassword;
+    await user.save();
+
+    res.json({
+      message: "Password changed successfully",
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      token: generateToken(user._id),
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

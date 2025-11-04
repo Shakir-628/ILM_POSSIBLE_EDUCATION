@@ -1,5 +1,7 @@
 import Timetable from "../models/Timetable.js";
 import Class from "../models/Class.js";
+import ExcelJS from "exceljs";
+import PDFDocument from "pdfkit";
 
 // @desc    Get all timetables
 // @route   GET /api/timetables
@@ -290,6 +292,354 @@ export const checkConflicts = async (req, res) => {
     });
   } catch (error) {
     console.error("Check conflicts error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// @desc    Export timetable to Excel
+// @route   GET /api/timetables/:id/export/excel
+// @access  Private
+export const exportToExcel = async (req, res) => {
+  try {
+    const timetable = await Timetable.findById(req.params.id)
+      .populate("class", "className grade section")
+      .populate({
+        path: "schedule.periods.subject",
+        select: "subjectName subjectCode",
+      })
+      .populate({
+        path: "schedule.periods.teacher",
+        select: "firstName lastName",
+      });
+
+    if (!timetable) {
+      return res.status(404).json({
+        success: false,
+        message: "Timetable not found",
+      });
+    }
+
+    // Create workbook and worksheet
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Timetable");
+
+    // Set column widths
+    worksheet.columns = [
+      { header: "Time", key: "time", width: 20 },
+      { header: "Monday", key: "monday", width: 25 },
+      { header: "Tuesday", key: "tuesday", width: 25 },
+      { header: "Wednesday", key: "wednesday", width: 25 },
+      { header: "Thursday", key: "thursday", width: 25 },
+      { header: "Friday", key: "friday", width: 25 },
+      { header: "Saturday", key: "saturday", width: 25 },
+    ];
+
+    // Add title row
+    worksheet.mergeCells("A1:G1");
+    const titleCell = worksheet.getCell("A1");
+    titleCell.value = `${timetable.class.className} - ${timetable.class.grade} ${timetable.class.section || ""} - Academic Year ${timetable.academicYear}`;
+    titleCell.font = { bold: true, size: 16, color: { argb: "FFFFFFFF" } };
+    titleCell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FF0070C0" },
+    };
+    titleCell.alignment = { horizontal: "center", vertical: "middle" };
+    worksheet.getRow(1).height = 30;
+
+    // Style header row
+    const headerRow = worksheet.getRow(2);
+    headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };
+    headerRow.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FF0070C0" },
+    };
+    headerRow.alignment = { horizontal: "center", vertical: "middle" };
+    headerRow.height = 25;
+
+    // Time slots
+    const timeSlots = [
+      { label: "08:00 - 08:45", isBreak: false },
+      { label: "08:45 - 09:30", isBreak: false },
+      { label: "09:30 - 10:15", isBreak: false },
+      { label: "10:15 - 10:30", isBreak: true, name: "Break" },
+      { label: "10:30 - 11:15", isBreak: false },
+      { label: "11:15 - 12:00", isBreak: false },
+      { label: "12:00 - 12:45", isBreak: false },
+      { label: "12:45 - 13:00", isBreak: true, name: "Lunch" },
+      { label: "13:00 - 13:45", isBreak: false },
+      { label: "13:45 - 14:30", isBreak: false },
+    ];
+
+    const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+    
+    let periodIndex = 0;
+    timeSlots.forEach((slot, slotIndex) => {
+      const row = worksheet.getRow(slotIndex + 3);
+      row.getCell(1).value = slot.label;
+
+      if (slot.isBreak) {
+        // Break row
+        worksheet.mergeCells(`B${slotIndex + 3}:G${slotIndex + 3}`);
+        const breakCell = row.getCell(2);
+        breakCell.value = slot.name;
+        breakCell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFFFF4CC" },
+        };
+        breakCell.font = { bold: true };
+        breakCell.alignment = { horizontal: "center", vertical: "middle" };
+      } else {
+        // Regular period row
+        daysOfWeek.forEach((day, dayIndex) => {
+          const daySchedule = timetable.schedule.find((s) => s.day.toLowerCase() === day);
+          if (daySchedule && daySchedule.periods[periodIndex]) {
+            const period = daySchedule.periods[periodIndex];
+            let cellValue = "";
+
+            if (period.subject && period.teacher) {
+              cellValue = `${period.subject.subjectName}\n${period.teacher.firstName} ${period.teacher.lastName}`;
+              if (period.roomNumber) cellValue += `\nRoom: ${period.roomNumber}`;
+            } else {
+              cellValue = "Free Period";
+            }
+
+            const cell = row.getCell(dayIndex + 2);
+            cell.value = cellValue;
+            cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+            
+            if (period.subject) {
+              cell.fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: { argb: "FFE7F3FF" },
+              };
+            }
+          }
+        });
+        periodIndex++;
+      }
+
+      row.height = slot.isBreak ? 25 : 50;
+      row.border = {
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" },
+      };
+    });
+
+    // Add borders to all cells
+    worksheet.eachRow((row, rowNumber) => {
+      row.eachCell((cell) => {
+        cell.border = {
+          top: { style: "thin" },
+          left: { style: "thin" },
+          bottom: { style: "thin" },
+          right: { style: "thin" },
+        };
+      });
+    });
+
+    // Set response headers
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=timetable_${timetable.class.className}_${Date.now()}.xlsx`
+    );
+
+    // Write to response
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (error) {
+    console.error("Export to Excel error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// @desc    Export timetable to PDF
+// @route   GET /api/timetables/:id/export/pdf
+// @access  Private
+export const exportToPDF = async (req, res) => {
+  try {
+    const timetable = await Timetable.findById(req.params.id)
+      .populate("class", "className grade section")
+      .populate({
+        path: "schedule.periods.subject",
+        select: "subjectName subjectCode",
+      })
+      .populate({
+        path: "schedule.periods.teacher",
+        select: "firstName lastName",
+      });
+
+    if (!timetable) {
+      return res.status(404).json({
+        success: false,
+        message: "Timetable not found",
+      });
+    }
+
+    // Create PDF document in landscape mode
+    const doc = new PDFDocument({ size: "A4", layout: "landscape", margin: 30 });
+
+    // Set response headers
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=timetable_${timetable.class.className}_${Date.now()}.pdf`
+    );
+
+    // Pipe PDF to response
+    doc.pipe(res);
+
+    // Add title
+    doc.fontSize(18).font("Helvetica-Bold").fillColor("#0070C0").text(
+      `${timetable.class.className} - ${timetable.class.grade} ${timetable.class.section || ""}`,
+      { align: "center" }
+    );
+    doc.fontSize(12).fillColor("#666666").text(`Academic Year: ${timetable.academicYear}`, {
+      align: "center",
+    });
+    doc.moveDown(1);
+
+    // Table settings
+    const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const timeSlots = [
+      { label: "08:00 - 08:45", isBreak: false },
+      { label: "08:45 - 09:30", isBreak: false },
+      { label: "09:30 - 10:15", isBreak: false },
+      { label: "10:15 - 10:30", isBreak: true, name: "☕ BREAK" },
+      { label: "10:30 - 11:15", isBreak: false },
+      { label: "11:15 - 12:00", isBreak: false },
+      { label: "12:00 - 12:45", isBreak: false },
+      { label: "12:45 - 13:00", isBreak: true, name: "🍽️ LUNCH" },
+      { label: "13:00 - 13:45", isBreak: false },
+      { label: "13:45 - 14:30", isBreak: false },
+    ];
+
+    const tableTop = doc.y;
+    const tableLeft = 30;
+    const colWidth = 110;
+    const rowHeight = 50;
+    const headerHeight = 30;
+
+    // Draw header
+    doc.fillColor("#0070C0").rect(tableLeft, tableTop, colWidth * 7, headerHeight).fill();
+
+    // Header text
+    doc.fontSize(9).font("Helvetica-Bold").fillColor("white");
+    ["Time", ...daysOfWeek].forEach((header, i) => {
+      doc.text(header, tableLeft + i * colWidth + 5, tableTop + 10, {
+        width: colWidth - 10,
+        align: "center",
+      });
+    });
+
+    let currentY = tableTop + headerHeight;
+    let periodIndex = 0;
+
+    // Draw timetable rows
+    timeSlots.forEach((slot) => {
+      if (slot.isBreak) {
+        // Draw break row
+        doc.fillColor("#FFF4CC").rect(tableLeft, currentY, colWidth * 7, rowHeight * 0.6).fill();
+        doc.strokeColor("#000000").rect(tableLeft, currentY, colWidth * 7, rowHeight * 0.6).stroke();
+
+        doc.fontSize(8).font("Helvetica").fillColor("#000000");
+        doc.text(slot.label, tableLeft + 5, currentY + 10, { width: colWidth - 10 });
+        doc.font("Helvetica-Bold").text(slot.name, tableLeft + colWidth, currentY + 10, {
+          width: colWidth * 6 - 10,
+          align: "center",
+        });
+
+        currentY += rowHeight * 0.6;
+      } else {
+        // Draw regular period row
+        doc.fillColor("#FFFFFF").rect(tableLeft, currentY, colWidth * 7, rowHeight).fill();
+        doc.strokeColor("#000000");
+
+        // Draw borders for each cell
+        for (let i = 0; i <= 7; i++) {
+          doc.moveTo(tableLeft + i * colWidth, currentY)
+            .lineTo(tableLeft + i * colWidth, currentY + rowHeight)
+            .stroke();
+        }
+        doc.moveTo(tableLeft, currentY).lineTo(tableLeft + colWidth * 7, currentY).stroke();
+        doc.moveTo(tableLeft, currentY + rowHeight)
+          .lineTo(tableLeft + colWidth * 7, currentY + rowHeight)
+          .stroke();
+
+        // Time slot
+        doc.fontSize(7).font("Helvetica").fillColor("#000000");
+        doc.text(slot.label, tableLeft + 5, currentY + 5, { width: colWidth - 10 });
+
+        // Periods for each day
+        daysOfWeek.forEach((day, dayIndex) => {
+          const daySchedule = timetable.schedule.find((s) => s.day === day);
+          if (daySchedule && daySchedule.periods[periodIndex]) {
+            const period = daySchedule.periods[periodIndex];
+            const x = tableLeft + (dayIndex + 1) * colWidth + 5;
+            const y = currentY + 5;
+
+            if (period.subject && period.teacher) {
+              doc.fontSize(8).font("Helvetica-Bold").fillColor("#000000");
+              doc.text(period.subject.subjectName, x, y, {
+                width: colWidth - 10,
+                align: "center",
+              });
+
+              doc.fontSize(7).font("Helvetica").fillColor("#666666");
+              doc.text(
+                `${period.teacher.firstName} ${period.teacher.lastName}`,
+                x,
+                y + 15,
+                { width: colWidth - 10, align: "center" }
+              );
+
+              if (period.roomNumber) {
+                doc.fontSize(6).fillColor("#999999");
+                doc.text(`Room: ${period.roomNumber}`, x, y + 30, {
+                  width: colWidth - 10,
+                  align: "center",
+                });
+              }
+            } else {
+              doc.fontSize(7).font("Helvetica-Oblique").fillColor("#CCCCCC");
+              doc.text("Free Period", x, y + 15, { width: colWidth - 10, align: "center" });
+            }
+          }
+        });
+
+        currentY += rowHeight;
+        periodIndex++;
+      }
+    });
+
+    // Add footer
+    doc.fontSize(8).font("Helvetica").fillColor("#666666");
+    doc.text(
+      `Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`,
+      tableLeft,
+      currentY + 20,
+      { align: "center", width: colWidth * 7 }
+    );
+
+    // Finalize PDF
+    doc.end();
+  } catch (error) {
+    console.error("Export to PDF error:", error);
     res.status(500).json({
       success: false,
       message: error.message,

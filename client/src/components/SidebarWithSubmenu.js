@@ -23,6 +23,10 @@ import {
   CogIcon,
   ChevronDownIcon,
   ChevronRightIcon,
+  CubeIcon,
+  WrenchScrewdriverIcon,
+  DocumentChartBarIcon,
+  ClipboardDocumentListIcon,
 } from '@heroicons/react/24/outline';
 
 const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
@@ -52,6 +56,7 @@ const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
       submenu: [
         { name: 'All Students', href: '/students', roles: ['admin', 'teacher'] },
         { name: 'Admissions', href: '/admissions', roles: ['admin'] },
+        { name: 'ID Cards', href: '/student-id-cards', roles: ['admin'] },
       ],
     },
     {
@@ -62,6 +67,7 @@ const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
         { name: 'All Teachers', href: '/teachers', roles: ['admin'] },
         { name: 'Performance Review', href: '/teacher-performance', roles: ['admin'] },
         { name: 'Payroll', href: '/teacher-payroll', roles: ['admin'] },
+        { name: 'ID Cards', href: '/teacher-id-cards', roles: ['admin'] },
       ],
     },
     {
@@ -168,19 +174,18 @@ const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
       icon: FolderIcon,
       roles: ['admin', 'teacher', 'student', 'parent'],
       submenu: [
-        { name: 'My Documents', href: '/documents', roles: ['admin', 'teacher', 'student', 'parent'] },
         { name: 'Certificates', href: '/certificates', roles: ['admin', 'student', 'parent'] },
         { name: 'Document Templates', href: '/documents/templates', roles: ['admin'] },
       ],
     },
     {
       name: 'Inventory',
-      icon: FolderIcon,
-      roles: ['admin'],
+      icon: CubeIcon,
+      roles: ['admin', 'superadmin', 'teacher'],
       submenu: [
-        { name: 'Assets', href: '/inventory/assets', roles: ['admin'] },
-        { name: 'Maintenance', href: '/inventory/maintenance', roles: ['admin'] },
-        { name: 'Reports', href: '/inventory/reports', roles: ['admin'] },
+        { name: 'Assets', href: '/assets', roles: ['admin', 'superadmin', 'teacher'] },
+        { name: 'Maintenance', href: '/maintenance', roles: ['admin', 'superadmin', 'teacher'] },
+        { name: 'Inventory Reports', href: '/inventory-reports', roles: ['admin', 'superadmin', 'teacher'] },
       ],
     },
     {
@@ -191,13 +196,22 @@ const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
     },
     {
       name: 'Reports',
-      icon: ChartBarIcon,
-      roles: ['admin', 'teacher'],
+      icon: DocumentChartBarIcon,
+      roles: ['admin', 'teacher', 'superadmin'],
       submenu: [
-        { name: 'Student Reports', href: '/reports/students', roles: ['admin', 'teacher'] },
-        { name: 'Attendance Reports', href: '/reports/attendance', roles: ['admin', 'teacher'] },
-        { name: 'Financial Reports', href: '/reports/financial', roles: ['admin'] },
-        { name: 'Custom Reports', href: '/reports/custom', roles: ['admin'] },
+        { name: 'Student Reports', href: '/reports/student', roles: ['admin', 'teacher', 'superadmin'] },
+        { name: 'Attendance Reports', href: '/reports/attendance', roles: ['admin', 'teacher', 'superadmin'] },
+        { name: 'Financial Reports', href: '/reports/financial', roles: ['admin', 'superadmin'] },
+        { name: 'Custom Reports', href: '/reports/custom', roles: ['admin', 'teacher', 'superadmin'] },
+      ],
+    },
+    {
+      name: 'Logs',
+      icon: ClipboardDocumentListIcon,
+      roles: ['admin', 'superadmin'],
+      submenu: [
+        { name: 'System Logs', href: '/system-logs', roles: ['admin', 'superadmin'] },
+        { name: 'Audit Logs', href: '/audit-logs', roles: ['admin', 'superadmin'] },
       ],
     },
     {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import Modal from '../components/Modal';
 import Table from '../components/Table';
 import Select from '../components/Select';
 import Input from '../components/Input';
@@ -23,6 +24,7 @@ const AuditLogs = () => {
   const [loading, setLoading] = useState(true);
   const [selectedLog, setSelectedLog] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isCleanupModalOpen, setIsCleanupModalOpen] = useState(false);
 
   // Filters
   const [filters, setFilters] = useState({
@@ -84,17 +86,20 @@ const AuditLogs = () => {
     }));
   };
 
-  const handleCleanup = async () => {
-    if (window.confirm('Are you sure you want to delete audit logs older than 90 days?')) {
-      try {
-        const response = await auditService.cleanupOldLogs(90);
-        toast.success(response.message);
-        fetchLogs();
-        fetchStats();
-      } catch (error) {
-        console.error('Error cleaning up logs:', error);
-        toast.error('Failed to cleanup logs');
-      }
+  const handleCleanupClick = () => {
+    setIsCleanupModalOpen(true);
+  };
+
+  const handleCleanupConfirm = async () => {
+    try {
+      const response = await auditService.cleanupOldLogs(90);
+      toast.success(response.message || 'Audit logs cleaned up successfully');
+      setIsCleanupModalOpen(false);
+      fetchLogs();
+      fetchStats();
+    } catch (error) {
+      console.error('Error cleaning up logs:', error);
+      toast.error('Failed to cleanup logs');
     }
   };
 
@@ -180,7 +185,7 @@ const AuditLogs = () => {
               Track all user actions and entity changes
             </p>
           </div>
-          <Button onClick={handleCleanup} variant="secondary" icon={TrashIcon}>
+          <Button onClick={handleCleanupClick} variant="secondary" icon={TrashIcon}>
             Cleanup Old Logs
           </Button>
         </div>
@@ -389,6 +394,55 @@ const AuditLogs = () => {
             </div>
           </div>
         )}
+
+        {/* Cleanup Confirmation Modal */}
+        <Modal
+          isOpen={isCleanupModalOpen}
+          onClose={() => setIsCleanupModalOpen(false)}
+          title="Cleanup Old Audit Logs"
+          size="md"
+        >
+          <div className="space-y-4">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <TrashIcon className="h-5 w-5 text-yellow-400" />
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-yellow-800">
+                    Warning: This action cannot be undone
+                  </h3>
+                  <div className="mt-2 text-sm text-yellow-700">
+                    <p>
+                      This will permanently delete all audit logs older than 90 days.
+                      This includes all user actions, entity changes, and access records.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 rounded-md p-4">
+              <p className="text-sm text-gray-700">
+                <strong>Important:</strong> Deleted audit logs cannot be recovered. Make sure you have backed up any logs you need to retain for compliance or legal purposes.
+              </p>
+            </div>
+
+            <div className="flex justify-end space-x-3 pt-4">
+              <Button type="button" variant="secondary" onClick={() => setIsCleanupModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button 
+                type="button" 
+                variant="danger" 
+                onClick={handleCleanupConfirm}
+                icon={TrashIcon}
+              >
+                Yes, Delete Old Logs
+              </Button>
+            </div>
+          </div>
+        </Modal>
       </div>
     </Layout>
   );

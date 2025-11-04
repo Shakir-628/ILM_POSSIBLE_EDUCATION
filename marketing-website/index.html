@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ILM Possible Education - Complete School Management System</title>
+    <meta name="description" content="Modern, comprehensive school management system for educational institutions. Manage students, teachers, attendance, grades, fees, and more.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:%234F46E5;stop-opacity:1'/><stop offset='100%' style='stop-color:%238B5CF6;stop-opacity:1'/></linearGradient></defs><rect width='100' height='100' rx='20' fill='url(%23grad)'/><text x='50' y='70' font-size='60' font-weight='bold' text-anchor='middle' fill='white' font-family='Arial'>I</text></svg>" type="image/svg+xml">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#4F46E5',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            500: '#8B5CF6',
+                            600: '#7C3AED',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Enhanced Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Particle Background -->
+    <div id="particles-container" class="particles-container"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar bg-white shadow-lg fixed w-full top-0 z-50" style="transition: transform 0.3s ease;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center space-x-2">
+                    <div class="text-2xl font-bold gradient-text">ILM Possible</div>
+                    <span class="text-sm text-gray-500 hidden sm:block">Education</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#features" class="text-gray-700 hover:text-primary-600 font-medium transition">Features</a>
+                    <a href="#modules" class="text-gray-700 hover:text-primary-600 font-medium transition">Modules</a>
+                    <a href="#benefits" class="text-gray-700 hover:text-primary-600 font-medium transition">Benefits</a>
+                    <a href="#contact" class="text-gray-700 hover:text-primary-600 font-medium transition">Contact</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Theme Toggle -->
+                    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                        <span id="theme-icon" class="theme-toggle-slider">☀️</span>
+                    </button>
+                    
+                    <a href="http://localhost:3000/login" class="hidden sm:inline-block text-primary-600 hover:text-primary-700 font-semibold transition">
+                        Login
+                    </a>
+                    <a href="http://localhost:3000/login" class="btn-primary">
+                        Get Started
+                    </a>
+                    
+                    <!-- Mobile Menu Button -->
+                    <button id="mobile-menu-button" class="md:hidden text-gray-700 hover:text-primary-600 focus:outline-none" aria-label="Open menu">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+    <div id="mobile-menu" class="mobile-menu">
+        <div class="flex justify-between items-center mb-8">
+            <div class="text-2xl font-bold gradient-text">ILM Possible</div>
+            <button id="mobile-menu-close" class="text-gray-700 hover:text-primary-600" aria-label="Close menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <nav class="flex flex-col space-y-4">
+            <a href="#features" class="text-lg font-medium text-gray-700 hover:text-primary-600 transition py-2">Features</a>
+            <a href="#modules" class="text-lg font-medium text-gray-700 hover:text-primary-600 transition py-2">Modules</a>
+            <a href="#benefits" class="text-lg font-medium text-gray-700 hover:text-primary-600 transition py-2">Benefits</a>
+            <a href="#contact" class="text-lg font-medium text-gray-700 hover:text-primary-600 transition py-2">Contact</a>
+            <hr class="border-gray-200 my-4">
+            <a href="http://localhost:3000/login" class="text-lg font-medium text-primary-600 hover:text-primary-700 transition py-2">Login</a>
+            <a href="http://localhost:3000/login" class="btn-primary text-center">Get Started</a>
+        </nav>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="main-content" class="hero-section pt-24 pb-20 bg-gradient-to-br from-primary-50 via-purple-50 to-pink-50 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="text-center md:text-left scroll-reveal">
+                    <h1 class="text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight animate-fade-in-up">
+                        Transform Your
+                        <span class="gradient-text block mt-2 animate-gradient">School Management</span>
+                    </h1>
+                    <p class="mt-6 text-xl text-gray-600 leading-relaxed animate-fade-in-up" style="animation-delay: 0.2s;">
+                        Complete, modern solution for educational institutions. Streamline operations, enhance communication, and improve student outcomes.
+                    </p>
+                    <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-fade-in-up" style="animation-delay: 0.4s;">
+                        <a href="http://localhost:3000/login" class="btn-primary animate-pulse-glow">
+                            Start Free Trial
+                        </a>
+                        <a href="#features" class="btn-secondary">
+                            Learn More
+                        </a>
+                    </div>
+                    <div class="mt-8 flex items-center gap-8 justify-center md:justify-start text-sm text-gray-600 animate-fade-in-up" style="animation-delay: 0.6s;">
+                        <div class="flex items-center animate-bounce" style="animation-delay: 0.8s;">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            Free Setup
+                        </div>
+                        <div class="flex items-center animate-bounce" style="animation-delay: 1s;">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            24/7 Support
+                        </div>
+                        <div class="flex items-center animate-bounce" style="animation-delay: 1.2s;">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            No Credit Card
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden md:block scroll-reveal-right">
+                    <div class="relative animate-float">
+                        <div class="absolute inset-0 bg-gradient-to-r from-primary-400 to-secondary-400 rounded-3xl blur-2xl opacity-30 animate-pulse-glow"></div>
+                        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&h=400&fit=crop" alt="School Management" class="relative rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-500">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-12 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div class="scroll-reveal hover-lift">
+                    <div class="stat-number">50+</div>
+                    <div class="text-gray-600 mt-2">Features</div>
+                </div>
+                <div class="scroll-reveal hover-lift" style="transition-delay: 0.1s;">
+                    <div class="stat-number">1000+</div>
+                    <div class="text-gray-600 mt-2">Schools Using</div>
+                </div>
+                <div class="scroll-reveal hover-lift" style="transition-delay: 0.2s;">
+                    <div class="stat-number">99.9%</div>
+                    <div class="text-gray-600 mt-2">Uptime</div>
+                </div>
+                <div class="scroll-reveal hover-lift" style="transition-delay: 0.3s;">
+                    <div class="stat-number">24/7</div>
+                    <div class="text-gray-600 mt-2">Support</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4 animate-fade-in-up">
+                    Everything You Need to Manage Your School
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in-up" style="animation-delay: 0.2s;">
+                    Comprehensive features designed for modern educational institutions
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl">
+                    <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Student Management</h3>
+                    <p class="text-gray-600">Complete student profiles, admissions, attendance tracking, and performance analytics.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl">
+                    <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Academic Excellence</h3>
+                    <p class="text-gray-600">Timetable management, assignments, exams, grades, and report cards in one place.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl">
+                    <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Financial Management</h3>
+                    <p class="text-gray-600">Fee collection, invoicing, expense tracking, payroll, and comprehensive reports.</p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl">
+                    <div class="w-14 h-14 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Attendance Tracking</h3>
+                    <p class="text-gray-600">Real-time attendance, automated alerts, detailed analytics, and parent notifications.</p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl">
+                    <div class="w-14 h-14 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Certificates & Documents</h3>
+                    <p class="text-gray-600">Generate certificates, ID cards, transfer certificates with digital verification.</p>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl">
+                    <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Analytics & Reports</h3>
+                    <p class="text-gray-600">Powerful insights, customizable reports, and data-driven decision making tools.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modules Section -->
+    <section id="modules" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                    Comprehensive Feature Set
+                </h2>
+                <p class="text-xl text-gray-600">
+                    Every module you need, all in one platform
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="module-card bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl scroll-reveal">
+                    <h4 class="font-bold text-gray-900 mb-3">👥 Student Module</h4>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        <li>• Student Profiles</li>
+                        <li>• Admission Management</li>
+                        <li>• ID Card Generation</li>
+                        <li>• Attendance Tracking</li>
+                    </ul>
+                </div>
+
+                <div class="module-card bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl scroll-reveal" style="transition-delay: 0.1s;">
+                    <h4 class="font-bold text-gray-900 mb-3">👨‍🏫 Teacher Module</h4>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        <li>• Teacher Profiles</li>
+                        <li>• Performance Reviews</li>
+                        <li>• Payroll Management</li>
+                        <li>• Subject Assignment</li>
+                    </ul>
+                </div>
+
+                <div class="module-card bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl scroll-reveal" style="transition-delay: 0.2s;">
+                    <h4 class="font-bold text-gray-900 mb-3">📚 Academic Module</h4>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        <li>• Class Management</li>
+                        <li>• Timetable Creation</li>
+                        <li>• Assignment System</li>
+                        <li>• Exam Schedules</li>
+                    </ul>
+                </div>
+
+                <div class="module-card bg-gradient-to-br from-yellow-50 to-yellow-100 p-6 rounded-xl scroll-reveal" style="transition-delay: 0.3s;">
+                    <h4 class="font-bold text-gray-900 mb-3">💰 Finance Module</h4>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        <li>• Fee Management</li>
+                        <li>• Payment Tracking</li>
+                        <li>• Invoicing System</li>
+                        <li>• Financial Reports</li>
+                    </ul>
+                </div>
+
+                <div class="module-card bg-gradient-to-br from-red-50 to-red-100 p-6 rounded-xl scroll-reveal" style="transition-delay: 0.4s;">
+                    <h4 class="font-bold text-gray-900 mb-3">📊 Reports & Analytics</h4>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        <li>• Performance Analytics</li>
+                        <li>• Custom Reports</li>
+                        <li>• Export to PDF/Excel</li>
+                        <li>• Real-time Dashboard</li>
+                    </ul>
+                </div>
+
+                <div class="module-card bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-xl scroll-reveal" style="transition-delay: 0.5s;">
+                    <h4 class="font-bold text-gray-900 mb-3">📢 Communication</h4>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        <li>• Announcements</li>
+                        <li>• Messaging System</li>
+                        <li>• Email Notifications</li>
+                        <li>• SMS Alerts</li>
+                    </ul>
+                </div>
+
+                <div class="module-card bg-gradient-to-br from-pink-50 to-pink-100 p-6 rounded-xl scroll-reveal" style="transition-delay: 0.6s;">
+                    <h4 class="font-bold text-gray-900 mb-3">📜 Certificates</h4>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        <li>• Digital Certificates</li>
+                        <li>• Custom Templates</li>
+                        <li>• QR Verification</li>
+                        <li>• Bulk Generation</li>
+                    </ul>
+                </div>
+
+                <div class="module-card bg-gradient-to-br from-teal-50 to-teal-100 p-6 rounded-xl scroll-reveal" style="transition-delay: 0.7s;">
+                    <h4 class="font-bold text-gray-900 mb-3">🔒 Security</h4>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        <li>• Role-Based Access</li>
+                        <li>• Audit Logging</li>
+                        <li>• Data Encryption</li>
+                        <li>• Backup System</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section id="benefits" class="py-20 bg-gradient-to-br from-primary-600 to-secondary-600 text-white relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="text-4xl font-bold mb-4 animate-fade-in-up">Why Choose ILM Possible?</h2>
+                <p class="text-xl text-primary-100 animate-fade-in-up" style="animation-delay: 0.2s;">Built by educators, for educators</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center scroll-reveal hover-lift">
+                    <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Lightning Fast</h3>
+                    <p class="text-primary-100">Optimized performance for instant access to all features</p>
+                </div>
+
+                <div class="text-center scroll-reveal hover-lift" style="transition-delay: 0.2s;">
+                    <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse-glow">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Secure & Reliable</h3>
+                    <p class="text-primary-100">Enterprise-grade security with automatic backups</p>
+                </div>
+
+                <div class="text-center scroll-reveal hover-lift" style="transition-delay: 0.4s;">
+                    <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Beautiful UI</h3>
+                    <p class="text-primary-100">Modern, intuitive interface designed for all users</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-gray-50 relative overflow-hidden">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center scroll-reveal">
+            <h2 class="text-4xl font-bold text-gray-900 mb-6 animate-fade-in-up">
+                Ready to Transform Your School?
+            </h2>
+            <p class="text-xl text-gray-600 mb-10 animate-fade-in-up" style="animation-delay: 0.2s;">
+                Join hundreds of schools already using ILM Possible Education
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up" style="animation-delay: 0.4s;">
+                <a href="http://localhost:3000/login" class="btn-primary animate-pulse-glow">
+                    Start Your Free Trial
+                </a>
+                <a href="#contact" class="btn-secondary">
+                    Request Demo
+                </a>
+            </div>
+            <p class="mt-6 text-sm text-gray-500">No credit card required • 30-day free trial • Cancel anytime</p>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-white">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12 scroll-reveal">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4 animate-fade-in-up">Get In Touch</h2>
+                <p class="text-xl text-gray-600 animate-fade-in-up" style="animation-delay: 0.2s;">Have questions? We're here to help!</p>
+            </div>
+
+            <form class="space-y-6 scroll-reveal">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                        <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Your name">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="you@school.com">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">School Name</label>
+                    <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Your school name">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                    <textarea rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Tell us about your requirements..."></textarea>
+                </div>
+                <button type="submit" class="w-full btn-primary hover-glow">
+                    Send Message
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="md:col-span-2">
+                    <div class="text-2xl font-bold gradient-text mb-4">ILM Possible Education</div>
+                    <p class="text-gray-400 mb-4">
+                        Empowering educational institutions in Karachi and across Pakistan with modern, comprehensive school management solutions.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="https://wa.me/923232207839" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-green-500 transition" title="WhatsApp">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        </a>
+                        <a href="mailto:mshakir628@gmail.com" class="text-gray-400 hover:text-blue-500 transition" title="Email">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                        </a>
+                        <a href="tel:+923232207839" class="text-gray-400 hover:text-green-400 transition" title="Call: +92-323-2207839">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                            </svg>
+                        </a>
+                        <a href="tel:+923433463246" class="text-gray-400 hover:text-blue-400 transition" title="Call: +92-343-3463246">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#features" class="hover:text-white transition">Features</a></li>
+                        <li><a href="#modules" class="hover:text-white transition">Modules</a></li>
+                        <li><a href="http://localhost:3000/login" class="hover:text-white transition">Login</a></li>
+                        <li><a href="#contact" class="hover:text-white transition">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold mb-4">Contact Info</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li>
+                            <a href="mailto:mshakir628@gmail.com" class="hover:text-white transition inline-flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                                mshakir628@gmail.com
+                            </a>
+                        </li>
+                        <li>
+                            <a href="tel:+923232207839" class="hover:text-white transition inline-flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                                </svg>
+                                +92-323-2207839
+                            </a>
+                        </li>
+                        <li>
+                            <a href="tel:+923433463246" class="hover:text-white transition inline-flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                </svg>
+                                +92-343-3463246 (Alt)
+                            </a>
+                        </li>
+                        <li class="inline-flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            Malir, Karachi, Pakistan
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 ILM Possible Education. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
+

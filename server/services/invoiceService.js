@@ -30,7 +30,7 @@ export const generateFeeInvoice = async (payment, student) => {
       .fontSize(20)
       .text("ILM POSSIBLE EDUCATION", 50, 50, { align: "center" })
       .fontSize(10)
-      .text("Student Management System", { align: "center" })
+      .text("School Management System", { align: "center" })
       .text("Email: info@ilmpossible.com | Phone: +92-300-1234567", { align: "center" })
       .moveDown(2);
 

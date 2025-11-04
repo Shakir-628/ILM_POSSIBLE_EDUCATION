@@ -1,7 +1,7 @@
 {
   "name": "student-management-system",
   "version": "1.0.0",
-  "description": "MERN Stack Student Management System",
+  "description": "MERN Stack School Management System",
   "main": "index.js",
   "scripts": {
     "start": "concurrently \"npm run server\" \"npm run client\"",

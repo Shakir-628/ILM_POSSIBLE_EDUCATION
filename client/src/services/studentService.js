@@ -75,7 +75,46 @@ export const studentService = {
     return response.data;
   },
 
-  // Generate ID card for single student
+  // Download single ID card
+  downloadIDCard: async (id) => {
+    const response = await api.get(`/students/${id}/id-card`, {
+      responseType: 'blob',
+    });
+    
+    // Create download link
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `student_id_card_${id}_${Date.now()}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+    
+    return response.data;
+  },
+
+  // Download bulk ID cards
+  downloadBulkIDCards: async (studentIds) => {
+    const response = await api.post('/students/bulk-id-cards', 
+      { studentIds },
+      { responseType: 'blob' }
+    );
+    
+    // Create download link
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `student_id_cards_${Date.now()}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+    
+    return response.data;
+  },
+
+  // Generate ID card for single student (legacy - use downloadIDCard instead)
   generateIDCard: async (studentId) => {
     const response = await api.get(`/students/${studentId}/id-card`, {
       responseType: 'blob',
@@ -83,7 +122,7 @@ export const studentService = {
     return response.data;
   },
 
-  // Generate bulk ID cards
+  // Generate bulk ID cards (legacy - use downloadBulkIDCards instead)
   generateBulkIDCards: async (studentIds) => {
     const response = await api.post('/students/bulk-id-cards', 
       { studentIds },

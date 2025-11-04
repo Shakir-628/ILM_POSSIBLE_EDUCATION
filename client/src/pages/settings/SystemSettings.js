@@ -20,11 +20,12 @@ const SystemSettings = () => {
     
     enableAttendance: true,
     enableFees: true,
-    enableLibrary: true,
-    enableTransport: true,
-    enableHostel: true,
     enableSMS: false,
     enableEmail: true,
+    // Optional modules (hidden):
+    // enableLibrary: true,
+    // enableTransport: true,
+    // enableHostel: true,
     
     sessionTimeout: 30,
     passwordMinLength: 6,
@@ -282,12 +283,13 @@ const SystemSettings = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[
                 { name: 'enableAttendance', label: 'Attendance Module' },
-                { name: 'enableFees', label: 'Fees Module' },
-                { name: 'enableLibrary', label: 'Library Module' },
-                { name: 'enableTransport', label: 'Transport Module' },
-                { name: 'enableHostel', label: 'Hostel Module' },
+                { name: 'enableFees', label: 'Fee Management' },
                 { name: 'enableSMS', label: 'SMS Notifications' },
                 { name: 'enableEmail', label: 'Email Notifications' },
+                // Temporarily hidden - Optional modules:
+                // { name: 'enableLibrary', label: 'Library Module' },
+                // { name: 'enableTransport', label: 'Transport Module' },
+                // { name: 'enableHostel', label: 'Hostel Module' },
               ].map((module) => (
                 <label key={module.name} className="inline-flex items-center">
                   <input

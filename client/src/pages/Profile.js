@@ -67,26 +67,31 @@ const Profile = () => {
   // Change password
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setMessage({ type: '', text: '' });
 
     // Validation
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setMessage({ type: 'error', text: 'New passwords do not match' });
-      setLoading(false);
+    if (!passwordData.currentPassword) {
+      setMessage({ type: 'error', text: 'Please enter your current password' });
       return;
     }
 
     if (passwordData.newPassword.length < 6) {
-      setMessage({ type: 'error', text: 'Password must be at least 6 characters' });
-      setLoading(false);
+      setMessage({ type: 'error', text: 'New password must be at least 6 characters' });
       return;
     }
 
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setMessage({ type: 'error', text: 'New passwords do not match' });
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      await authService.updateProfile({
-        password: passwordData.newPassword,
-      });
+      await authService.changePassword(
+        passwordData.currentPassword,
+        passwordData.newPassword
+      );
 
       setMessage({ type: 'success', text: 'Password changed successfully!' });
       setPasswordData({
@@ -274,6 +279,16 @@ const Profile = () => {
                       <li>Avoid common words</li>
                     </ul>
                   </div>
+
+                  <Input
+                    label="Current Password"
+                    name="currentPassword"
+                    type="password"
+                    value={passwordData.currentPassword}
+                    onChange={handlePasswordChange}
+                    placeholder="Enter current password"
+                    required
+                  />
 
                   <Input
                     label="New Password"

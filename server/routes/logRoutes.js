@@ -10,8 +10,8 @@ import { authorize } from "../middleware/roleMiddleware.js";
 
 const router = express.Router();
 
-// All log routes require superadmin role
-router.use(protect, authorize("superadmin"));
+// All log routes require admin or superadmin role
+router.use(protect, authorize("admin", "superadmin"));
 
 router.get("/", getAllLogs);
 router.get("/stats", getLogStats);

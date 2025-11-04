@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import Modal from '../components/Modal';
 import Table from '../components/Table';
 import Select from '../components/Select';
 import Input from '../components/Input';
@@ -23,6 +24,7 @@ const SystemLogs = () => {
   const [loading, setLoading] = useState(true);
   const [selectedLog, setSelectedLog] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isCleanupModalOpen, setIsCleanupModalOpen] = useState(false);
 
   // Filters
   const [filters, setFilters] = useState({
@@ -35,6 +37,12 @@ const SystemLogs = () => {
     limit: 50,
   });
 
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalLogs: 0,
+  });
+
   useEffect(() => {
     fetchLogs();
     fetchStats();
@@ -44,7 +52,12 @@ const SystemLogs = () => {
     setLoading(true);
     try {
       const response = await logService.getAllLogs(filters);
-      setLogs(response.data);
+      setLogs(response.data || response.logs || []);
+      setPagination({
+        currentPage: response.currentPage || response.page || 1,
+        totalPages: response.totalPages || 1,
+        totalLogs: response.totalLogs || response.total || (response.data?.length || 0),
+      });
     } catch (error) {
       console.error('Error fetching logs:', error);
       toast.error('Failed to fetch logs');
@@ -73,17 +86,20 @@ const SystemLogs = () => {
     }));
   };
 
-  const handleCleanup = async () => {
-    if (window.confirm('Are you sure you want to delete logs older than 90 days?')) {
-      try {
-        const response = await logService.cleanupLogs(90);
-        toast.success(response.message);
-        fetchLogs();
-        fetchStats();
-      } catch (error) {
-        console.error('Error cleaning up logs:', error);
-        toast.error('Failed to cleanup logs');
-      }
+  const handleCleanupClick = () => {
+    setIsCleanupModalOpen(true);
+  };
+
+  const handleCleanupConfirm = async () => {
+    try {
+      const response = await logService.cleanupLogs(90);
+      toast.success(response.message || 'Logs cleaned up successfully');
+      setIsCleanupModalOpen(false);
+      fetchLogs();
+      fetchStats();
+    } catch (error) {
+      console.error('Error cleaning up logs:', error);
+      toast.error('Failed to cleanup logs');
     }
   };
 
@@ -156,7 +172,7 @@ const SystemLogs = () => {
               Monitor and track system activity and errors
             </p>
           </div>
-          <Button onClick={handleCleanup} variant="secondary" icon={TrashIcon}>
+          <Button onClick={handleCleanupClick} variant="secondary" icon={TrashIcon}>
             Cleanup Old Logs
           </Button>
         </div>
@@ -242,12 +258,29 @@ const SystemLogs = () => {
               onChange={(e) => handleFilterChange('endDate', e.target.value)}
             />
           </div>
+          {!loading && (
+            <div className="mt-2 text-sm text-gray-600">
+              Showing {logs.length} of {pagination.totalLogs} system logs
+            </div>
+          )}
         </div>
 
         {/* Logs Table */}
         <div className="bg-white shadow rounded-lg overflow-hidden">
           <Table columns={columns} data={logs} loading={loading} />
         </div>
+
+        {/* Pagination */}
+        {!loading && logs.length > 0 && (
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.totalLogs}
+            itemsPerPage={filters.limit}
+            onPageChange={(page) => handleFilterChange('page', page)}
+            onItemsPerPageChange={(limit) => handleFilterChange('limit', limit)}
+          />
+        )}
 
         {/* Log Detail Modal */}
         {isDetailModalOpen && selectedLog && (
@@ -351,6 +384,55 @@ const SystemLogs = () => {
             </div>
           </div>
         )}
+
+        {/* Cleanup Confirmation Modal */}
+        <Modal
+          isOpen={isCleanupModalOpen}
+          onClose={() => setIsCleanupModalOpen(false)}
+          title="Cleanup Old Logs"
+          size="md"
+        >
+          <div className="space-y-4">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <ExclamationTriangleIcon className="h-5 w-5 text-yellow-400" />
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-yellow-800">
+                    Warning: This action cannot be undone
+                  </h3>
+                  <div className="mt-2 text-sm text-yellow-700">
+                    <p>
+                      This will permanently delete all system logs older than 90 days.
+                      This action is irreversible and the logs cannot be recovered.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 rounded-md p-4">
+              <p className="text-sm text-gray-700">
+                Are you sure you want to proceed with cleaning up old logs?
+              </p>
+            </div>
+
+            <div className="flex justify-end space-x-3 pt-4">
+              <Button type="button" variant="secondary" onClick={() => setIsCleanupModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button 
+                type="button" 
+                variant="danger" 
+                onClick={handleCleanupConfirm}
+                icon={TrashIcon}
+              >
+                Yes, Delete Old Logs
+              </Button>
+            </div>
+          </div>
+        </Modal>
       </div>
     </Layout>
   );

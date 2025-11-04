@@ -7,6 +7,8 @@ import {
   updateTimetable,
   deleteTimetable,
   checkConflicts,
+  exportToExcel,
+  exportToPDF,
 } from "../controllers/timetableController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { authorize } from "../middleware/roleMiddleware.js";
@@ -19,6 +21,10 @@ router.post("/check-conflicts", protect, authorize("admin"), checkConflicts);
 
 // Get timetable by class
 router.get("/class/:classId", protect, getTimetableByClass);
+
+// Export routes (must come before /:id route)
+router.get("/:id/export/excel", protect, exportToExcel);
+router.get("/:id/export/pdf", protect, exportToPDF);
 
 router
   .route("/")

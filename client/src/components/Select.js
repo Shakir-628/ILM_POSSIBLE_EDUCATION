@@ -6,6 +6,7 @@ const Select = ({
   value,
   onChange,
   options,
+  children,
   required = false,
   error,
   disabled = false,
@@ -34,12 +35,13 @@ const Select = ({
           ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}
         `}
       >
-        <option value="">{placeholder}</option>
-        {options.map((option, index) => (
+        {!children && <option value="">{placeholder}</option>}
+        {options && options.map((option, index) => (
           <option key={index} value={option.value}>
             {option.label}
           </option>
         ))}
+        {children}
       </select>
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
     </div>
