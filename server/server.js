@@ -4,10 +4,12 @@ import mongoose from "mongoose";
 import cors from "cors";
 import morgan from "morgan";
 import path from "path";
+import http from "http";
 import { requestLogger } from "./middleware/loggingMiddleware.js";
 import { fileURLToPath } from "url";
 import { connectDB } from "./config/db.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import { initializeSocket } from "./config/socket.js";
 
 // Import routes
 import authRoutes from "./routes/authRoutes.js";
@@ -132,6 +134,13 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5001;
 
-app.listen(PORT, () => {
+// Create HTTP server
+const server = http.createServer(app);
+
+// Initialize Socket.IO
+initializeSocket(server);
+
+server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🔌 Socket.IO ready for connections`);
 });

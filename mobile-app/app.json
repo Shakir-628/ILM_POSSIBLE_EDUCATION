@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "ILM Possible Education",
+    "slug": "ilm-possible-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#4F46E5"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ilmpossible.education"
+    },
+    "android": {
+      "package": "com.ilmpossible.education",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "NOTIFICATIONS"
+      ]
+    }
+  }
+}
+

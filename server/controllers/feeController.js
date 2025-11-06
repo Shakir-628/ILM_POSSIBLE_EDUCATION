@@ -5,6 +5,7 @@ import Income from "../models/Income.js";
 import { generateFeeInvoice, generateFeeReceipt } from "../services/invoiceService.js";
 import { createStripePayment, verifyStripePayment } from "../services/paymentService.js";
 import { sendEmail } from "../services/mailService.js";
+import { emitToRole, emitToUser, emitToAll } from "../config/socket.js";
 
 // @desc    Get all fee structures
 // @route   GET /api/fees/structures
@@ -138,6 +139,18 @@ export const createFeePayment = async (req, res) => {
     payment.receiptPath = filepath;
     await payment.save();
 
+    // Emit socket event for real-time update
+    try {
+      emitToRole('admin', 'fee:created', { 
+        payment, 
+        studentId,
+        message: `New fee created for ${student.name}` 
+      });
+      emitToUser(studentId, 'fee:created', { payment });
+    } catch (socketError) {
+      console.error('Socket emission error:', socketError);
+    }
+
     res.status(201).json(payment);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -232,6 +245,22 @@ export const processPayment = async (req, res) => {
       });
     } catch (emailError) {
       console.error("Failed to send receipt email:", emailError);
+    }
+
+    // Emit socket event for real-time update
+    try {
+      emitToRole('admin', 'payment:received', {
+        payment,
+        studentId: payment.student._id,
+        studentName: `${payment.student.firstName} ${payment.student.lastName}`,
+        amount: amountPaid,
+        balance: payment.balance,
+        message: `Payment of PKR ${amountPaid} received from ${payment.student.firstName} ${payment.student.lastName}`,
+      });
+      emitToUser(payment.student._id.toString(), 'payment:processed', { payment });
+      emitToRole('accountant', 'payment:received', { payment, amount: amountPaid });
+    } catch (socketError) {
+      console.error('Socket emission error:', socketError);
     }
 
     res.json(payment);

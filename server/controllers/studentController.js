@@ -11,6 +11,46 @@ import path from "path";
 import fs from "fs";
 import bcrypt from "bcryptjs";
 
+// @desc    Get my profile (for logged-in student)
+// @route   GET /api/students/me
+// @access  Private (Student)
+export const getMyProfile = async (req, res) => {
+  try {
+    const student = await Student.findOne({ user: req.user._id })
+      .populate("user", "name email")
+      .populate("class", "className grade section")
+      .populate("parent", "firstName lastName phone email");
+    
+    if (!student) {
+      return res.status(404).json({ message: "Student profile not found" });
+    }
+    
+    res.json(student);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Get dashboard stats for logged-in student
+// @route   GET /api/students/dashboard/stats  
+// @access  Private (Student)
+export const getDashboardStats = async (req, res) => {
+  try {
+    const student = await Student.findOne({ user: req.user._id });
+    
+    if (!student) {
+      return res.status(404).json({ message: "Student profile not found" });
+    }
+    
+    res.json({
+      studentId: student._id,
+      message: "Use specific service endpoints for detailed stats"
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc    Get all students
 // @route   GET /api/students
 // @access  Private (Admin, Teacher)
