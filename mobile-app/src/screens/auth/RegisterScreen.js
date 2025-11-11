@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingTop: spacing.xxxl,
-    paddingBottom: spacing.lg,
+    paddingBottom: spacing.xxl,
     paddingHorizontal: spacing.xxl,
   },
   backButton: {

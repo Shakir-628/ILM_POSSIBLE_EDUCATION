@@ -1,5 +1,6 @@
 import io from 'socket.io-client';
 import { storage, STORAGE_KEYS } from '../utils/storage';
+import { SOCKET_URL } from '../utils/constants';
 
 class SocketService {
   constructor() {
@@ -18,9 +19,8 @@ class SocketService {
         return;
       }
 
-      // Connect to the backend socket server
-      // Change this URL to match your backend server
-      const SOCKET_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000';
+      // Connect to the backend socket server using the configured SOCKET_URL
+      console.log('🔌 Connecting to socket server:', SOCKET_URL);
       
       this.socket = io(SOCKET_URL, {
         auth: {
@@ -31,6 +31,7 @@ class SocketService {
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
         reconnectionAttempts: 5,
+        timeout: 10000,
       });
 
       this.setupDefaultListeners();

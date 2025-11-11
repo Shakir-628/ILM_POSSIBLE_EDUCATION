@@ -11,7 +11,10 @@ import ClassesListScreen from '../screens/admin/ClassesListScreen';
 import ParentsListScreen from '../screens/admin/ParentsListScreen';
 import AnnouncementsScreen from '../screens/admin/AnnouncementsScreen';
 import AnnouncementDetailScreen from '../screens/admin/AnnouncementDetailScreen';
+import NotificationsScreen from '../screens/shared/NotificationsScreen';
 import FinanceScreen from '../screens/admin/FinanceScreen';
+import FeeManagementScreen from '../screens/admin/FeeManagementScreen';
+import ClassGradeHistoryScreen from '../screens/admin/ClassGradeHistoryScreen';
 import AdminProfileScreen from '../screens/admin/AdminProfileScreen';
 import SettingsScreen from '../screens/admin/SettingsScreen';
 import ChangePasswordScreen from '../screens/admin/ChangePasswordScreen';
@@ -36,8 +39,8 @@ const AdminTabNavigator = () => {
             case 'Students':
               iconName = focused ? 'school' : 'school-outline';
               break;
-            case 'Announcements':
-              iconName = focused ? 'megaphone' : 'megaphone-outline';
+            case 'Notifications':
+              iconName = focused ? 'notifications' : 'notifications-outline';
               break;
             case 'Profile':
               iconName = focused ? 'person' : 'person-outline';
@@ -69,7 +72,7 @@ const AdminTabNavigator = () => {
     >
       <Tab.Screen name="Dashboard" component={AdminDashboardScreen} />
       <Tab.Screen name="Students" component={StudentsListScreen} />
-      <Tab.Screen name="Announcements" component={AnnouncementsScreen} />
+      <Tab.Screen name="Notifications" component={NotificationsScreen} />
       <Tab.Screen name="Profile" component={AdminProfileScreen} />
     </Tab.Navigator>
   );
@@ -88,8 +91,12 @@ const AdminNavigator = () => {
       <Stack.Screen name="TeachersList" component={TeachersListScreen} />
       <Stack.Screen name="ClassesList" component={ClassesListScreen} />
       <Stack.Screen name="ParentsList" component={ParentsListScreen} />
+      <Stack.Screen name="Announcements" component={AnnouncementsScreen} />
       <Stack.Screen name="AnnouncementDetail" component={AnnouncementDetailScreen} />
       <Stack.Screen name="Finance" component={FinanceScreen} />
+      <Stack.Screen name="FeeManagement" component={FeeManagementScreen} />
+      <Stack.Screen name="Accounting" component={FinanceScreen} />
+      <Stack.Screen name="ClassGradeHistory" component={ClassGradeHistoryScreen} />
     </Stack.Navigator>
   );
 };

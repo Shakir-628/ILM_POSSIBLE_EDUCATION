@@ -5,8 +5,10 @@ import { Ionicons } from '@expo/vector-icons';
 // Student Screens
 import StudentDashboardScreen from '../screens/student/StudentDashboardScreen';
 import AttendanceScreen from '../screens/student/AttendanceScreen';
-import TimetableScreen from '../screens/student/TimetableScreen';
+import GradesScreen from '../screens/student/GradesScreen';
 import AssignmentsScreen from '../screens/student/AssignmentsScreen';
+import AnnouncementsScreen from '../screens/shared/AnnouncementsScreen';
+import NotificationsScreen from '../screens/shared/NotificationsScreen';
 import ProfileScreen from '../screens/student/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
@@ -22,14 +24,14 @@ const StudentNavigator = () => {
             case 'Dashboard':
               iconName = focused ? 'home' : 'home-outline';
               break;
-            case 'Attendance':
-              iconName = focused ? 'calendar' : 'calendar-outline';
+            case 'Grades':
+              iconName = focused ? 'school' : 'school-outline';
               break;
-            case 'Timetable':
-              iconName = focused ? 'time' : 'time-outline';
+            case 'Notifications':
+              iconName = focused ? 'notifications' : 'notifications-outline';
               break;
-            case 'Assignments':
-              iconName = focused ? 'document-text' : 'document-text-outline';
+            case 'Announcements':
+              iconName = focused ? 'megaphone' : 'megaphone-outline';
               break;
             case 'Profile':
               iconName = focused ? 'person' : 'person-outline';
@@ -68,9 +70,9 @@ const StudentNavigator = () => {
         component={StudentDashboardScreen}
         options={{ title: 'Home' }}
       />
-      <Tab.Screen name="Attendance" component={AttendanceScreen} />
-      <Tab.Screen name="Timetable" component={TimetableScreen} />
-      <Tab.Screen name="Assignments" component={AssignmentsScreen} />
+      <Tab.Screen name="Grades" component={GradesScreen} />
+      <Tab.Screen name="Notifications" component={NotificationsScreen} />
+      <Tab.Screen name="Announcements" component={AnnouncementsScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );

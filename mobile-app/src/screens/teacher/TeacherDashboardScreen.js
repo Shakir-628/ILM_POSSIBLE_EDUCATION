@@ -106,7 +106,19 @@ const TeacherDashboardScreen = ({ navigation }) => {
             <Text style={styles.userName}>{user?.name}!</Text>
             <Text style={styles.subtitle}>Teacher Dashboard</Text>
           </View>
-          <LogoutButton />
+          <View style={styles.headerActions}>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() => {
+                navigation.navigate('Notifications');
+                toast.info('Opening notifications');
+              }}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="notifications-outline" size={24} color={colors.white} />
+            </TouchableOpacity>
+            <LogoutButton />
+          </View>
         </View>
       </LinearGradient>
 
@@ -185,6 +197,32 @@ const TeacherDashboardScreen = ({ navigation }) => {
             <Text style={styles.actionText}>Enter Grades</Text>
           </TouchableOpacity>
         </View>
+
+        <View style={[styles.actionsGrid, { marginTop: spacing.md }]}>
+          <TouchableOpacity 
+            style={styles.actionCard}
+            onPress={() => {
+              navigation.navigate('ClassGradeHistory');
+              toast.info('Opening class grade history');
+            }}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="bar-chart" size={32} color="#8B5CF6" />
+            <Text style={styles.actionText}>Grade History</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.actionCard}
+            onPress={() => {
+              navigation.navigate('Notifications');
+              toast.info('Opening notifications');
+            }}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="notifications" size={32} color="#EF4444" />
+            <Text style={styles.actionText}>Notifications</Text>
+          </TouchableOpacity>
+        </View>
       </Animated.View>
 
       {/* Recent Announcements */}
@@ -240,9 +278,19 @@ const styles = StyleSheet.create({
   headerContent: { 
     flexDirection: 'row', 
     justifyContent: 'space-between', 
-    alignItems: 'flex-start' 
+    alignItems: 'center' 
   },
   headerInfo: { flex: 1 },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  iconButton: {
+    padding: spacing.sm,
+    borderRadius: borderRadius.full || borderRadius.lg,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  },
   greeting: { 
     fontSize: fontSize.lg, 
     color: 'rgba(255, 255, 255, 0.9)', 

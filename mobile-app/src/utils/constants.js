@@ -1,7 +1,12 @@
 // API Configuration
 export const API_URL = __DEV__ 
-  ? 'http://192.168.0.104:5001/api' // Android Emulator 172.17.40.238
+  ? 'http://192.168.0.103:5001/api' // Android Emulator 172.17.40.238, 192.168.0.104
   : 'https://your-production-api.com/api';
+
+// Socket.IO Configuration (without /api suffix)
+export const SOCKET_URL = __DEV__ 
+  ? 'http://192.168.0.103:5001' // Match your API_URL but without /api
+  : 'https://your-production-api.com';
 
 // For iOS Simulator, use: http://localhost:5001/api
 // For Real Device, use your computer's IP: http://192.168.1.x:5001/api

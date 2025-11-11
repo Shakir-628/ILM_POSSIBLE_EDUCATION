@@ -124,25 +124,12 @@ const AdminDashboardScreen = ({ navigation }) => {
         
         <View style={styles.statsRow}>
           <StatCard 
-            title="Total Students" 
-            value={stats.totalStudents.toString()} 
-            icon="school" 
-            color="blue"
-            onPress={() => {
-              navigation.navigate('StudentsList');
-              toast.info('Viewing all students');
-            }}
-          />
-          <StatCard 
             title="Active Students" 
             value={stats.activeStudents?.toString() || '0'} 
             icon="checkmark-circle" 
             color="green"
             onPress={() => navigation.navigate('StudentsList')}
           />
-        </View>
-
-        <View style={styles.statsRow}>
           <StatCard 
             title="Total Teachers" 
             value={stats.totalTeachers.toString()} 
@@ -151,16 +138,6 @@ const AdminDashboardScreen = ({ navigation }) => {
             onPress={() => {
               navigation.navigate('TeachersList');
               toast.info('Viewing all teachers');
-            }}
-          />
-          <StatCard 
-            title="Total Classes" 
-            value={stats.totalClasses.toString()} 
-            icon="book" 
-            color="orange"
-            onPress={() => {
-              navigation.navigate('ClassesList');
-              toast.info('Viewing all classes');
             }}
           />
         </View>
@@ -251,6 +228,58 @@ const AdminDashboardScreen = ({ navigation }) => {
             >
               <Ionicons name="megaphone" size={32} color={colors.success} />
               <Text style={styles.actionText}>Announcements</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={[styles.actionsGrid, { marginTop: spacing.md }]}>
+            <TouchableOpacity 
+              style={styles.actionCard}
+              onPress={() => {
+                navigation.navigate('FeeManagement');
+                toast.info('Opening fee management');
+              }}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="cash" size={32} color="#10B981" />
+              <Text style={styles.actionText}>Fee Management</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.actionCard}
+              onPress={() => {
+                navigation.navigate('Accounting');
+                toast.info('Opening accounting');
+              }}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="calculator" size={32} color="#F59E0B" />
+              <Text style={styles.actionText}>Accounting</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={[styles.actionsGrid, { marginTop: spacing.md }]}>
+            <TouchableOpacity 
+              style={styles.actionCard}
+              onPress={() => {
+                navigation.navigate('ClassGradeHistory');
+                toast.info('Opening class grade history');
+              }}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="bar-chart" size={32} color="#8B5CF6" />
+              <Text style={styles.actionText}>Grade History</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.actionCard}
+              onPress={() => {
+                navigation.navigate('Announcements');
+                toast.info('Opening announcements');
+              }}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="megaphone" size={32} color="#EC4899" />
+              <Text style={styles.actionText}>Post Announcement</Text>
             </TouchableOpacity>
           </View>
         </Animated.View>

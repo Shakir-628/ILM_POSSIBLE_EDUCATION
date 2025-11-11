@@ -128,20 +128,6 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
-  const handleQuickFill = (role) => {
-    const credentials = {
-      student: { email: 'student@test.com', password: 'password123' },
-      teacher: { email: 'teacher@test.com', password: 'password123' },
-      admin: { email: 'admin@ilmpossible.com', password: 'admin123' },
-    };
-    
-    if (credentials[role]) {
-      setEmail(credentials[role].email);
-      setPassword(credentials[role].password);
-      toast.info(`Filled ${role} credentials`);
-    }
-  };
-
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -187,33 +173,6 @@ const LoginScreen = ({ navigation }) => {
           </View>
 
           {/* Quick Fill Buttons for Testing */}
-          <View style={styles.quickFillContainer}>
-            <Text style={styles.quickFillLabel}>Quick Login (Test):</Text>
-            <View style={styles.quickFillButtons}>
-              <TouchableOpacity
-                style={[styles.quickFillBtn, { backgroundColor: colors.student + '20', borderColor: colors.student }]}
-                onPress={() => handleQuickFill('student')}
-              >
-                <Ionicons name="person" size={16} color={colors.student} />
-                <Text style={[styles.quickFillText, { color: colors.student }]}>Student</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.quickFillBtn, { backgroundColor: colors.teacher + '20', borderColor: colors.teacher }]}
-                onPress={() => handleQuickFill('teacher')}
-              >
-                <Ionicons name="people" size={16} color={colors.teacher} />
-                <Text style={[styles.quickFillText, { color: colors.teacher }]}>Teacher</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.quickFillBtn, { backgroundColor: colors.admin + '20', borderColor: colors.admin }]}
-                onPress={() => handleQuickFill('admin')}
-              >
-                <Ionicons name="shield" size={16} color={colors.admin} />
-                <Text style={[styles.quickFillText, { color: colors.admin }]}>Admin</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
           <View style={styles.inputsContainer}>
             <CustomInput
               label="Email Address"
@@ -306,7 +265,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingTop: spacing.xxxl,
-    paddingBottom: spacing.xl,
+    paddingBottom: spacing.xxl + spacing.md,
     alignItems: 'center',
   },
   logoContainer: {
@@ -356,35 +315,6 @@ const styles = StyleSheet.create({
     fontSize: fontSize.md,
     color: colors.textSecondary,
     lineHeight: 22,
-  },
-  quickFillContainer: {
-    paddingHorizontal: spacing.xxl,
-    marginBottom: spacing.sm,
-  },
-  quickFillLabel: {
-    fontSize: fontSize.sm,
-    color: colors.textSecondary,
-    marginBottom: spacing.sm,
-  },
-  quickFillButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: spacing.sm,
-  },
-  quickFillBtn: {
-    flex: 1,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.xs,
-    borderRadius: borderRadius.sm,
-    borderWidth: 1,
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: spacing.xs,
-  },
-  quickFillText: {
-    fontSize: fontSize.xs,
-    fontWeight: fontWeight.semibold,
   },
   inputsContainer: {
     paddingHorizontal: spacing.xxl,

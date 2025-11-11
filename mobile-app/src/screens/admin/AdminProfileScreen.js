@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import CustomButton from '../../components/CustomButton';
 import CustomCard from '../../components/CustomCard';
 import { useAuth } from '../../context/AuthContext';
@@ -44,20 +43,6 @@ const AdminProfileScreen = ({ navigation }) => {
 
   return (
     <ScrollView style={styles.container}>
-      <LinearGradient colors={['#4F46E5', '#8B5CF6']} style={styles.header}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
-            {user?.name?.charAt(0)?.toUpperCase() || 'A'}
-          </Text>
-        </View>
-        <Text style={styles.name}>{user?.name || 'Administrator'}</Text>
-        <View style={styles.roleBadge}>
-          <Text style={styles.roleText}>
-            {user?.role?.toUpperCase() || 'ADMIN'}
-          </Text>
-        </View>
-      </LinearGradient>
-
       <View style={styles.content}>
         {/* Personal Information */}
         <Text style={styles.sectionTitle}>Personal Information</Text>
@@ -170,45 +155,9 @@ const styles = StyleSheet.create({
     flex: 1, 
     backgroundColor: '#f5f7fa' 
   },
-  header: { 
-    paddingTop: 20, 
-    paddingBottom: 30, 
-    alignItems: 'center' 
-  },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  avatarText: { 
-    fontSize: 40, 
-    fontWeight: 'bold', 
-    color: '#fff' 
-  },
-  name: { 
-    fontSize: 24, 
-    fontWeight: 'bold', 
-    color: '#fff', 
-    marginBottom: 8 
-  },
-  roleBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  roleText: { 
-    fontSize: 12, 
-    color: '#fff', 
-    fontWeight: '700',
-    letterSpacing: 1,
-  },
   content: { 
-    padding: 16 
+    padding: 16,
+    paddingTop: 20,
   },
   sectionTitle: {
     fontSize: 18,
