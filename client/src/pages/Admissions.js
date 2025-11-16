@@ -21,6 +21,12 @@ import { admissionService } from '../services/admissionService';
 import { classService } from '../services/classService';
 import { useTableData } from '../hooks/useTableData';
 import { useToast } from '../context/ToastContext';
+import {
+  handleValidatedInput,
+  validateForm,
+  validationPatterns,
+  validationMessages,
+} from '../utils/validation';
 
 const Admissions = () => {
   const toast = useToast();
@@ -142,25 +148,83 @@ const Admissions = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name.includes('.')) {
-      const [parent, child] = name.split('.');
-      setFormData({
-        ...formData,
-        [parent]: {
-          ...formData[parent],
-          [child]: value,
-        },
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
+    
+    // Use generic validation handler for simple fields
+    switch (name) {
+      case 'firstName':
+      case 'lastName':
+      case 'fatherName':
+      case 'motherName':
+      case 'fatherOccupation':
+      case 'previousSchool.name':
+        handleValidatedInput(e, 'name', setFormData, formData, { maxLength: 50 });
+        return;
+        
+      case 'email':
+        handleValidatedInput(e, 'email', setFormData, formData);
+        return;
+        
+      case 'phone':
+      case 'fatherPhone':
+      case 'motherPhone':
+        handleValidatedInput(e, 'phone', setFormData, formData, { maxLength: 15 });
+        return;
+        
+      case 'academicYear':
+        handleValidatedInput(e, 'studentId', setFormData, formData, { maxLength: 10 });
+        return;
+        
+      default:
+        // For nested objects and other fields, use original logic
+        if (name.includes('.')) {
+          const [parent, child] = name.split('.');
+          setFormData({
+            ...formData,
+            [parent]: {
+              ...formData[parent],
+              [child]: value,
+            },
+          });
+        } else {
+          setFormData({
+            ...formData,
+            [name]: value,
+          });
+        }
+        break;
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Define validation rules for admission form
+    const validationRules = {
+      firstName: { type: 'name', required: true, label: 'First Name' },
+      lastName: { type: 'name', required: true, label: 'Last Name' },
+      dateOfBirth: { type: 'dateOfBirth', required: true, label: 'Date of Birth' },
+      gender: { type: 'select', required: true, label: 'Gender' },
+      email: { type: 'email', required: true, label: 'Email' },
+      phone: { type: 'phone', required: true, label: 'Phone', minLength: 10, maxLength: 15 },
+      fatherName: { type: 'name', required: true, label: 'Father Name' },
+      fatherPhone: { type: 'phone', required: true, label: 'Father Phone', minLength: 10, maxLength: 15 },
+      motherName: { type: 'name', required: true, label: 'Mother Name' },
+      motherPhone: { type: 'phone', label: 'Mother Phone', minLength: 10, maxLength: 15 },
+      appliedForClass: { type: 'select', required: true, label: 'Applied For Class' },
+      academicYear: { type: 'text', required: true, label: 'Academic Year' },
+    };
+    
+    // Validate form
+    const validation = validateForm(formData, validationRules);
+    
+    if (!validation.isValid) {
+      // Show error messages for each field
+      Object.values(validation.errors).forEach(error => {
+        toast.error(error);
+      });
+      return;
+    }
+    
     try {
       await admissionService.submitApplication(formData);
       toast.success('Application submitted successfully');
@@ -432,6 +496,8 @@ const Admissions = () => {
               value={academicYear}
               onChange={(e) => setAcademicYear(e.target.value)}
               placeholder="Academic Year"
+              className="text-sm"
+              maxLength="20"
             />
           </div>
           <div className="mt-2 text-sm text-gray-600">
@@ -491,6 +557,10 @@ const Admissions = () => {
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleInputChange}
+                pattern={validationPatterns.name}
+                title={validationMessages.name}
+                className="text-sm"
+                maxLength="50"
                 required
               />
               <Input
@@ -498,6 +568,10 @@ const Admissions = () => {
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleInputChange}
+                pattern={validationPatterns.name}
+                title={validationMessages.name}
+                className="text-sm"
+                maxLength="50"
                 required
               />
             </div>
@@ -508,6 +582,7 @@ const Admissions = () => {
                 type="date"
                 value={formData.dateOfBirth}
                 onChange={handleInputChange}
+                className="text-sm"
                 required
               />
               <Select
@@ -531,13 +606,22 @@ const Admissions = () => {
                 type="email"
                 value={formData.email}
                 onChange={handleInputChange}
+                pattern={validationPatterns.email}
+                title={validationMessages.email}
+                className="text-sm"
+                maxLength="100"
                 required
               />
               <Input
                 label="Phone"
                 name="phone"
+                type="text"
                 value={formData.phone}
                 onChange={handleInputChange}
+                pattern={validationPatterns.phone}
+                title={validationMessages.phone}
+                className="text-sm"
+                maxLength="15"
                 required
               />
             </div>
@@ -551,13 +635,22 @@ const Admissions = () => {
                 name="fatherName"
                 value={formData.fatherName}
                 onChange={handleInputChange}
+                pattern={validationPatterns.name}
+                title={validationMessages.name}
+                className="text-sm"
+                maxLength="50"
                 required
               />
               <Input
                 label="Father Phone"
                 name="fatherPhone"
+                type="text"
                 value={formData.fatherPhone}
                 onChange={handleInputChange}
+                pattern={validationPatterns.phone}
+                title={validationMessages.phone}
+                className="text-sm"
+                maxLength="15"
                 required
               />
             </div>
@@ -566,6 +659,10 @@ const Admissions = () => {
               name="fatherOccupation"
               value={formData.fatherOccupation}
               onChange={handleInputChange}
+              pattern={validationPatterns.name}
+              title={validationMessages.name}
+              className="text-sm"
+              maxLength="50"
             />
             <div className="grid grid-cols-2 gap-4">
               <Input
@@ -573,13 +670,22 @@ const Admissions = () => {
                 name="motherName"
                 value={formData.motherName}
                 onChange={handleInputChange}
+                pattern={validationPatterns.name}
+                title={validationMessages.name}
+                className="text-sm"
+                maxLength="50"
                 required
               />
               <Input
                 label="Mother Phone"
                 name="motherPhone"
+                type="text"
                 value={formData.motherPhone}
                 onChange={handleInputChange}
+                pattern={validationPatterns.phone}
+                title={validationMessages.phone}
+                className="text-sm"
+                maxLength="15"
               />
             </div>
             
@@ -606,6 +712,8 @@ const Admissions = () => {
                 name="academicYear"
                 value={formData.academicYear}
                 onChange={handleInputChange}
+                className="text-sm"
+                maxLength="20"
                 required
               />
             </div>
@@ -614,6 +722,10 @@ const Admissions = () => {
               name="previousSchool.name"
               value={formData.previousSchool.name}
               onChange={handleInputChange}
+              pattern={validationPatterns.name}
+              title={validationMessages.name}
+              className="text-sm"
+              maxLength="100"
             />
             <div className="grid grid-cols-2 gap-4">
               <Input
@@ -621,6 +733,8 @@ const Admissions = () => {
                 name="previousSchool.lastClass"
                 value={formData.previousSchool.lastClass}
                 onChange={handleInputChange}
+                className="text-sm"
+                maxLength="50"
               />
               <Input
                 label="Last Grade/Percentage"
@@ -629,6 +743,8 @@ const Admissions = () => {
                 value={formData.previousSchool.lastGrade}
                 onChange={handleInputChange}
                 placeholder="e.g., 85"
+                className="text-sm"
+                maxLength="5"
               />
             </div>
             
@@ -680,6 +796,8 @@ const Admissions = () => {
                 value={reviewData.reviewComments}
                 onChange={(e) => setReviewData({ ...reviewData, reviewComments: e.target.value })}
                 placeholder="Add review comments..."
+                className="text-sm"
+                maxLength="500"
               />
               
               <div className="flex justify-end space-x-3 mt-6">
@@ -715,12 +833,14 @@ const Admissions = () => {
                   onChange={(e) => setScoresData({ ...scoresData, entranceTestScore: e.target.value })}
                   placeholder="Out of 100"
                   max="100"
+                  className="text-sm"
                 />
                 <Input
                   label="Test Date"
                   type="date"
                   value={scoresData.entranceTestDate}
                   onChange={(e) => setScoresData({ ...scoresData, entranceTestDate: e.target.value })}
+                  className="text-sm"
                 />
               </div>
               
@@ -732,12 +852,14 @@ const Admissions = () => {
                   onChange={(e) => setScoresData({ ...scoresData, interviewScore: e.target.value })}
                   placeholder="Out of 100"
                   max="100"
+                  className="text-sm"
                 />
                 <Input
                   label="Interview Date"
                   type="date"
                   value={scoresData.interviewDate}
                   onChange={(e) => setScoresData({ ...scoresData, interviewDate: e.target.value })}
+                  className="text-sm"
                 />
               </div>
               

@@ -1,28 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import Layout from '../components/Layout';
-import Table from '../components/Table';
-import Button from '../components/Button';
-import Modal from '../components/Modal';
-import Input from '../components/Input';
-import Select from '../components/Select';
-import SearchBar from '../components/SearchBar';
-import Pagination from '../components/Pagination';
-import { QRCodeSVG } from 'qrcode.react';
-import {
-  PlusIcon,
-  FunnelIcon,
-  ArrowUpTrayIcon,
-  DocumentArrowDownIcon,
-  QrCodeIcon,
-  ArrowPathIcon,
-  ArrowRightIcon,
-  DocumentTextIcon,
-  PaperClipIcon,
-} from '@heroicons/react/24/outline';
 import { studentService } from '../services/studentService';
 import { classService } from '../services/classService';
 import { useTableData } from '../hooks/useTableData';
 import { useToast } from '../context/ToastContext';
+import Layout from '../components/Layout';
+import Button from '../components/Button';
+import Input from '../components/Input';
+import Select from '../components/Select';
+import Modal from '../components/Modal';
+import SearchBar from '../components/SearchBar';
+import Table from '../components/Table';
+import Pagination from '../components/Pagination';
+import { QRCodeSVG } from 'qrcode.react';
+import {
+  DocumentArrowDownIcon,
+  PlusIcon,
+  DocumentTextIcon,
+  ArrowUpTrayIcon,
+  PaperClipIcon,
+  ArrowRightIcon,
+  ArrowPathIcon
+} from '@heroicons/react/24/outline';
+import {
+  handleValidatedInput,
+  validateForm,
+  validationPatterns,
+  validationMessages,
+} from '../utils/validation';
 
 const Students = () => {
   const toast = useToast();
@@ -113,14 +117,61 @@ const Students = () => {
   } = useTableData(filteredStudents, ['studentId', 'firstName', 'lastName', 'email'], 10);
 
   const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    
+    // Use generic validation handler
+    switch (name) {
+      case 'firstName':
+      case 'lastName':
+      case 'guardianName':
+        handleValidatedInput(e, 'name', setFormData, formData, { maxLength: 50 });
+        break;
+      case 'email':
+        handleValidatedInput(e, 'email', setFormData, formData);
+        break;
+      case 'phone':
+      case 'guardianPhone':
+        handleValidatedInput(e, 'phone', setFormData, formData, { maxLength: 15 });
+        break;
+      case 'studentId':
+        handleValidatedInput(e, 'studentId', setFormData, formData, { maxLength: 20 });
+        break;
+      default:
+        // For other fields, just update form data
+        setFormData({
+          ...formData,
+          [name]: value,
+        });
+        break;
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Define validation rules for the student form
+    const validationRules = {
+      firstName: { type: 'name', required: true, label: 'First Name' },
+      lastName: { type: 'name', required: true, label: 'Last Name' },
+      email: { type: 'email', required: false, label: 'Email' },
+      phone: { type: 'phone', required: false, label: 'Phone', minLength: 10 },
+      guardianName: { type: 'name', required: true, label: 'Guardian Name' },
+      guardianPhone: { type: 'phone', required: true, label: 'Guardian Phone', minLength: 10 },
+      dateOfBirth: { type: 'dateOfBirth', required: true, label: 'Date of Birth' },
+      gender: { type: 'select', required: true, label: 'Gender' },
+      classId: { type: 'select', required: true, label: 'Class' },
+    };
+    
+    // Validate entire form
+    const validation = validateForm(formData, validationRules);
+    
+    if (!validation.isValid) {
+      // Show first error message
+      const firstError = Object.values(validation.errors)[0];
+      toast.error(firstError);
+      return;
+    }
+    
     try {
       if (editingStudent) {
         await studentService.updateStudent(editingStudent._id, formData);
@@ -188,15 +239,153 @@ const Students = () => {
   };
 
   const downloadQR = () => {
-    const canvas = document.getElementById('qr-canvas');
-    if (canvas) {
-      const pngUrl = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
-      const downloadLink = document.createElement('a');
-      downloadLink.href = pngUrl;
-      downloadLink.download = `${selectedStudent.studentId}_qr.png`;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
+    const container = document.getElementById('qr-canvas');
+    if (container) {
+      // Find the SVG element within the container
+      const svgElement = container.querySelector('svg');
+      if (svgElement) {
+        // Get SVG data
+        const svgData = new XMLSerializer().serializeToString(svgElement);
+        const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+        const svgUrl = URL.createObjectURL(svgBlob);
+        
+        // Create download link
+        const downloadLink = document.createElement('a');
+        downloadLink.href = svgUrl;
+        downloadLink.download = `${selectedStudent.studentId}_qr.svg`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        
+        // Clean up
+        URL.revokeObjectURL(svgUrl);
+      }
+    }
+  };
+
+  const downloadIDCard = () => {
+    // Create a canvas for the ID card
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Set ID card dimensions (standard credit card size ratio)
+    canvas.width = 600;
+    canvas.height = 380;
+    
+    // Background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Add border
+    ctx.strokeStyle = '#3b82f6';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+    
+    // School Header
+    ctx.fillStyle = '#1e40af';
+    ctx.fillRect(10, 10, canvas.width - 20, 60);
+    
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 24px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('ILM POSSIBLE SCHOOL', canvas.width / 2, 35);
+    ctx.font = '16px Arial';
+    ctx.fillText('Student Identification Card', canvas.width / 2, 55);
+    
+    // Student Photo placeholder (if no photo available)
+    ctx.fillStyle = '#f3f4f6';
+    ctx.fillRect(30, 90, 120, 150);
+    ctx.strokeStyle = '#d1d5db';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(30, 90, 120, 150);
+    
+    ctx.fillStyle = '#6b7280';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('PHOTO', 90, 165);
+    
+    // Student Information
+    ctx.fillStyle = '#111827';
+    ctx.font = 'bold 18px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText(`${selectedStudent.firstName} ${selectedStudent.lastName}`, 170, 110);
+    
+    ctx.font = '14px Arial';
+    ctx.fillStyle = '#374151';
+    ctx.fillText(`Student ID: ${selectedStudent.studentId}`, 170, 135);
+    ctx.fillText(`Class: ${selectedStudent.class?.className || 'N/A'}`, 170, 155);
+    ctx.fillText(`Roll No: ${selectedStudent.rollNumber || 'N/A'}`, 170, 175);
+    
+    // Add more student details
+    if (selectedStudent.dateOfBirth) {
+      ctx.fillText(`DOB: ${new Date(selectedStudent.dateOfBirth).toLocaleDateString()}`, 170, 195);
+    }
+    if (selectedStudent.gender) {
+      ctx.fillText(`Gender: ${selectedStudent.gender}`, 170, 215);
+    }
+    if (selectedStudent.phone) {
+      ctx.fillText(`Phone: ${selectedStudent.phone}`, 170, 235);
+    }
+    if (selectedStudent.email) {
+      ctx.fillText(`Email: ${selectedStudent.email}`, 170, 255);
+    }
+    
+    // QR Code Section
+    ctx.fillStyle = '#111827';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('SCAN FOR VERIFICATION', 450, 280);
+    
+    // Get QR code and draw it on canvas
+    const container = document.getElementById('qr-canvas');
+    if (container) {
+      const svgElement = container.querySelector('svg');
+      if (svgElement) {
+        const svgData = new XMLSerializer().serializeToString(svgElement);
+        const img = new Image();
+        const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        
+        img.onload = function() {
+          // Draw QR code
+          ctx.drawImage(img, 380, 300, 140, 140);
+          
+          // Valid Until date
+          ctx.fillStyle = '#6b7280';
+          ctx.font = '12px Arial';
+          ctx.textAlign = 'left';
+          const validDate = new Date();
+          validDate.setFullYear(validDate.getFullYear() + 1);
+          ctx.fillText(`Valid Until: ${validDate.toLocaleDateString()}`, 30, 350);
+          
+          // Signature line
+          ctx.strokeStyle = '#9ca3af';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(400, 350);
+          ctx.lineTo(570, 350);
+          ctx.stroke();
+          
+          ctx.fillStyle = '#6b7280';
+          ctx.font = '10px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText('Principal Signature', 485, 365);
+          
+          // Convert canvas to blob and download
+          canvas.toBlob(function(blob) {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${selectedStudent.studentId}_ID_Card.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            URL.revokeObjectURL(link.href);
+          }, 'image/png');
+        };
+        
+        img.src = url;
+      }
     }
   };
 
@@ -707,20 +896,29 @@ const Students = () => {
               value={formData.studentId}
               onChange={handleInputChange}
               placeholder="Auto-generated if empty"
+              className="text-sm"
             />
             <div className="grid grid-cols-2 gap-4">
               <Input
                 label="First Name"
                 name="firstName"
+                type="text"
                 value={formData.firstName}
                 onChange={handleInputChange}
+                className="text-sm"
+                pattern={validationPatterns.name}
+                title={validationMessages.name}
                 required
               />
               <Input
                 label="Last Name"
                 name="lastName"
+                type="text"
                 value={formData.lastName}
                 onChange={handleInputChange}
+                className="text-sm"
+                pattern={validationPatterns.name}
+                title={validationMessages.name}
                 required
               />
             </div>
@@ -730,13 +928,21 @@ const Students = () => {
               type="email"
               value={formData.email}
               onChange={handleInputChange}
-              required
+              placeholder="student@example.com"
+              className="text-sm"
+              pattern={validationPatterns.email}
+              title={validationMessages.email}
             />
             <Input
               label="Phone"
               name="phone"
+              type="text"
               value={formData.phone}
               onChange={handleInputChange}
+              placeholder="03331234567"
+              className="text-sm"
+              pattern={validationPatterns.phone}
+              title={validationMessages.phone}
             />
             <Input
               label="Date of Birth"
@@ -762,15 +968,24 @@ const Students = () => {
             <Input
               label="Guardian Name"
               name="guardianName"
+              type="text"
               value={formData.guardianName}
               onChange={handleInputChange}
+              className="text-sm"
+              pattern={validationPatterns.name}
+              title={validationMessages.name}
               required
             />
             <Input
               label="Guardian Phone"
               name="guardianPhone"
+              type="text"
               value={formData.guardianPhone}
               onChange={handleInputChange}
+              placeholder="03331234567"
+              className="text-sm"
+              pattern={validationPatterns.phone}
+              title={validationMessages.phone}
               required
             />
             <Select
@@ -805,9 +1020,8 @@ const Students = () => {
         >
           {selectedStudent && (
             <div className="text-center space-y-4">
-              <div className="p-6 bg-white rounded-lg">
+              <div id="qr-canvas" className="p-6 bg-white rounded-lg">
                 <QRCodeSVG
-                  id="qr-canvas"
                   value={JSON.stringify({
                     studentId: selectedStudent.studentId,
                     name: `${selectedStudent.firstName} ${selectedStudent.lastName}`,
@@ -823,9 +1037,14 @@ const Students = () => {
                 <p className="text-sm text-gray-600">{selectedStudent.studentId}</p>
                 <p className="text-sm text-gray-600">{selectedStudent.class?.className || 'No Class'}</p>
               </div>
-              <Button onClick={downloadQR} icon={DocumentArrowDownIcon}>
-                Download QR Code
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={downloadQR} icon={DocumentArrowDownIcon}>
+                  Download QR Code
+                </Button>
+                <Button onClick={downloadIDCard} icon={DocumentArrowDownIcon} className="bg-blue-600 hover:bg-blue-700">
+                  Download ID Card
+                </Button>
+              </div>
             </div>
           )}
         </Modal>

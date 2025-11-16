@@ -13,6 +13,7 @@ import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import Students from './pages/Students';
 import Teachers from './pages/Teachers';
+import QRVerification from './pages/QRVerification';
 import Classes from './pages/Classes';
 import Attendance from './pages/Attendance';
 import Grades from './pages/Grades';
@@ -71,6 +72,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/qr-verification" element={<QRVerification />} />
 
         {/* Private Routes */}
         <Route
