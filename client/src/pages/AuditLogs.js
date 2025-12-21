@@ -46,12 +46,23 @@ const AuditLogs = () => {
   useEffect(() => {
     fetchLogs();
     fetchStats();
-  }, [filters]);
+  }, [JSON.stringify(filters)]);
 
   const fetchLogs = async () => {
     setLoading(true);
     try {
-      const response = await auditService.getAllAuditLogs(filters);
+      // Format dates properly for backend
+      const formattedFilters = { ...filters };
+      if (formattedFilters.startDate) {
+        formattedFilters.startDate = new Date(formattedFilters.startDate).toISOString();
+      }
+      if (formattedFilters.endDate) {
+        const endDate = new Date(formattedFilters.endDate);
+        endDate.setHours(23, 59, 59, 999); // Include entire day
+        formattedFilters.endDate = endDate.toISOString();
+      }
+      
+      const response = await auditService.getAllAuditLogs(formattedFilters);
       setLogs(response.logs || []);
       setPagination({
         currentPage: response.currentPage || 1,
@@ -68,10 +79,18 @@ const AuditLogs = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await auditService.getAuditStats({
-        startDate: filters.startDate,
-        endDate: filters.endDate,
-      });
+      // Format dates properly for backend
+      const formattedFilters = {};
+      if (filters.startDate) {
+        formattedFilters.startDate = new Date(filters.startDate).toISOString();
+      }
+      if (filters.endDate) {
+        const endDate = new Date(filters.endDate);
+        endDate.setHours(23, 59, 59, 999); // Include entire day
+        formattedFilters.endDate = endDate.toISOString();
+      }
+      
+      const response = await auditService.getAuditStats(formattedFilters);
       setStats(response);
     } catch (error) {
       console.error('Error fetching stats:', error);

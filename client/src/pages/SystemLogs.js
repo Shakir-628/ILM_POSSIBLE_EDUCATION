@@ -46,12 +46,23 @@ const SystemLogs = () => {
   useEffect(() => {
     fetchLogs();
     fetchStats();
-  }, [filters]);
+  }, [JSON.stringify(filters)]);
 
   const fetchLogs = async () => {
     setLoading(true);
     try {
-      const response = await logService.getAllLogs(filters);
+      // Format dates properly for backend
+      const formattedFilters = { ...filters };
+      if (formattedFilters.startDate) {
+        formattedFilters.startDate = new Date(formattedFilters.startDate).toISOString();
+      }
+      if (formattedFilters.endDate) {
+        const endDate = new Date(formattedFilters.endDate);
+        endDate.setHours(23, 59, 59, 999); // Include entire day
+        formattedFilters.endDate = endDate.toISOString();
+      }
+      
+      const response = await logService.getAllLogs(formattedFilters);
       setLogs(response.data || response.logs || []);
       setPagination({
         currentPage: response.currentPage || response.page || 1,
@@ -68,10 +79,18 @@ const SystemLogs = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await logService.getLogStats({
-        startDate: filters.startDate,
-        endDate: filters.endDate,
-      });
+      // Format dates properly for backend
+      const formattedFilters = {};
+      if (filters.startDate) {
+        formattedFilters.startDate = new Date(filters.startDate).toISOString();
+      }
+      if (filters.endDate) {
+        const endDate = new Date(filters.endDate);
+        endDate.setHours(23, 59, 59, 999); // Include entire day
+        formattedFilters.endDate = endDate.toISOString();
+      }
+      
+      const response = await logService.getLogStats(formattedFilters);
       setStats(response.data);
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -257,6 +276,22 @@ const SystemLogs = () => {
               value={filters.endDate}
               onChange={(e) => handleFilterChange('endDate', e.target.value)}
             />
+          </div>
+          <div className="mt-4">
+            <Button
+              onClick={() => setFilters({
+                level: '',
+                category: '',
+                search: '',
+                startDate: '',
+                endDate: '',
+                page: 1,
+                limit: 50,
+              })}
+              variant="secondary"
+            >
+              Clear Filters
+            </Button>
           </div>
           {!loading && (
             <div className="mt-2 text-sm text-gray-600">

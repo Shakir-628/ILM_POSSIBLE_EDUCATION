@@ -146,6 +146,22 @@ const Students = () => {
     }
   };
 
+  const generateStudentId = () => {
+    if (students.length === 0) return 'S001';
+    
+    // Extract numeric part from existing student IDs and find the highest
+    const studentIds = students.map(s => s.studentId).filter(id => id && id.startsWith('S'));
+    const numbers = studentIds.map(id => {
+      const num = id.replace('S', '');
+      return parseInt(num) || 0;
+    }).filter(num => num > 0);
+    
+    const maxNumber = Math.max(...numbers, 0);
+    const nextNumber = maxNumber + 1;
+    
+    return `S${nextNumber.toString().padStart(3, '0')}`;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -173,10 +189,16 @@ const Students = () => {
     }
     
     try {
+      // Auto-generate student ID if empty and not editing
+      const submitData = { ...formData };
+      if (!editingStudent && !submitData.studentId) {
+        submitData.studentId = generateStudentId();
+      }
+      
       if (editingStudent) {
-        await studentService.updateStudent(editingStudent._id, formData);
+        await studentService.updateStudent(editingStudent._id, submitData);
       } else {
-        await studentService.createStudent(formData);
+        await studentService.createStudent(submitData);
       }
       fetchStudents();
       closeModal();
@@ -184,6 +206,24 @@ const Students = () => {
       console.error('Error saving student:', error);
       toast.error(error.response?.data?.message || 'Error saving student');
     }
+  };
+
+  const openModal = () => {
+    setIsModalOpen(true);
+    setEditingStudent(null);
+    const newId = generateStudentId();
+    setFormData({
+      studentId: newId,
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      dateOfBirth: '',
+      gender: '',
+      guardianName: '',
+      guardianPhone: '',
+      classId: '',
+    });
   };
 
   const handleEdit = (student) => {
@@ -779,7 +819,7 @@ const Students = () => {
             </Button>
             <Button
               icon={PlusIcon}
-              onClick={() => setIsModalOpen(true)}
+              onClick={openModal}
             >
               Add Student
             </Button>
@@ -897,6 +937,7 @@ const Students = () => {
               onChange={handleInputChange}
               placeholder="Auto-generated if empty"
               className="text-sm"
+              disabled
             />
             <div className="grid grid-cols-2 gap-4">
               <Input

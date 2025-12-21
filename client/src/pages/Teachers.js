@@ -11,6 +11,7 @@ import { PlusIcon } from '@heroicons/react/24/outline';
 import { teacherService } from '../services/teacherService';
 import { useToast } from '../context/ToastContext';
 import { useTableData } from '../hooks/useTableData';
+import { validationPatterns, validationMessages } from '../utils/validation';
 
 const Teachers = () => {
   const toast = useToast();
@@ -73,13 +74,35 @@ const Teachers = () => {
     });
   };
 
+  const generateTeacherId = () => {
+    if (teachers.length === 0) return 'TCH001';
+    
+    // Extract numeric part from existing teacher IDs and find the highest
+    const teacherIds = teachers.map(t => t.teacherId).filter(id => id && id.startsWith('TCH'));
+    const numbers = teacherIds.map(id => {
+      const num = id.replace('TCH', '');
+      return parseInt(num) || 0;
+    }).filter(num => num > 0);
+    
+    const maxNumber = Math.max(...numbers, 0);
+    const nextNumber = maxNumber + 1;
+    
+    return `TCH${nextNumber.toString().padStart(3, '0')}`;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Auto-generate teacher ID if empty and not editing
+      const submitData = { ...formData };
+      if (!editingTeacher && !submitData.teacherId) {
+        submitData.teacherId = generateTeacherId();
+      }
+      
       if (editingTeacher) {
-        await teacherService.updateTeacher(editingTeacher._id, formData);
+        await teacherService.updateTeacher(editingTeacher._id, submitData);
       } else {
-        await teacherService.createTeacher(formData);
+        await teacherService.createTeacher(submitData);
       }
       fetchTeachers();
       closeModal();
@@ -116,6 +139,24 @@ const Teachers = () => {
         toast.error('Error deleting teacher');
       }
     }
+  };
+
+  const openModal = () => {
+    setIsModalOpen(true);
+    setEditingTeacher(null);
+    const newId = generateTeacherId();
+    setFormData({
+      teacherId: newId,
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      dateOfBirth: '',
+      gender: '',
+      qualification: '',
+      specialization: '',
+      experience: '',
+    });
   };
 
   const closeModal = () => {
@@ -177,7 +218,7 @@ const Teachers = () => {
               Manage teacher records and assignments
             </p>
           </div>
-          <Button icon={PlusIcon} onClick={() => setIsModalOpen(true)}>
+          <Button icon={PlusIcon} onClick={openModal}>
             Add Teacher
           </Button>
         </div>
@@ -257,7 +298,12 @@ const Teachers = () => {
               name="teacherId"
               value={formData.teacherId}
               onChange={handleInputChange}
-              required
+              placeholder="Auto-generated if empty"
+              className="text-sm"
+              pattern={validationPatterns.studentId}
+              title={validationMessages.studentId}
+              maxLength="20"
+              disabled
             />
             <Select
               label="Gender"
@@ -279,6 +325,10 @@ const Teachers = () => {
               name="firstName"
               value={formData.firstName}
               onChange={handleInputChange}
+              pattern={validationPatterns.name}
+              title={validationMessages.name}
+              className="text-sm"
+              maxLength="50"
               required
             />
             <Input
@@ -286,6 +336,10 @@ const Teachers = () => {
               name="lastName"
               value={formData.lastName}
               onChange={handleInputChange}
+              pattern={validationPatterns.name}
+              title={validationMessages.name}
+              className="text-sm"
+              maxLength="50"
               required
             />
           </div>
@@ -297,6 +351,10 @@ const Teachers = () => {
               type="email"
               value={formData.email}
               onChange={handleInputChange}
+              pattern={validationPatterns.email}
+              title={validationMessages.email}
+              className="text-sm"
+              maxLength="100"
               required
             />
             <Input
@@ -305,6 +363,10 @@ const Teachers = () => {
               type="tel"
               value={formData.phone}
               onChange={handleInputChange}
+              pattern={validationPatterns.phone}
+              title={validationMessages.phone}
+              className="text-sm"
+              maxLength="15"
               required
             />
           </div>
@@ -315,6 +377,7 @@ const Teachers = () => {
             type="date"
             value={formData.dateOfBirth}
             onChange={handleInputChange}
+            className="text-sm"
             required
           />
 
@@ -324,6 +387,10 @@ const Teachers = () => {
               name="qualification"
               value={formData.qualification}
               onChange={handleInputChange}
+              pattern={validationPatterns.name}
+              title={validationMessages.name}
+              className="text-sm"
+              maxLength="100"
               required
             />
             <Input
@@ -331,6 +398,10 @@ const Teachers = () => {
               name="specialization"
               value={formData.specialization}
               onChange={handleInputChange}
+              pattern={validationPatterns.name}
+              title={validationMessages.name}
+              className="text-sm"
+              maxLength="100"
               required
             />
           </div>
@@ -341,6 +412,11 @@ const Teachers = () => {
             type="number"
             value={formData.experience}
             onChange={handleInputChange}
+            placeholder="e.g., 5"
+            className="text-sm"
+            maxLength="2"
+            min="0"
+            max="50"
           />
 
           <div className="flex justify-end space-x-3 pt-4">
