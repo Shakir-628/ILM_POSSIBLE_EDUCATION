@@ -4,7 +4,6 @@ import Button from '../components/Button';
 import Table from '../components/Table';
 import Modal from '../components/Modal';
 import Input from '../components/Input';
-import Select from '../components/Select';
 import { PlusIcon, InboxIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { messageService } from '../services/messageService';
 import { useToast } from '../context/ToastContext';
@@ -14,7 +13,6 @@ const Messages = () => {
   const toast = useToast();
   const { user } = useAuth();
   const [messages, setMessages] = useState([]);
-  const [users, setUsers] = useState([]);
   const [activeTab, setActiveTab] = useState('inbox'); // 'inbox' or 'sent'
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);

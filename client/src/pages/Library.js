@@ -13,10 +13,7 @@ import {
   BookOpenIcon,
   UserGroupIcon,
   ExclamationTriangleIcon,
-  CurrencyDollarIcon,
-  ArrowPathIcon,
   CheckCircleIcon,
-  XCircleIcon,
 } from '@heroicons/react/24/outline';
 import { libraryService } from '../services/libraryService';
 import { studentService } from '../services/studentService';

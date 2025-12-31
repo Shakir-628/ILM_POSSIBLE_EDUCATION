@@ -15,13 +15,10 @@ import {
   CheckCircleIcon,
   ClockIcon,
   ExclamationCircleIcon,
-  DocumentArrowDownIcon,
-  EnvelopeIcon,
 } from '@heroicons/react/24/outline';
 import { feeService } from '../services/feeService';
 import { classService } from '../services/classService';
 import { studentService } from '../services/studentService';
-import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 
 const FeeManagement = () => {

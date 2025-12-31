@@ -31,8 +31,14 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('userInfo');
-      window.location.href = '/login';
+      // Don't redirect if we're already trying to login or register
+      const isAuthPath = error.config.url.includes('/auth/login') ||
+        error.config.url.includes('/auth/register');
+
+      if (!isAuthPath) {
+        localStorage.removeItem('userInfo');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

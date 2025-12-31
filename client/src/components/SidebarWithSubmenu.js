@@ -7,14 +7,12 @@ import {
   UserGroupIcon,
   BookOpenIcon,
   CalendarDaysIcon,
-  ChartBarIcon,
   ClipboardDocumentCheckIcon,
   XMarkIcon,
   ChartPieIcon,
   BanknotesIcon,
   UserCircleIcon,
   BellAlertIcon,
-  DocumentTextIcon,
   TruckIcon,
   BuildingOfficeIcon,
   BookmarkIcon,
@@ -24,15 +22,37 @@ import {
   ChevronDownIcon,
   ChevronRightIcon,
   CubeIcon,
-  WrenchScrewdriverIcon,
   DocumentChartBarIcon,
   ClipboardDocumentListIcon,
 } from '@heroicons/react/24/outline';
+import { rolePermissionService } from '../services/rolePermissionService';
 
 const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
   const { user } = useAuth();
   const location = useLocation();
   const [expandedMenus, setExpandedMenus] = useState({});
+  const [permissions, setPermissions] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  React.useEffect(() => {
+    if (user?.role) {
+      fetchPermissions();
+    }
+  }, [user?.role]);
+
+  const fetchPermissions = async () => {
+    setLoading(true);
+    try {
+      const response = await rolePermissionService.getRolePermissionByRole(user.role);
+      if (response.success) {
+        setPermissions(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching sidebar permissions:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const toggleSubmenu = (menuName) => {
     setExpandedMenus((prev) => ({
@@ -209,15 +229,44 @@ const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
     {
       name: 'Settings',
       icon: CogIcon,
-      roles: ['admin'],
+      roles: ['admin', 'superadmin'],
       submenu: [
         { name: 'School Profile', href: '/settings/school', roles: ['admin'] },
-        { name: 'User Roles', href: '/settings/roles', roles: ['admin'] },
-        { name: 'Backup & Security', href: '/settings/backup', roles: ['admin'] },
-        { name: 'System Settings', href: '/settings/system', roles: ['admin'] },
+        { name: 'User Roles', href: '/settings/roles', roles: ['admin', 'superadmin'] },
+        { name: 'Role & Module Permissions', href: '/settings/role-permissions', roles: ['admin', 'superadmin'] },
+        { name: 'Backup & Security', href: '/settings/backup', roles: ['admin', 'superadmin'] },
+        { name: 'System Settings', href: '/settings/system', roles: ['admin', 'superadmin'] },
       ],
     },
   ];
+
+  // Map UI names to DB module names where they differ
+  const uiToDbMap = {
+    'Fees & Finance': 'Fees',
+    'Logs': 'System Logs', // simplified mapping
+  };
+
+  // Helper to check if a module or submodule is enabled for the current user
+  const isModuleEnabled = (menuName, subModuleName = null) => {
+    // SuperAdmin always has access
+    if (user?.role === 'superadmin') return true;
+
+    // While loading, don't show anything to prevent flicker
+    if (loading || !permissions) return false;
+
+    const dbName = uiToDbMap[menuName] || menuName;
+    const module = permissions.modules.find(m => m.moduleName === dbName);
+
+    // If not found in permissions, it's either not manageable yet or allowed by default
+    if (!module) return true;
+
+    if (subModuleName) {
+      const submodule = module.submodules?.find(s => s.name === subModuleName);
+      return submodule ? submodule.enabled : true;
+    }
+
+    return module.enabled;
+  };
 
   // Auto-expand parent menu if child is active
   React.useEffect(() => {
@@ -236,13 +285,16 @@ const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
-  // Filter menu items based on user role
-  const filteredMenu = menuStructure.filter((item) => item.roles.includes(user?.role));
+  // Filter menu items based on user role and dynamic permissions
+  const filteredMenu = menuStructure.filter((item) => {
+    const hasRoleAccess = item.roles.includes(user?.role);
+    if (!hasRoleAccess) return false;
+
+    // Check dynamic module permissions
+    return isModuleEnabled(item.name);
+  });
 
   // Check if current path matches menu item
-  const isActiveMenu = (href) => {
-    return location.pathname === href;
-  };
 
   const isActiveParent = (submenu) => {
     if (!submenu) return false;
@@ -258,9 +310,8 @@ const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
         />
       )}
       <div
-        className={`${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        } fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col`}
+        className={`${isOpen ? 'translate-x-0' : '-translate-x-full'
+          } fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col`}
       >
         {/* Header */}
         <div className="flex h-16 items-center justify-between px-4 bg-gray-800 lg:justify-center flex-shrink-0">
@@ -282,10 +333,13 @@ const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
               const isParentActive = isActiveParent(item.submenu);
 
               if (hasSubmenu) {
-                // Filter submenu items based on user role
-                const filteredSubmenu = item.submenu.filter((subItem) =>
-                  subItem.roles.includes(user?.role)
-                );
+                // Filter submenu items based on user role and dynamic permissions
+                const filteredSubmenu = item.submenu.filter((subItem) => {
+                  const hasRoleAccess = subItem.roles.includes(user?.role);
+                  if (!hasRoleAccess) return false;
+
+                  return isModuleEnabled(item.name, subItem.name);
+                });
 
                 if (filteredSubmenu.length === 0) return null;
 
@@ -294,11 +348,10 @@ const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
                     {/* Parent menu item */}
                     <button
                       onClick={() => toggleSubmenu(item.name)}
-                      className={`group flex items-center justify-between w-full px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                        isParentActive
-                          ? 'bg-gray-800 text-white'
-                          : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                      }`}
+                      className={`group flex items-center justify-between w-full px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${isParentActive
+                        ? 'bg-gray-800 text-white'
+                        : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                        }`}
                     >
                       <div className="flex items-center">
                         <item.icon
@@ -322,10 +375,9 @@ const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
                             key={subItem.href}
                             to={subItem.href}
                             className={({ isActive }) =>
-                              `group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                                isActive
-                                  ? 'bg-gray-800 text-white'
-                                  : 'text-gray-400 hover:bg-gray-700 hover:text-white'
+                              `group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${isActive
+                                ? 'bg-gray-800 text-white'
+                                : 'text-gray-400 hover:bg-gray-700 hover:text-white'
                               }`
                             }
                             onClick={() => {
@@ -349,10 +401,9 @@ const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
                     key={item.name}
                     to={item.href}
                     className={({ isActive }) =>
-                      `group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                        isActive
-                          ? 'bg-gray-800 text-white'
-                          : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                      `group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${isActive
+                        ? 'bg-gray-800 text-white'
+                        : 'text-gray-300 hover:bg-gray-700 hover:text-white'
                       }`
                     }
                     onClick={() => {

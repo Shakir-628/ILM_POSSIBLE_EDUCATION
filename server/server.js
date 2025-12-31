@@ -48,6 +48,7 @@ import certificateTemplateRoutes from "./routes/certificateTemplateRoutes.js";
 import libraryRoutes from "./routes/library.js";
 import transportRoutes from "./routes/transport.js";
 import hostelRoutes from "./routes/hostel.js";
+import superadminRoutes from "./routes/superadminRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -93,6 +94,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/superadmins", superadminRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/teachers", teacherRoutes);
 app.use("/api/classes", classRoutes);

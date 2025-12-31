@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
-import Card from '../components/Card';
 import Button from '../components/Button';
 import Table from '../components/Table';
 import Modal from '../components/Modal';
@@ -10,9 +9,6 @@ import SearchBar from '../components/SearchBar';
 import Pagination from '../components/Pagination';
 import {
   PlusIcon,
-  StarIcon,
-  TrophyIcon,
-  ClipboardDocumentCheckIcon,
 } from '@heroicons/react/24/outline';
 import { performanceService } from '../services/performanceService';
 import { teacherService } from '../services/teacherService';
@@ -25,7 +21,6 @@ const TeacherPerformance = () => {
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedTeacher, setSelectedTeacher] = useState(null);
 
   const [formData, setFormData] = useState({
     teacher: '',

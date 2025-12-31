@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { authService } from '../services/authService';
 
+
 const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -29,9 +30,9 @@ export const AuthProvider = ({ children }) => {
       setUser(data);
       return { success: true, data };
     } catch (error) {
-      return { 
-        success: false, 
-        error: error.response?.data?.message || 'Login failed' 
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Login failed'
       };
     }
   };
@@ -42,9 +43,9 @@ export const AuthProvider = ({ children }) => {
       setUser(data);
       return { success: true, data };
     } catch (error) {
-      return { 
-        success: false, 
-        error: error.response?.data?.message || 'Registration failed' 
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Registration failed'
       };
     }
   };
@@ -60,9 +61,9 @@ export const AuthProvider = ({ children }) => {
       setUser(data);
       return { success: true, data };
     } catch (error) {
-      return { 
-        success: false, 
-        error: error.response?.data?.message || 'Update failed' 
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Update failed'
       };
     }
   };

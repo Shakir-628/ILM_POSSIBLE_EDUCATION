@@ -9,11 +9,9 @@ import Pagination from '../components/Pagination';
 import Select from '../components/Select';
 import {
   BookmarkIcon,
-  ClockIcon,
   CheckCircleIcon,
   ExclamationCircleIcon,
   CurrencyDollarIcon,
-  ArrowPathIcon,
 } from '@heroicons/react/24/outline';
 import { libraryService } from '../services/libraryService';
 import { useTableData } from '../hooks/useTableData';

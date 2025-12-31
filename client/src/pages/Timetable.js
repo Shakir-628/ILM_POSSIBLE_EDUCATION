@@ -21,11 +21,12 @@ import { useToast } from '../context/ToastContext';
 const Timetable = () => {
   const toast = useToast();
   const { isAdmin } = useAuth();
-  const [timetables, setTimetables] = useState([]);
   const [classes, setClasses] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [teachers, setTeachers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // loading indicates when the timetable fetch is in progress.
+  // Default to false so the page doesn't show a perpetual spinner before a class is selected.
+  const [loading, setLoading] = useState(false);
   const [selectedClass, setSelectedClass] = useState('');
   const [currentTimetable, setCurrentTimetable] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);

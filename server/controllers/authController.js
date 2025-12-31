@@ -4,6 +4,89 @@ import crypto from "crypto";
 import { sendPasswordResetEmail } from "../services/mailService.js";
 import { createAuditLog } from "../middleware/auditMiddleware.js";
 
+// @desc    Register a new superadmin (SUPERADMIN ONLY)
+// @route   POST /api/auth/register-superadmin
+// @access  Private (SuperAdmin only)
+export const registerSuperadmin = async (req, res) => {
+  try {
+    const { name, email, password, phone, address } = req.body;
+
+    // Verify requester is superadmin
+    if (!req.user || req.user.role !== "superadmin") {
+      return res.status(403).json({
+        success: false,
+        message: "Only SuperAdmins can create new SuperAdmin accounts",
+      });
+    }
+
+    // Validate input
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Name, email, and password are required",
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters",
+      });
+    }
+
+    // Check if user exists
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({
+        success: false,
+        message: "Email already registered",
+      });
+    }
+
+    // Create superadmin user
+    const user = await User.create({
+      name,
+      email,
+      password,
+      role: "superadmin",
+      phone,
+      address,
+      isActive: true,
+    });
+
+    // Log this action
+    await createAuditLog({
+      entity: "User",
+      entityId: user._id,
+      action: "create_superadmin",
+      userId: req.user._id,
+      details: { email, name },
+      req,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "SuperAdmin user created successfully",
+      data: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        phone: user.phone,
+        address: user.address,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+      },
+    });
+  } catch (error) {
+    console.error("Register superadmin error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 // @desc    Register a new user
 // @route   POST /api/auth/register
 // @access  Public
@@ -18,12 +101,18 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
+    // Prevent direct superadmin registration through public endpoint
+    let assignedRole = role || "student";
+    if (assignedRole === "superadmin") {
+      assignedRole = "student"; // Force to student if someone tries to register as superadmin
+    }
+
     // Create user
     const user = await User.create({
       name,
       email,
       password,
-      role: role || "student",
+      role: assignedRole,
       phone,
       address,
     });

@@ -3,15 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { useAuth } from '../context/AuthContext';
 import Card from '../components/Card';
-import Button from '../components/Button';
 import Table from '../components/Table';
 import {
   BanknotesIcon,
   ClockIcon,
   CheckCircleIcon,
-  ExclamationCircleIcon,
-  ArrowRightIcon,
-  DocumentArrowDownIcon,
 } from '@heroicons/react/24/outline';
 import { feeService } from '../services/feeService';
 import { useToast } from '../context/ToastContext';

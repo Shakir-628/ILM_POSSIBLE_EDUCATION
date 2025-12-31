@@ -10,7 +10,6 @@ import { classService } from '../services/classService';
 
 const Attendance = () => {
   const toast = useToast();
-  const { isTeacher, isAdmin } = useAuth();
   const [classes, setClasses] = useState([]);
   const [students, setStudents] = useState([]);
   const [selectedClass, setSelectedClass] = useState('');
@@ -19,6 +18,7 @@ const Attendance = () => {
   );
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isMarking, setIsMarking] = useState(false);
 
   useEffect(() => {
     fetchClasses();
@@ -49,12 +49,64 @@ const Attendance = () => {
           studentId: student._id,
           name: `${student.firstName} ${student.lastName}`,
           status: 'present',
+          isMarked: false
         }))
       );
+      
+      // Check for existing attendance after setting up the initial data
+      if (attendanceDate) {
+        checkExistingAttendance();
+      }
     } catch (error) {
       console.error('Error fetching students:', error);
     }
   };
+  
+  const checkExistingAttendance = async () => {
+    if (!selectedClass || !attendanceDate) return;
+    
+    try {
+      const existingAttendance = await attendanceService.getAllAttendance({
+        classId: selectedClass,
+        date: attendanceDate
+      });
+      
+      // Always update the attendance data with the latest from the database
+      setAttendanceData(prev => {
+        // Create a map of existing attendance for quick lookup
+        const attendanceMap = new Map();
+        if (existingAttendance && existingAttendance.length > 0) {
+          existingAttendance.forEach(record => {
+            attendanceMap.set(record.studentId, record);
+          });
+        }
+        
+        // Update each student's status based on the latest data
+        return prev.map(item => {
+          const existingRecord = attendanceMap.get(item.studentId);
+          if (existingRecord) {
+            return {
+              ...item,
+              status: existingRecord.status,
+              isMarked: true,
+              updatedAt: existingRecord.updatedAt // Store when it was last updated
+            };
+          }
+          // If no existing record, keep current data but ensure isMarked is false
+          return { ...item, isMarked: false };
+        });
+      });
+    } catch (error) {
+      console.error('Error checking existing attendance:', error);
+    }
+  };
+  
+  // Check for existing attendance when date changes
+  useEffect(() => {
+    if (selectedClass && attendanceDate) {
+      checkExistingAttendance();
+    }
+  }, [attendanceDate]);
 
   const handleStatusChange = (studentId, status) => {
     setAttendanceData((prev) =>
@@ -67,27 +119,38 @@ const Attendance = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setIsMarking(true);
 
     try {
       const bulkData = {
         classId: selectedClass,
         date: attendanceDate,
-        attendanceRecords: attendanceData.map((item) => ({
-          studentId: item.studentId,
-          status: item.status,
-        })),
+        attendanceRecords: attendanceData
+          .filter(item => !item.isMarked) // Only include unmarked records
+          .map((item) => ({
+            studentId: item.studentId,
+            status: item.status,
+          })),
       };
 
+      if (bulkData.attendanceRecords.length === 0) {
+        toast.info('Attendance already marked for all students');
+        return;
+      }
+
+      // Submit the attendance
       await attendanceService.bulkMarkAttendance(bulkData);
       toast.success('Attendance marked successfully!');
-      setAttendanceData([]);
-      setSelectedClass('');
-      setStudents([]);
+      
+      // Refresh the attendance data from the database to get the latest status
+      await checkExistingAttendance();
+      
     } catch (error) {
       console.error('Error marking attendance:', error);
       toast.error(error.response?.data?.message || 'Error marking attendance');
     } finally {
       setLoading(false);
+      setIsMarking(false);
     }
   };
 
@@ -152,22 +215,36 @@ const Attendance = () => {
                               {item.name}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
+                              {item.isMarked && item.updatedAt && (
+                                <div className="text-xs text-gray-500 mb-1">
+                                  Last updated: {new Date(item.updatedAt).toLocaleString()}
+                                </div>
+                              )}
                               <div className="flex space-x-4">
-                                {['present', 'absent', 'late', 'excused'].map((status) => (
-                                  <label key={status} className="inline-flex items-center">
-                                    <input
-                                      type="radio"
-                                      name={`status-${item.studentId}`}
-                                      value={status}
-                                      checked={item.status === status}
-                                      onChange={() => handleStatusChange(item.studentId, status)}
-                                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
-                                    />
-                                    <span className="ml-2 text-sm text-gray-700 capitalize">
-                                      {status}
-                                    </span>
-                                  </label>
-                                ))}
+                                {['present', 'absent', 'late', 'excused'].map((status) => {
+                                  const isCurrentStatus = item.status === status;
+                                  const isMarked = item.isMarked && isCurrentStatus;
+                                  
+                                  return (
+                                    <label 
+                                      key={status} 
+                                      className={`inline-flex items-center ${isMarked ? 'opacity-100' : ''} ${!isMarked && item.isMarked ? 'opacity-50' : ''}`}
+                                    >
+                                      <input
+                                        type="radio"
+                                        name={`status-${item.studentId}`}
+                                        value={status}
+                                        checked={isCurrentStatus}
+                                        onChange={() => handleStatusChange(item.studentId, status)}
+                                        disabled={item.isMarked}
+                                        className={`h-4 w-4 ${isMarked ? 'text-green-500' : 'text-primary-600'} focus:ring-primary-500 border-gray-300`}
+                                      />
+                                      <span className={`ml-2 text-sm ${isMarked ? 'text-green-700 font-medium' : 'text-gray-700'} capitalize`}>
+                                        {status} {isMarked && '(Marked)'}
+                                      </span>
+                                    </label>
+                                  );
+                                })}
                               </div>
                             </td>
                           </tr>
@@ -178,9 +255,17 @@ const Attendance = () => {
                 </div>
 
                 <div className="flex justify-end">
-                  <Button type="submit" disabled={loading}>
-                    {loading ? 'Submitting...' : 'Mark Attendance'}
-                  </Button>
+                  <div className="flex items-center space-x-4">
+                    {isMarking && (
+                      <span className="text-sm text-green-600">Saving changes...</span>
+                    )}
+                    <Button 
+                      type="submit" 
+                      disabled={loading || attendanceData.every(item => item.isMarked)}
+                    >
+                      {loading ? 'Submitting...' : 'Mark Attendance'}
+                    </Button>
+                  </div>
                 </div>
               </>
             )}

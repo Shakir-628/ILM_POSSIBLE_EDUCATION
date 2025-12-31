@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
-import Card from '../components/Card';
 import Button from '../components/Button';
 import Select from '../components/Select';
 import Input from '../components/Input';
@@ -8,12 +7,10 @@ import {
   CubeIcon,
   ArrowDownTrayIcon,
   DocumentTextIcon,
-  ChartBarIcon,
   MagnifyingGlassIcon,
   ChevronUpIcon,
   ChevronDownIcon,
   ChevronUpDownIcon,
-  EyeIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { assetService } from '../services/assetService';

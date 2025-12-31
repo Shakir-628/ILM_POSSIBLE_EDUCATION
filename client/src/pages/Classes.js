@@ -9,6 +9,9 @@ import { PlusIcon } from '@heroicons/react/24/outline';
 import { classService } from '../services/classService';
 import { useToast } from '../context/ToastContext';
 import { teacherService } from '../services/teacherService';
+import { useTableData } from '../hooks/useTableData';
+import SearchBar from '../components/SearchBar';
+import Pagination from '../components/Pagination';
 
 const Classes = () => {
   const toast = useToast();
@@ -31,6 +34,19 @@ const Classes = () => {
     fetchClasses();
     fetchTeachers();
   }, []);
+
+  const {
+    paginatedData,
+    searchTerm,
+    setSearchTerm,
+    clearSearch,
+    currentPage,
+    totalPages,
+    totalItems,
+    itemsPerPage,
+    setCurrentPage,
+    setItemsPerPage,
+  } = useTableData(classes, ['className', 'grade', 'section', 'classTeacher.firstName', 'classTeacher.lastName', 'room'], 10);
 
   const fetchClasses = async () => {
     try {
@@ -71,7 +87,7 @@ const Classes = () => {
       closeModal();
     } catch (error) {
       console.error('Error saving class:', error);
-      toast.error(error.response?.data?.message || 'Error saving class'); 
+      toast.error(error.response?.data?.message || 'Error saving class');
     }
   };
 
@@ -138,11 +154,10 @@ const Classes = () => {
       accessor: 'status',
       render: (row) => (
         <span
-          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-            row.status === 'active'
-              ? 'bg-green-100 text-green-800'
-              : 'bg-gray-100 text-gray-800'
-          }`}
+          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${row.status === 'active'
+            ? 'bg-green-100 text-green-800'
+            : 'bg-gray-100 text-gray-800'
+            }`}
         >
           {row.status}
         </span>
@@ -160,16 +175,37 @@ const Classes = () => {
           </Button>
         </div>
 
-        <div className="bg-white shadow rounded-lg">
+
+        <div className="bg-white shadow rounded-lg overflow-hidden">
+          <div className="p-4 border-b border-gray-200">
+            <div className="max-w-md">
+              <SearchBar
+                value={searchTerm}
+                onChange={setSearchTerm}
+                onClear={clearSearch}
+                placeholder="Search classes..."
+              />
+            </div>
+          </div>
           {loading ? (
             <div className="p-8 text-center">Loading...</div>
           ) : (
-            <Table
-              columns={columns}
-              data={classes}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
+            <>
+              <Table
+                columns={columns}
+                data={paginatedData}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={setItemsPerPage}
+              />
+            </>
           )}
         </div>
       </div>

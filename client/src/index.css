@@ -1,6 +1,12 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* 
+  Tailwind CSS Directives
+  Note: If your IDE shows "Unknown at rule" errors here, you can fix this by:
+  1. Installing the "Tailwind CSS IntelliSense" extension
+  2. Setting "css.lint.unknownAtRules": "ignore" in your VS Code settings.json
+*/
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
@@ -27,6 +33,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -37,6 +44,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -48,6 +56,7 @@
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -58,6 +67,7 @@
   from {
     transform: translateX(100%);
   }
+
   to {
     transform: translateX(0);
   }
@@ -67,6 +77,7 @@
   from {
     transform: translateX(-100%);
   }
+
   to {
     transform: translateX(0);
   }
@@ -77,6 +88,7 @@
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -84,30 +96,55 @@
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-10px);
   }
 }
 
 @keyframes pulse-soft {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.8;
   }
 }
 
 @keyframes gradient-shift {
-  0%, 100% {
+
+  0%,
+  100% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #f8f8f8 50%, #f0f0f0 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
 }
 
 .animate-fade-in {
@@ -149,7 +186,7 @@
 
 /* Custom Utilities */
 .bg-pattern {
-  background-image: 
+  background-image:
     radial-gradient(at 40% 20%, rgba(14, 165, 233, 0.05) 0, transparent 50%),
     radial-gradient(at 80% 0%, rgba(168, 85, 247, 0.05) 0, transparent 50%),
     radial-gradient(at 0% 50%, rgba(14, 165, 233, 0.05) 0, transparent 50%),
@@ -160,7 +197,9 @@
 
 /* Smooth Transitions */
 * {
-  @apply transition-colors duration-200;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
 }
 
 /* Form Elements */
@@ -172,38 +211,79 @@ input[type="date"],
 input[type="time"],
 select,
 textarea {
-  @apply focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  --tw-ring-inset: var(--tw-empty,
+      /*!*/
+      /*!*/
+    );
+  --tw-ring-offset-width: 0px;
+  --tw-ring-offset-color: #fff;
+  --tw-ring-color: #0ea5e9;
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+  border-color: #0ea5e9;
 }
 
 /* Table Styles */
 table {
-  @apply w-full;
+  width: 100%;
 }
 
 thead {
-  @apply bg-gradient-to-r from-primary-50 to-secondary-50;
+  background: linear-gradient(to right, #f0f9ff, #f5f3ff);
 }
 
 th {
-  @apply px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider;
+  padding: 1rem 1.5rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 td {
-  @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
+  padding: 1rem 1.5rem;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  color: #111827;
 }
 
 tr {
-  @apply border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150;
+  border-bottom: 1px solid #f3f4f6;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+tr:hover {
+  background-color: #f9fafb;
 }
 
 /* Modal Backdrop */
 .modal-backdrop {
-  @apply fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40 animate-fade-in;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 40;
+  animation: fade-in 0.5s ease-out;
 }
 
 /* Toast Notifications */
 .toast {
-  @apply animate-slide-in-right;
+  animation: slide-in-right 0.5s ease-out;
 }
 
 /* Loading Spinner */
@@ -215,6 +295,7 @@ tr {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -222,24 +303,50 @@ tr {
 
 /* Badge */
 .badge {
-  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
 }
 
 /* Hover Effects */
 .hover-lift {
-  @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-large;
+  transition-property: all;
+  transition-duration: 300ms;
+}
+
+.hover-lift:hover {
+  transform: translateY(-0.25rem);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .hover-glow {
-  @apply transition-all duration-300 hover:shadow-glow;
+  transition-property: all;
+  transition-duration: 300ms;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 15px rgba(14, 165, 233, 0.3);
 }
 
 /* Gradient Text */
 .gradient-text {
-  @apply bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent;
+  background-image: linear-gradient(to right, #0284c7, #9333ea);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 /* Card Hover Effect */
 .card-interactive {
-  @apply transition-all duration-300 hover:shadow-large hover:-translate-y-1 hover:scale-[1.02];
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+.card-interactive:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: translateY(-0.25rem) scale(1.02);
 }

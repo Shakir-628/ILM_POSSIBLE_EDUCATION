@@ -12,6 +12,7 @@ import SearchBar from '../components/SearchBar';
 import Table from '../components/Table';
 import Pagination from '../components/Pagination';
 import { QRCodeSVG } from 'qrcode.react';
+import { TableSkeleton } from '../components/LoadingSkeleton';
 import {
   DocumentArrowDownIcon,
   PlusIcon,
@@ -98,8 +99,8 @@ const Students = () => {
   };
 
   // Filter students by status
-  const filteredStudents = statusFilter === 'all' 
-    ? students 
+  const filteredStudents = statusFilter === 'all'
+    ? students
     : students.filter(s => s.status === statusFilter);
 
   // Use table data hook for pagination and search
@@ -118,7 +119,7 @@ const Students = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Use generic validation handler
     switch (name) {
       case 'firstName':
@@ -148,23 +149,23 @@ const Students = () => {
 
   const generateStudentId = () => {
     if (students.length === 0) return 'S001';
-    
+
     // Extract numeric part from existing student IDs and find the highest
     const studentIds = students.map(s => s.studentId).filter(id => id && id.startsWith('S'));
     const numbers = studentIds.map(id => {
       const num = id.replace('S', '');
       return parseInt(num) || 0;
     }).filter(num => num > 0);
-    
+
     const maxNumber = Math.max(...numbers, 0);
     const nextNumber = maxNumber + 1;
-    
+
     return `S${nextNumber.toString().padStart(3, '0')}`;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Define validation rules for the student form
     const validationRules = {
       firstName: { type: 'name', required: true, label: 'First Name' },
@@ -177,24 +178,24 @@ const Students = () => {
       gender: { type: 'select', required: true, label: 'Gender' },
       classId: { type: 'select', required: true, label: 'Class' },
     };
-    
+
     // Validate entire form
     const validation = validateForm(formData, validationRules);
-    
+
     if (!validation.isValid) {
       // Show first error message
       const firstError = Object.values(validation.errors)[0];
       toast.error(firstError);
       return;
     }
-    
+
     try {
       // Auto-generate student ID if empty and not editing
       const submitData = { ...formData };
       if (!editingStudent && !submitData.studentId) {
         submitData.studentId = generateStudentId();
       }
-      
+
       if (editingStudent) {
         await studentService.updateStudent(editingStudent._id, submitData);
       } else {
@@ -288,7 +289,7 @@ const Students = () => {
         const svgData = new XMLSerializer().serializeToString(svgElement);
         const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
         const svgUrl = URL.createObjectURL(svgBlob);
-        
+
         // Create download link
         const downloadLink = document.createElement('a');
         downloadLink.href = svgUrl;
@@ -296,7 +297,7 @@ const Students = () => {
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
-        
+
         // Clean up
         URL.revokeObjectURL(svgUrl);
       }
@@ -307,55 +308,55 @@ const Students = () => {
     // Create a canvas for the ID card
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    
+
     // Set ID card dimensions (standard credit card size ratio)
     canvas.width = 600;
     canvas.height = 380;
-    
+
     // Background
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
+
     // Add border
     ctx.strokeStyle = '#3b82f6';
     ctx.lineWidth = 3;
     ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
-    
+
     // School Header
     ctx.fillStyle = '#1e40af';
     ctx.fillRect(10, 10, canvas.width - 20, 60);
-    
+
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 24px Arial';
     ctx.textAlign = 'center';
     ctx.fillText('ILM POSSIBLE SCHOOL', canvas.width / 2, 35);
     ctx.font = '16px Arial';
     ctx.fillText('Student Identification Card', canvas.width / 2, 55);
-    
+
     // Student Photo placeholder (if no photo available)
     ctx.fillStyle = '#f3f4f6';
     ctx.fillRect(30, 90, 120, 150);
     ctx.strokeStyle = '#d1d5db';
     ctx.lineWidth = 1;
     ctx.strokeRect(30, 90, 120, 150);
-    
+
     ctx.fillStyle = '#6b7280';
     ctx.font = '12px Arial';
     ctx.textAlign = 'center';
     ctx.fillText('PHOTO', 90, 165);
-    
+
     // Student Information
     ctx.fillStyle = '#111827';
     ctx.font = 'bold 18px Arial';
     ctx.textAlign = 'left';
     ctx.fillText(`${selectedStudent.firstName} ${selectedStudent.lastName}`, 170, 110);
-    
+
     ctx.font = '14px Arial';
     ctx.fillStyle = '#374151';
     ctx.fillText(`Student ID: ${selectedStudent.studentId}`, 170, 135);
     ctx.fillText(`Class: ${selectedStudent.class?.className || 'N/A'}`, 170, 155);
     ctx.fillText(`Roll No: ${selectedStudent.rollNumber || 'N/A'}`, 170, 175);
-    
+
     // Add more student details
     if (selectedStudent.dateOfBirth) {
       ctx.fillText(`DOB: ${new Date(selectedStudent.dateOfBirth).toLocaleDateString()}`, 170, 195);
@@ -369,13 +370,13 @@ const Students = () => {
     if (selectedStudent.email) {
       ctx.fillText(`Email: ${selectedStudent.email}`, 170, 255);
     }
-    
+
     // QR Code Section
     ctx.fillStyle = '#111827';
     ctx.font = 'bold 14px Arial';
     ctx.textAlign = 'center';
     ctx.fillText('SCAN FOR VERIFICATION', 450, 280);
-    
+
     // Get QR code and draw it on canvas
     const container = document.getElementById('qr-canvas');
     if (container) {
@@ -385,11 +386,11 @@ const Students = () => {
         const img = new Image();
         const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
         const url = URL.createObjectURL(blob);
-        
-        img.onload = function() {
+
+        img.onload = function () {
           // Draw QR code
           ctx.drawImage(img, 380, 300, 140, 140);
-          
+
           // Valid Until date
           ctx.fillStyle = '#6b7280';
           ctx.font = '12px Arial';
@@ -397,7 +398,7 @@ const Students = () => {
           const validDate = new Date();
           validDate.setFullYear(validDate.getFullYear() + 1);
           ctx.fillText(`Valid Until: ${validDate.toLocaleDateString()}`, 30, 350);
-          
+
           // Signature line
           ctx.strokeStyle = '#9ca3af';
           ctx.lineWidth = 1;
@@ -405,14 +406,14 @@ const Students = () => {
           ctx.moveTo(400, 350);
           ctx.lineTo(570, 350);
           ctx.stroke();
-          
+
           ctx.fillStyle = '#6b7280';
           ctx.font = '10px Arial';
           ctx.textAlign = 'center';
           ctx.fillText('Principal Signature', 485, 365);
-          
+
           // Convert canvas to blob and download
-          canvas.toBlob(function(blob) {
+          canvas.toBlob(function (blob) {
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = `${selectedStudent.studentId}_ID_Card.png`;
@@ -423,7 +424,7 @@ const Students = () => {
             URL.revokeObjectURL(link.href);
           }, 'image/png');
         };
-        
+
         img.src = url;
       }
     }
@@ -575,9 +576,9 @@ const Students = () => {
 
       const response = await studentService.uploadBulkImportFile(formData);
       setImportPreview(response.data);
-      
+
       if (response.data.errorCount > 0) {
-        toast.warning(`File processed: ${response.data.validCount} valid, ${response.data.errorCount} errors. Please review.`);   
+        toast.warning(`File processed: ${response.data.validCount} valid, ${response.data.errorCount} errors. Please review.`);
       } else {
         toast.success(`File validated successfully! ${response.data.validCount} students ready to import.`);
       }
@@ -593,7 +594,7 @@ const Students = () => {
 
   const handleConfirmImport = async () => {
     if (!importPreview || importPreview.validCount === 0) {
-        toast.warning('No valid students to import');
+      toast.warning('No valid students to import');
       return;
     }
 
@@ -716,12 +717,11 @@ const Students = () => {
       accessor: 'status',
       render: (row) => (
         <span
-          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-            row.status === 'active' ? 'bg-green-100 text-green-800' :
+          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${row.status === 'active' ? 'bg-green-100 text-green-800' :
             row.status === 'inactive' ? 'bg-gray-100 text-gray-800' :
-            row.status === 'graduated' ? 'bg-blue-100 text-blue-800' :
-            'bg-red-100 text-red-800'
-          }`}
+              row.status === 'graduated' ? 'bg-blue-100 text-blue-800' :
+                'bg-red-100 text-red-800'
+            }`}
         >
           {row.status}
         </span>
@@ -874,43 +874,54 @@ const Students = () => {
           </div>
         )}
 
-        {/* Search and Filter */}
-        <div className="bg-white shadow rounded-lg p-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="md:col-span-2">
+        {/* Filters and List */}
+        <div className="bg-white shadow rounded-lg overflow-hidden">
+          <div className="p-4 border-b border-gray-200 sm:flex sm:items-center sm:justify-between">
+            <div className="flex-1 min-w-0 max-w-md">
               <SearchBar
                 value={searchTerm}
                 onChange={setSearchTerm}
                 onClear={clearSearch}
-                placeholder="Search by ID, name, or email..."
+                placeholder="Search by ID, name, email..."
               />
             </div>
-            <div>
+            <div className="mt-3 sm:mt-0 sm:ml-4 flex space-x-3">
               <Select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 options={[
-                  { value: 'all', label: 'All Status' },
-                  { value: 'active', label: 'Active' },
-                  { value: 'inactive', label: 'Inactive' },
-                  { value: 'graduated', label: 'Graduated' },
-                  { value: 'transferred', label: 'Transferred' },
+                  { label: 'All Status', value: 'all' },
+                  { label: 'Active', value: 'active' },
+                  { label: 'Inactive', value: 'inactive' },
+                  { label: 'Graduated', value: 'graduated' },
+                  { label: 'Transferred', value: 'transferred' },
+                ]}
+              />
+              <Select
+                value={itemsPerPage}
+                onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                options={[
+                  { label: '10 per page', value: 10 },
+                  { label: '25 per page', value: 25 },
+                  { label: '50 per page', value: 50 },
                 ]}
               />
             </div>
           </div>
-          <div className="mt-2 text-sm text-gray-600">
-            Showing {paginatedData.length} of {totalItems} students
-          </div>
-        </div>
 
-        {/* Table */}
-        <div className="bg-white shadow rounded-lg overflow-hidden">
-          <Table
-            columns={columns}
-            data={paginatedData}
-            loading={loading}
-          />
+          <div className="overflow-x-auto">
+            {loading ? (
+              <div className="p-4">
+                <TableSkeleton rows={10} cols={8} />
+              </div>
+            ) : (
+              <Table
+                columns={columns}
+                data={paginatedData}
+                loading={loading}
+              />
+            )}
+          </div>
         </div>
 
         {/* Pagination */}
