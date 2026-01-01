@@ -37,13 +37,12 @@ const Timetable = () => {
     { label: '08:00 - 08:45', value: '08:00' },
     { label: '08:45 - 09:30', value: '08:45' },
     { label: '09:30 - 10:15', value: '09:30' },
-    { label: '10:15 - 10:30', value: 'break', isBreak: true },
-    { label: '10:30 - 11:15', value: '10:30' },
-    { label: '11:15 - 12:00', value: '11:15' },
-    { label: '12:00 - 12:45', value: '12:00' },
-    { label: '12:45 - 13:00', value: 'lunch', isBreak: true },
-    { label: '13:00 - 13:45', value: '13:00' },
-    { label: '13:45 - 14:30', value: '13:45' },
+    { label: '10:15 - 11:00', value: '10:15' },
+    { label: '11:00 - 11:45', value: '11:00' },
+    { label: '11:45 - 12:30', value: '11:45' },
+    { label: '12:30 - 13:15', value: 'school_break', isBreak: true },
+    { label: '13:15 - 14:00', value: '13:15' },
+    { label: '14:00 - 14:45', value: '14:00' },
   ];
 
   useEffect(() => {
@@ -87,7 +86,7 @@ const Timetable = () => {
 
   const fetchTimetable = async () => {
     if (!selectedClass) return;
-    
+
     setLoading(true);
     try {
       const response = await timetableService.getTimetableByClass(selectedClass);
@@ -110,72 +109,103 @@ const Timetable = () => {
       return;
     }
 
-    try {
-      // Define time slots with start and end times
-      const actualTimeSlots = [
-        { start: '08:00', end: '08:45' },
-        { start: '08:45', end: '09:30' },
-        { start: '09:30', end: '10:15' },
-        { start: '10:30', end: '11:15' },
-        { start: '11:15', end: '12:00' },
-        { start: '12:00', end: '12:45' },
-        { start: '13:00', end: '13:45' },
-        { start: '13:45', end: '14:30' },
-      ];
+    // Define time slots with start and end times
+    const actualTimeSlots = [
+      { start: '08:00', end: '08:45' },
+      { start: '08:45', end: '09:30' },
+      { start: '09:30', end: '10:15' },
+      { start: '10:15', end: '11:00' },
+      { start: '11:00', end: '11:45' },
+      { start: '11:45', end: '12:30' },
+      { start: '13:15', end: '14:00' },
+      { start: '14:00', end: '14:45' },
+    ];
 
-      const emptySchedule = daysOfWeek.map((day) => ({
-        day,
-        periods: actualTimeSlots.map((slot, index) => ({
-          periodNumber: index + 1,
-          startTime: slot.start,
-          endTime: slot.end,
-          subject: null,
-          teacher: null,
-          roomNumber: '',
-          periodType: 'lecture',
-        })),
-      }));
+    const emptySchedule = daysOfWeek.map((day) => ({
+      day,
+      periods: actualTimeSlots.map((slot, index) => ({
+        periodNumber: index + 1,
+        startTime: slot.start,
+        endTime: slot.end,
+        subject: null,
+        teacher: null,
+        roomNumber: '',
+        periodType: 'lecture',
+      })),
+    }));
 
-      const emptyTimetable = {
-        class: selectedClass,
-        academicYear: new Date().getFullYear().toString(),
-        term: '1st',
-        schedule: emptySchedule,
-        breaks: [
-          {
-            name: 'Short Break',
-            startTime: '10:15',
-            endTime: '10:30',
-            duration: 15,
-          },
-          {
-            name: 'Lunch Break',
-            startTime: '12:45',
-            endTime: '13:00',
-            duration: 15,
-          },
-        ],
-      };
+    const emptyTimetable = {
+      class: selectedClass,
+      academicYear: new Date().getFullYear().toString(),
+      term: '1st',
+      schedule: emptySchedule,
+      breaks: [
+        {
+          name: 'School Break (Lunch & Playing)',
+          startTime: '12:30',
+          endTime: '13:15',
+          duration: 45,
+        },
+      ],
+    };
 
-      const response = await timetableService.createTimetable(emptyTimetable);
-      setCurrentTimetable(response.data);
-      toast.success('Timetable created successfully');
-    } catch (error) {
-      console.error('Error creating timetable:', error);
-      toast.error(error.response?.data?.message || 'Error creating timetable');
-    }
+    setCurrentTimetable(emptyTimetable);
+    toast.info('Empty timetable initialized. Fill in the slots and click "Save Changes".');
   };
 
   const handleSaveTimetable = async () => {
     if (!currentTimetable) return;
 
     try {
-      await timetableService.updateTimetable(currentTimetable._id, currentTimetable);
-      toast.success('Timetable updated successfully');
+      if (currentTimetable._id) {
+        await timetableService.updateTimetable(currentTimetable._id, currentTimetable);
+      } else {
+        const response = await timetableService.createTimetable(currentTimetable);
+        setCurrentTimetable(response.data);
+      }
+      toast.success('Timetable saved successfully');
       fetchTimetable();
     } catch (error) {
       console.error('Error saving timetable:', error);
-      toast.error('Error saving timetable');
+      toast.error(error.response?.data?.message || 'Error saving timetable');
+    }
+  };
+
+  const handleSmartGenerate = async () => {
+    if (!selectedClass) {
+      toast.warning('Please select a class first');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res = await timetableService.smartGenerate({
+        classId: selectedClass,
+        academicYear: new Date().getFullYear().toString(),
+        term: '1st'
+      });
+
+      if (res.success) {
+        // Add default breaks to the generated schedule
+        const suggested = {
+          ...res.data,
+          breaks: [
+            {
+              name: 'School Break (Lunch & Playing)',
+              startTime: '12:30',
+              endTime: '13:15',
+              duration: 45,
+            },
+          ],
+        };
+        setCurrentTimetable(suggested);
+        toast.success('Smart timetable generated based on teacher expertise! Click "Save Changes" to finalize.');
+      }
+    } catch (error) {
+      console.error('Error smart generating timetable:', error);
+      toast.error(error.response?.data?.message || 'Error generating smart timetable');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -195,7 +225,7 @@ const Timetable = () => {
 
   const handlePeriodClick = (dayIndex, periodIndex) => {
     if (!isAdmin) return;
-    
+
     const period = currentTimetable.schedule[dayIndex].periods[periodIndex];
     setEditingPeriod({
       dayIndex,
@@ -210,7 +240,7 @@ const Timetable = () => {
 
     const updatedSchedule = [...currentTimetable.schedule];
     const currentPeriod = updatedSchedule[editingPeriod.dayIndex].periods[editingPeriod.periodIndex];
-    
+
     // Update period while maintaining required fields
     updatedSchedule[editingPeriod.dayIndex].periods[editingPeriod.periodIndex] = {
       ...currentPeriod,
@@ -231,7 +261,7 @@ const Timetable = () => {
 
   const getPeriodColor = (period) => {
     if (!period.subject) return 'bg-gray-50 border-gray-200';
-    
+
     const colors = [
       'bg-blue-50 border-blue-300',
       'bg-green-50 border-green-300',
@@ -240,10 +270,10 @@ const Timetable = () => {
       'bg-yellow-50 border-yellow-300',
       'bg-indigo-50 border-indigo-300',
     ];
-    
+
     // Get subject ID whether it's an object or string
     const subjectId = typeof period.subject === 'object' ? period.subject._id : period.subject;
-    
+
     // Simple hash to get consistent color for same subject
     const hash = subjectId ? subjectId.toString().codePointAt(0) % colors.length : 0;
     return colors[hash];
@@ -252,12 +282,12 @@ const Timetable = () => {
   const getSubjectName = (subjectData) => {
     // Handle both cases: when subject is an object (from backend) or just an ID (from local state)
     if (!subjectData) return '';
-    
+
     // If it's already an object with subjectName, return it
     if (typeof subjectData === 'object' && subjectData.subjectName) {
       return subjectData.subjectName;
     }
-    
+
     // Otherwise, look it up by ID
     const subjectId = typeof subjectData === 'object' ? subjectData._id : subjectData;
     const subject = subjects.find(s => s._id === subjectId);
@@ -267,12 +297,12 @@ const Timetable = () => {
   const getTeacherName = (teacherData) => {
     // Handle both cases: when teacher is an object (from backend) or just an ID (from local state)
     if (!teacherData) return '';
-    
+
     // If it's already an object with firstName, return the full name
     if (typeof teacherData === 'object' && teacherData.firstName) {
       return `${teacherData.firstName} ${teacherData.lastName}`;
     }
-    
+
     // Otherwise, look it up by ID
     const teacherId = typeof teacherData === 'object' ? teacherData._id : teacherData;
     const teacher = teachers.find(t => t._id === teacherId);
@@ -328,23 +358,23 @@ const Timetable = () => {
           {currentTimetable && (
             <div className="flex space-x-2">
               {/* Export Buttons */}
-              <Button 
-                onClick={handleExportExcel} 
+              <Button
+                onClick={handleExportExcel}
                 variant="outline"
                 icon={ArrowDownTrayIcon}
                 className="shadow-sm hover:shadow-md"
               >
                 Export Excel
               </Button>
-              <Button 
-                onClick={handleExportPDF} 
+              <Button
+                onClick={handleExportPDF}
                 variant="primary"
                 icon={DocumentTextIcon}
                 className="shadow-sm"
               >
                 Export PDF
               </Button>
-              
+
               {/* Admin Actions */}
               {isAdmin && (
                 <>
@@ -376,9 +406,14 @@ const Timetable = () => {
               ]}
             />
             {isAdmin && selectedClass && !currentTimetable && (
-              <Button onClick={handleCreateTimetable} icon={PlusIcon}>
-                Create Timetable
-              </Button>
+              <div className="flex space-x-2">
+                <Button onClick={handleCreateTimetable} variant="outline" icon={PlusIcon}>
+                  Empty Timetable
+                </Button>
+                <Button onClick={handleSmartGenerate} icon={CalendarDaysIcon} className="bg-gradient-to-r from-purple-600 to-indigo-600 border-none">
+                  Smart AI Generate
+                </Button>
+              </div>
             )}
           </div>
         </div>
@@ -426,7 +461,7 @@ const Timetable = () => {
                             {timeSlot.label}
                           </td>
                           <td colSpan={6} className="px-4 py-3 text-center text-sm font-medium text-yellow-800">
-                            {timeSlot.value === 'break' ? '☕ BREAK' : '🍽️ LUNCH BREAK'}
+                            🍱 SCHOOL BREAK (LUNCH & PLAYING)
                           </td>
                         </tr>
                       );
@@ -444,14 +479,13 @@ const Timetable = () => {
                         </td>
                         {daysOfWeek.map((day, dayIndex) => {
                           const period = currentTimetable.schedule[dayIndex]?.periods[actualPeriodIndex];
-                          
+
                           return (
                             <td
                               key={day}
                               onClick={() => isAdmin && handlePeriodClick(dayIndex, actualPeriodIndex)}
-                              className={`px-3 py-4 text-sm border-r cursor-pointer transition-all duration-200 hover:shadow-inner ${
-                                period?.subject ? getPeriodColor(period) : 'bg-white hover:bg-gray-50'
-                              } ${isAdmin ? 'hover:scale-105' : ''}`}
+                              className={`px-3 py-4 text-sm border-r cursor-pointer transition-all duration-200 hover:shadow-inner ${period?.subject ? getPeriodColor(period) : 'bg-white hover:bg-gray-50'
+                                } ${isAdmin ? 'hover:scale-105' : ''}`}
                             >
                               {period?.subject ? (
                                 <div className="text-center">
@@ -560,10 +594,18 @@ const Timetable = () => {
                     onChange={(e) => setEditingPeriod({ ...editingPeriod, teacher: e.target.value || null })}
                     options={[
                       { value: '', label: 'Select Teacher' },
-                      ...teachers.map((teacher) => ({
-                        value: teacher._id,
-                        label: `${teacher.firstName} ${teacher.lastName}`,
-                      })),
+                      ...teachers
+                        .map((teacher) => {
+                          const isExpert = teacher.subjects?.some(s =>
+                            (typeof s === 'object' ? s._id : s) === editingPeriod.subject
+                          );
+                          return {
+                            value: teacher._id,
+                            label: `${teacher.firstName} ${teacher.lastName}${isExpert ? ' (Expert)' : ' (Not expert)'}`,
+                            isExpert
+                          };
+                        })
+                        .sort((a, b) => (b.isExpert ? 1 : 0) - (a.isExpert ? 1 : 0)),
                     ]}
                   />
 

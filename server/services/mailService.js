@@ -95,7 +95,7 @@ export const sendAssignmentNotification = async (studentEmail, assignmentTitle, 
 // Send grade notification
 export const sendGradeNotification = async (studentEmail, assignmentTitle, marks, totalMarks, studentName) => {
   const percentage = ((marks / totalMarks) * 100).toFixed(2);
-  
+
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #333;">Assignment Graded</h2>
@@ -221,6 +221,45 @@ export const sendCertificateNotificationEmail = async (email, certificateData) =
     to: email,
     subject: `Certificate Issued - ${certificateData.certificateNumber}`,
     html,
+  });
+};
+
+// Send certificate with PDF attachment
+export const sendCertificateWithAttachment = async (email, certificateData, pdfPath) => {
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #4F46E5;">🎉 Congratulations!</h2>
+      <p>Dear Parent,</p>
+      <p>We are delighted to share the final exam results and certificate for <strong>${certificateData.studentName}</strong>.</p>
+      
+      <div style="background-color: #f9fafb; padding: 25px; border-radius: 10px; margin: 25px 0; border: 1px solid #e5e7eb;">
+        <h3 style="margin-top: 0; color: #111827;">A Special Note from our AI Tutor:</h3>
+        <p style="font-style: italic; color: #4b5563; line-height: 1.6;">"${certificateData.congratulatoryNote}"</p>
+      </div>
+      
+      <p>Please find the official certificate attached to this email.</p>
+      
+      <div style="text-align: center; margin: 30px 0;">
+        <p>Keep up the great work, ${certificateData.studentName}!</p>
+      </div>
+      
+      <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+      <p style="color: #999; font-size: 12px;">${process.env.SCHOOL_NAME || 'School Management System'}</p>
+    </div>
+  `;
+
+  const attachments = [
+    {
+      filename: `Certificate_${certificateData.certificateNumber}.pdf`,
+      path: pdfPath,
+    },
+  ];
+
+  return await sendEmail({
+    to: email,
+    subject: `Final Exam Certificate - ${certificateData.studentName}`,
+    html,
+    attachments,
   });
 };
 
@@ -401,7 +440,7 @@ export const sendReportCardEmail = async (email, reportCardData) => {
 // Send fee reminder email
 export const sendFeeReminderEmail = async (email, feeData) => {
   const daysOverdue = Math.floor((new Date() - new Date(feeData.dueDate)) / (1000 * 60 * 60 * 24));
-  
+
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: ${daysOverdue > 0 ? '#e74c3c' : '#f39c12'};">💰 Fee Payment ${daysOverdue > 0 ? 'Overdue' : 'Reminder'}</h2>
@@ -481,6 +520,7 @@ export default {
   sendEventReminderEmail,
   sendReportCardEmail,
   sendExamScheduleEmail,
+  sendCertificateWithAttachment,
   sendAssignmentNotification,
   sendGradeNotification,
 };

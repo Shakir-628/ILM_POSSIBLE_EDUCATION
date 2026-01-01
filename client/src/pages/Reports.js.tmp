@@ -1,0 +1,19 @@
+                    </tbody>
+                  </table>
+                </div>
+
+                {reportData.data?.length > 10 && (
+                  <p className="text-sm text-gray-500 mt-4 text-center">
+                    Showing 10 of {reportData.data.length} records. Download full report for complete data.
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </Layout>
+  );
+};
+
+export default Reports;

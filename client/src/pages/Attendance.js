@@ -44,69 +44,19 @@ const Attendance = () => {
     try {
       const data = await studentService.getStudentsByClass(selectedClass);
       setStudents(data || []);
-
-      const initialAttendance = (data || []).map((student) => ({
-        studentId: student._id,
-        name: `${student.firstName} ${student.lastName}`,
-        status: 'present',
-        isMarked: false,
-      }));
-
-      if (attendanceDate) {
-        try {
-          const existingAttendance = await attendanceService.getAllAttendance({
-            classId: selectedClass,
-            date: attendanceDate,
-          });
-
-          console.log('Raw API response:', existingAttendance);
-
-          const attendanceMap = new Map();
-          if (existingAttendance && existingAttendance.length > 0) {
-            existingAttendance.forEach((record) => {
-              console.log('Processing record:', record);
-              // Try different field names for student ID
-              const studentId = record.studentId || record.student?._id || record.student?.id || record.student;
-              console.log('Extracted studentId:', studentId);
-              if (studentId) {
-                attendanceMap.set(studentId, record);
-              }
-            });
-          }
-
-          console.log('Attendance map:', Array.from(attendanceMap.entries()));
-
-          const merged = initialAttendance.map((item) => {
-            const existing = attendanceMap.get(item.studentId);
-            if (existing) {
-              console.log('Found existing attendance for:', item.name, existing);
-              return {
-                ...item,
-                status: existing.status,
-                isMarked: true,
-                attendanceId: existing._id || existing.id,
-                updatedAt: existing.updatedAt,
-              };
-            }
-            return item;
-          });
-
-          console.log('Final merged attendance:', merged);
-          setAttendanceData(merged);
-        } catch (err) {
-          console.error('Error checking existing attendance (fetchStudents):', err);
-          setAttendanceData(initialAttendance);
-        }
-      } else {
-        setAttendanceData(initialAttendance);
-      }
     } catch (error) {
       console.error('Error fetching students:', error);
+      setStudents([]);
     }
   };
 
   const checkExistingAttendance = async () => {
-    if (!selectedClass || !attendanceDate) return;
+    if (!selectedClass || !attendanceDate) {
+      setAttendanceData([]);
+      return;
+    }
+
+    if (students.length === 0) return;
 
     try {
       const existingAttendance = await attendanceService.getAllAttendance({
@@ -116,14 +66,19 @@ const Attendance = () => {
 
       const attendanceMap = new Map();
       if (existingAttendance && existingAttendance.length > 0) {
-        console.log('checkExistingAttendance - Found records:', existingAttendance);
         existingAttendance.forEach((record) => {
-          attendanceMap.set(record.studentId, record);
+          // The student might be populated (object) or just an ID
+          const sId = record.student?._id || record.studentId || record.student?.id || record.student;
+          if (sId) {
+            attendanceMap.set(sId.toString(), record);
+          }
         });
       }
 
-      const rebuilt = (students || []).map((student) => {
-        const existingRecord = attendanceMap.get(student._id);
+      const rebuilt = students.map((student) => {
+        const studentIdStr = student._id.toString();
+        const existingRecord = attendanceMap.get(studentIdStr);
+
         if (existingRecord) {
           return {
             studentId: student._id,
@@ -148,7 +103,7 @@ const Attendance = () => {
       console.error('Error checking existing attendance:', error);
     }
   };
-  
+
   // Check for existing attendance when date or class changes
   useEffect(() => {
     if (selectedClass && attendanceDate) {
@@ -189,7 +144,7 @@ const Attendance = () => {
       setIsMarking(true);
       console.log('Saving attendance update:', item.attendanceId, editingStatus);
       await attendanceService.updateAttendance(item.attendanceId, { status: editingStatus });
-      
+
       // Directly update the state with the new status
       setAttendanceData((prev) =>
         prev.map((record) => {
@@ -205,7 +160,7 @@ const Attendance = () => {
           return record;
         })
       );
-      
+
       toast.success('Attendance updated');
     } catch (err) {
       console.error('Error updating attendance:', err);
@@ -242,10 +197,10 @@ const Attendance = () => {
       // Submit the attendance
       await attendanceService.bulkMarkAttendance(bulkData);
       toast.success('Attendance marked successfully!');
-      
+
       // Refresh the attendance data from the database to get the latest status
       await checkExistingAttendance();
-      
+
     } catch (error) {
       console.error('Error marking attendance:', error);
       toast.error(error.response?.data?.message || 'Error marking attendance');
@@ -328,10 +283,10 @@ const Attendance = () => {
                                   const isCurrentStatus = currentStatus === status;
                                   const isMarked = item.isMarked && isCurrentStatus && editingStudentId !== item.studentId;
                                   const disabledInput = item.isMarked && editingStudentId !== item.studentId;
-                                  
+
                                   return (
-                                    <label 
-                                      key={status} 
+                                    <label
+                                      key={status}
                                       className={`inline-flex items-center ${isMarked ? 'opacity-100' : ''} ${!isMarked && item.isMarked ? 'opacity-50' : ''}`}
                                     >
                                       <input
@@ -394,8 +349,8 @@ const Attendance = () => {
                     {isMarking && (
                       <span className="text-sm text-green-600">Saving changes...</span>
                     )}
-                    <Button 
-                      type="submit" 
+                    <Button
+                      type="submit"
                       disabled={loading || attendanceData.every(item => item.isMarked)}
                     >
                       {loading ? 'Submitting...' : 'Mark Attendance'}
@@ -412,9 +367,38 @@ const Attendance = () => {
           <h3 className="text-lg font-medium text-gray-900 mb-4">
             Attendance Statistics
           </h3>
-          <p className="text-sm text-gray-500">
-            Select a class and date to view attendance statistics.
-          </p>
+          {selectedClass && attendanceData.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-green-50 rounded-lg p-4 border border-green-100">
+                <div className="text-sm text-green-600 font-medium">Present</div>
+                <div className="text-2xl font-bold text-green-900">
+                  {attendanceData.filter(a => a.status === 'present').length}
+                </div>
+              </div>
+              <div className="bg-red-50 rounded-lg p-4 border border-red-100">
+                <div className="text-sm text-red-600 font-medium">Absent</div>
+                <div className="text-2xl font-bold text-red-900">
+                  {attendanceData.filter(a => a.status === 'absent').length}
+                </div>
+              </div>
+              <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-100">
+                <div className="text-sm text-yellow-600 font-medium">Late</div>
+                <div className="text-2xl font-bold text-yellow-900">
+                  {attendanceData.filter(a => a.status === 'late').length}
+                </div>
+              </div>
+              <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                <div className="text-sm text-blue-600 font-medium">Excused</div>
+                <div className="text-2xl font-bold text-blue-900">
+                  {attendanceData.filter(a => a.status === 'excused').length}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">
+              Select a class and date to view attendance statistics.
+            </p>
+          )}
         </div>
       </div>
     </Layout>

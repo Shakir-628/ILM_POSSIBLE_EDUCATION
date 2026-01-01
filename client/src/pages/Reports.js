@@ -24,7 +24,7 @@ const Reports = () => {
   const toast = useToast();
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // Determine initial tab from URL
   const getInitialTab = () => {
     const path = location.pathname;
@@ -34,7 +34,7 @@ const Reports = () => {
     if (path.includes('/reports/custom')) return 'custom';
     return 'attendance'; // default
   };
-  
+
   const [activeTab, setActiveTab] = useState(getInitialTab());
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -207,16 +207,14 @@ const Reports = () => {
                   navigate(`/reports/${tab.id}`);
                   setReportData(null);
                 }}
-                className={`${
-                  activeTab === tab.id
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                } group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200`}
+                className={`${activeTab === tab.id
+                  ? 'border-primary-500 text-primary-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  } group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200`}
               >
                 <tab.icon
-                  className={`${
-                    activeTab === tab.id ? 'text-primary-500' : 'text-gray-400 group-hover:text-gray-500'
-                  } -ml-0.5 mr-2 h-5 w-5`}
+                  className={`${activeTab === tab.id ? 'text-primary-500' : 'text-gray-400 group-hover:text-gray-500'
+                    } -ml-0.5 mr-2 h-5 w-5`}
                 />
                 {tab.name}
               </button>
@@ -317,7 +315,7 @@ const Reports = () => {
                 <p className="text-sm text-gray-500 mb-4">
                   Generated: {new Date(reportData.generatedAt).toLocaleString()}
                 </p>
-                
+
                 {/* Summary Statistics */}
                 {reportData.summary && (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -364,20 +362,18 @@ const Reports = () => {
                             {student.class?.className || 'N/A'}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                              parseFloat(student.averageGrade) >= 80 ? 'bg-green-100 text-green-800' :
+                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${parseFloat(student.averageGrade) >= 80 ? 'bg-green-100 text-green-800' :
                               parseFloat(student.averageGrade) >= 60 ? 'bg-yellow-100 text-yellow-800' :
-                              'bg-red-100 text-red-800'
-                            }`}>
+                                'bg-red-100 text-red-800'
+                              }`}>
                               {student.averageGrade}%
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                              parseFloat(student.attendanceRate) >= 90 ? 'bg-green-100 text-green-800' :
+                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${parseFloat(student.attendanceRate) >= 90 ? 'bg-green-100 text-green-800' :
                               parseFloat(student.attendanceRate) >= 75 ? 'bg-yellow-100 text-yellow-800' :
-                              'bg-red-100 text-red-800'
-                            }`}>
+                                'bg-red-100 text-red-800'
+                              }`}>
                               {student.attendanceRate}%
                             </span>
                           </td>
@@ -474,7 +470,7 @@ const Reports = () => {
             {reportData && attendanceFilters.format === 'json' && (
               <div className="bg-white rounded-lg shadow p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Report Results</h2>
-                
+
                 {/* Statistics */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                   <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4">
@@ -519,11 +515,10 @@ const Reports = () => {
                             {record.class?.className}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                              record.status === 'present' ? 'bg-green-100 text-green-800' :
+                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${record.status === 'present' ? 'bg-green-100 text-green-800' :
                               record.status === 'absent' ? 'bg-red-100 text-red-800' :
-                              'bg-yellow-100 text-yellow-800'
-                            }`}>
+                                'bg-yellow-100 text-yellow-800'
+                              }`}>
                               {record.status}
                             </span>
                           </td>
@@ -606,7 +601,7 @@ const Reports = () => {
             {reportData && financialFilters.format === 'json' && (
               <div className="bg-white rounded-lg shadow p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Financial Summary</h2>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6">
                     <div className="text-sm text-green-600 font-medium mb-2">Total Income</div>
@@ -614,7 +609,7 @@ const Reports = () => {
                       Rs. {reportData.summary?.totalIncome?.toLocaleString()}
                     </div>
                     <div className="text-xs text-green-600 mt-2">
-                      Fee: Rs. {reportData.summary?.totalFeeIncome?.toLocaleString()} | 
+                      Fee: Rs. {reportData.summary?.totalFeeIncome?.toLocaleString()} |
                       Other: Rs. {reportData.summary?.totalOtherIncome?.toLocaleString()}
                     </div>
                   </div>
@@ -677,13 +672,14 @@ const Reports = () => {
                   onChange={(e) => setCustomReportType(e.target.value)}
                   options={[
                     { value: 'student-performance', label: 'Student Performance' },
+                    { value: 'student-attendance-summary', label: 'Student Attendance Summary' },
                     { value: 'class-summary', label: 'Class Summary' },
                     { value: 'teacher-workload', label: 'Teacher Workload' },
                     { value: 'fee-collection', label: 'Fee Collection' },
                   ]}
                 />
-                
-                {customReportType === 'student-performance' && (
+
+                {(customReportType === 'student-performance' || customReportType === 'student-attendance-summary') && (
                   <>
                     <Select
                       label="Class (Optional)"
@@ -787,7 +783,7 @@ const Reports = () => {
                 <p className="text-sm text-gray-500 mb-4">
                   Generated: {new Date(reportData.generatedAt).toLocaleString()}
                 </p>
-                
+
                 {reportData.summary && (
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                     {Object.entries(reportData.summary).map(([key, value]) => (
@@ -799,35 +795,37 @@ const Reports = () => {
                   </div>
                 )}
 
+                {/* Data Table */}
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        {reportData.data && reportData.data.length > 0 && Object.keys(reportData.data[0]).slice(0, 5).map((key) => (
-                          <th key={key} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            {key}
+                        {reportData.data && reportData.data.length > 0 && Object.keys(reportData.data[0]).map((header) => (
+                          <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {header.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                           </th>
                         ))}
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {reportData.data?.slice(0, 10).map((row, index) => (
-                        <tr key={index} className="hover:bg-gray-50">
-                          {Object.values(row).slice(0, 5).map((value, idx) => (
-                            <td key={idx} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {typeof value === 'object' ? JSON.stringify(value).substring(0, 50) : String(value).substring(0, 50)}
+                      {reportData.data?.map((row, i) => (
+                        <tr key={i} className="hover:bg-gray-50">
+                          {Object.values(row).map((val, j) => (
+                            <td key={j} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {typeof val === 'object' ? JSON.stringify(val) : val}
                             </td>
                           ))}
                         </tr>
                       ))}
                     </tbody>
                   </table>
-                  {reportData.data?.length > 10 && (
-                    <p className="text-sm text-gray-500 mt-4 text-center">
-                      Showing 10 of {reportData.data.length} records. Download full report for complete data.
-                    </p>
-                  )}
                 </div>
+
+                {reportData.data?.length > 10 && (
+                  <p className="text-sm text-gray-500 mt-4 text-center">
+                    Showing 10 of {reportData.data.length} records. Download full report for complete data.
+                  </p>
+                )}
               </div>
             )}
           </div>

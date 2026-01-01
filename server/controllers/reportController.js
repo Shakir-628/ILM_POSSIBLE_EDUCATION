@@ -180,6 +180,9 @@ export const generateCustomReport = async (req, res) => {
       case 'fee-collection':
         reportData = await generateFeeCollectionReport(filters, fields);
         break;
+      case 'student-attendance-summary':
+        reportData = await generateStudentAttendanceSummaryReport(filters, fields);
+        break;
       default:
         return res.status(400).json({
           success: false,
@@ -210,7 +213,7 @@ export const generateCustomReport = async (req, res) => {
 async function generateStudentPerformanceReport(filters, fields) {
   const { classId, startDate, endDate } = filters;
   const filter = {};
-  
+
   if (classId) filter.class = classId;
 
   const students = await Student.find(filter)
@@ -226,14 +229,15 @@ async function generateStudentPerformanceReport(filters, fields) {
   const enrichedStudents = await Promise.all(
     students.map(async (student) => {
       const grades = await Grade.find({ student: student._id, ...dateFilter });
-      const attendance = await Attendance.find({ student: student._id, 
+      const attendance = await Attendance.find({
+        student: student._id,
         ...(startDate && endDate ? { date: { $gte: new Date(startDate), $lte: new Date(endDate) } } : {})
       });
-      
+
       const avgGrade = grades.length > 0
         ? grades.reduce((sum, g) => sum + (g.percentage || 0), 0) / grades.length
         : 0;
-      
+
       const attendanceRate = attendance.length > 0
         ? (attendance.filter(a => a.status === 'present').length / attendance.length) * 100
         : 0;
@@ -256,7 +260,7 @@ async function generateStudentPerformanceReport(filters, fields) {
   const totalAvgGrade = enrichedStudents.length > 0
     ? enrichedStudents.reduce((sum, s) => sum + parseFloat(s.averageGrade), 0) / enrichedStudents.length
     : 0;
-  
+
   const totalAvgAttendance = enrichedStudents.length > 0
     ? enrichedStudents.reduce((sum, s) => sum + parseFloat(s.attendanceRate), 0) / enrichedStudents.length
     : 0;
@@ -379,6 +383,67 @@ async function generateFeeCollectionReport(filters, fields) {
   };
 }
 
+async function generateStudentAttendanceSummaryReport(filters, fields) {
+  const { classId, startDate, endDate } = filters;
+  const filter = {};
+
+  if (classId) filter.class = classId;
+
+  const students = await Student.find(filter)
+    .populate('class', 'className grade')
+    .lean();
+
+  const dateFilter = {};
+  if (startDate && endDate) {
+    dateFilter.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
+  }
+
+  const enrichedStudents = await Promise.all(
+    students.map(async (student) => {
+      const attendance = await Attendance.find({
+        student: student._id,
+        ...dateFilter
+      });
+
+      const present = attendance.filter(a => a.status === 'present').length;
+      const absent = attendance.filter(a => a.status === 'absent').length;
+      const late = attendance.filter(a => a.status === 'late').length;
+      const excused = attendance.filter(a => a.status === 'excused').length;
+      const others = attendance.length - (present + absent + late + excused);
+
+      const attendanceRate = attendance.length > 0
+        ? ((present / attendance.length) * 100).toFixed(2)
+        : 0;
+
+      return {
+        studentId: student.studentId,
+        name: `${student.firstName} ${student.lastName}`,
+        class: student.class?.className || 'N/A',
+        present,
+        absent,
+        late,
+        excused,
+        others,
+        totalDays: attendance.length,
+        attendanceRate: `${attendanceRate}%`,
+      };
+    })
+  );
+
+  return {
+    title: 'Student Attendance Summary Report',
+    generatedAt: new Date(),
+    filters,
+    summary: {
+      totalStudents: enrichedStudents.length,
+      averageAttendanceRate: enrichedStudents.length > 0
+        ? (enrichedStudents.reduce((sum, s) => sum + parseFloat(s.attendanceRate), 0) / enrichedStudents.length).toFixed(2) + '%'
+        : '0%',
+    },
+    data: enrichedStudents,
+  };
+}
+
 // Excel generation functions
 function generateAttendanceExcel(reportData, res) {
   const workbook = new ExcelJS.Workbook();
@@ -414,7 +479,7 @@ function generateAttendanceExcel(reportData, res) {
 
 function generateFinancialExcel(reportData, res) {
   const workbook = new ExcelJS.Workbook();
-  
+
   // Summary sheet
   const summarySheet = workbook.addWorksheet('Summary');
   summarySheet.addRow(['Financial Report Summary']);

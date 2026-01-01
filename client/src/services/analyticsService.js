@@ -49,6 +49,12 @@ export const analyticsService = {
     const response = await api.get('/analytics/attendance-by-class');
     return response.data;
   },
+
+  // Get smart alerts for attendance drops
+  getSmartAlerts: async () => {
+    const response = await api.get('/analytics/smart-alerts');
+    return response.data;
+  },
 };
 
 export default analyticsService;

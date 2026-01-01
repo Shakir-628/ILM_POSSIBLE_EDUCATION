@@ -5,6 +5,8 @@ import Attendance from "../models/Attendance.js";
 import Grade from "../models/Grade.js";
 import Assignment from "../models/Assignment.js";
 import Submission from "../models/Submission.js";
+import Notification from "../models/Notification.js";
+import User from "../models/User.js";
 
 // @desc    Get attendance trends (last N days)
 // @route   GET /api/analytics/attendance-trends
@@ -100,11 +102,11 @@ export const getGradeDistribution = async (req, res) => {
 export const getClassPerformance = async (req, res) => {
   try {
     const classes = await Class.find().select("className");
-    
+
     const performanceData = await Promise.all(
       classes.map(async (cls) => {
         const grades = await Grade.find({ class: cls._id });
-        
+
         if (grades.length === 0) {
           return {
             className: cls.className,
@@ -323,8 +325,8 @@ export const getDashboardAnalytics = async (req, res) => {
       status: "present",
     });
 
-    const attendanceRate = todayAttendance > 0 
-      ? ((presentToday / todayAttendance) * 100).toFixed(2) 
+    const attendanceRate = todayAttendance > 0
+      ? ((presentToday / todayAttendance) * 100).toFixed(2)
       : 0;
 
     res.json({
@@ -345,6 +347,122 @@ export const getDashboardAnalytics = async (req, res) => {
   }
 };
 
+// @desc    Get smart alerts for students with significant attendance drop
+// @route   GET /api/analytics/smart-alerts
+// @access  Private (Admin/Teacher)
+export const getSmartAlerts = async (req, res) => {
+  try {
+    const now = new Date();
+    const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const prevMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+
+    // Get attendance for all students in current and previous months
+    const alerts = await Attendance.aggregate([
+      {
+        $match: {
+          date: { $gte: prevMonthStart },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            student: "$student",
+            isCurrentMonth: { $gte: ["$date", currentMonthStart] },
+          },
+          totalDays: { $sum: 1 },
+          presentDays: {
+            $sum: { $cond: [{ $eq: ["$status", "present"] }, 1, 0] },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.student",
+          currentMonth: {
+            $push: {
+              $cond: [
+                "$_id.isCurrentMonth",
+                { total: "$totalDays", present: "$presentDays" },
+                "$$REMOVE",
+              ],
+            },
+          },
+          prevMonth: {
+            $push: {
+              $cond: [
+                { $not: ["$_id.isCurrentMonth"] },
+                { total: "$totalDays", present: "$presentDays" },
+                "$$REMOVE",
+              ],
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          student: "$_id",
+          curr: { $arrayElemAt: ["$currentMonth", 0] },
+          prev: { $arrayElemAt: ["$prevMonth", 0] },
+        },
+      },
+      // Ensure we have data for both months to compare
+      {
+        $match: {
+          curr: { $exists: true },
+          prev: { $exists: true },
+        },
+      },
+      {
+        $project: {
+          student: 1,
+          currRate: { $multiply: [{ $divide: ["$curr.present", "$curr.total"] }, 100] },
+          prevRate: { $multiply: [{ $divide: ["$prev.present", "$prev.total"] }, 100] },
+        },
+      },
+      {
+        $project: {
+          student: 1,
+          currRate: 1,
+          prevRate: 1,
+          drop: { $subtract: ["$prevRate", "$currRate"] },
+        },
+      },
+      {
+        $match: {
+          drop: { $gt: 20 }, // Drop of more than 20 percentage points
+        },
+      },
+      {
+        $lookup: {
+          from: "students",
+          localField: "student",
+          foreignField: "_id",
+          as: "studentInfo",
+        },
+      },
+      { $unwind: "$studentInfo" },
+      {
+        $project: {
+          studentId: "$student",
+          name: { $concat: ["$studentInfo.firstName", " ", "$studentInfo.lastName"] },
+          studentRegistrationId: "$studentInfo.studentId",
+          currRate: { $round: ["$currRate", 2] },
+          prevRate: { $round: ["$prevRate", 2] },
+          drop: { $round: ["$drop", 2] },
+        },
+      },
+    ]);
+
+    // Optional: Create notifications if they don't exist
+    // For simplicity, we'll just return them as "active alerts" for the dashboard
+
+    res.json(alerts);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export default {
   getAttendanceTrends,
   getGradeDistribution,
@@ -354,5 +472,6 @@ export default {
   getSubjectPerformance,
   getAttendanceByClass,
   getDashboardAnalytics,
+  getSmartAlerts,
 };
 

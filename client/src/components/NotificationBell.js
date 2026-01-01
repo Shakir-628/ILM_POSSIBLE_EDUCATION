@@ -18,7 +18,10 @@ const NotificationBell = () => {
   useEffect(() => {
     if (!user || !token) return;
 
-    const newSocket = io(process.env.REACT_APP_API_URL || 'http://localhost:5001', {
+    const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+    const socketUrl = baseUrl.replace(/\/api\/?$/, '');
+
+    const newSocket = io(socketUrl, {
       auth: {
         token: token,
       },
@@ -243,9 +246,8 @@ const NotificationBell = () => {
                   <Menu.Item key={notification._id}>
                     {({ active }) => (
                       <div
-                        className={`px-4 py-3 cursor-pointer transition-colors ${
-                          active ? 'bg-gray-50' : ''
-                        } ${notification.read ? 'opacity-60' : 'bg-primary-50/30'}`}
+                        className={`px-4 py-3 cursor-pointer transition-colors ${active ? 'bg-gray-50' : ''
+                          } ${notification.read ? 'opacity-60' : 'bg-primary-50/30'}`}
                       >
                         <div className="flex gap-3">
                           {/* Icon */}
@@ -255,9 +257,8 @@ const NotificationBell = () => {
 
                           {/* Content */}
                           <div className="flex-1 min-w-0">
-                            <p className={`text-sm font-medium ${
-                              notification.read ? 'text-gray-700' : 'text-gray-900'
-                            }`}>
+                            <p className={`text-sm font-medium ${notification.read ? 'text-gray-700' : 'text-gray-900'
+                              }`}>
                               {notification.title}
                             </p>
                             <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">

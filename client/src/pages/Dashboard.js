@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
 import Card from '../components/Card';
@@ -11,16 +12,20 @@ import {
 import { studentService } from '../services/studentService';
 import { teacherService } from '../services/teacherService';
 import { classService } from '../services/classService';
+import { analyticsService } from '../services/analyticsService';
 import { DashboardSkeleton } from '../components/LoadingSkeleton';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/solid';
 
 const Dashboard = () => {
   const { user, isAdmin, isTeacher, isStudent } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalStudents: 0,
     totalTeachers: 0,
     totalClasses: 0,
     activeStudents: 0,
   });
+  const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,6 +44,9 @@ const Dashboard = () => {
             totalClasses: classes.length,
             activeStudents: students.filter(s => s.status === 'active').length,
           });
+
+          const smartAlerts = await analyticsService.getSmartAlerts();
+          setAlerts(smartAlerts);
         }
       } catch (error) {
         console.error('Error fetching stats:', error);
@@ -102,6 +110,45 @@ const Dashboard = () => {
             </div>
           )}
 
+          {/* Smart Alerts Section */}
+          {(isAdmin || isTeacher) && alerts.length > 0 && (
+            <div className="bg-white shadow rounded-lg p-6 animate-fade-in-up border-l-4 border-red-500">
+              <div className="flex items-center mb-4">
+                <ExclamationTriangleIcon className="h-6 w-6 text-red-500 mr-2" />
+                <h2 className="text-lg font-bold text-gray-900">Smart Alerts: Attendance Drops</h2>
+              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {alerts.map((alert) => (
+                  <div key={alert.studentId} className="bg-red-50 rounded-lg p-4 border border-red-100 flex flex-col justify-between">
+                    <div>
+                      <div className="flex justify-between items-start">
+                        <h3 className="text-sm font-bold text-red-900">{alert.name}</h3>
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                          {alert.drop}% drop
+                        </span>
+                      </div>
+                      <p className="text-xs text-red-700 mt-1">ID: {alert.studentRegistrationId}</p>
+                    </div>
+                    <div className="mt-3 flex items-center justify-between text-xs">
+                      <div className="text-red-800">
+                        Prev: <span className="font-bold">{alert.prevRate}%</span>
+                      </div>
+                      <div className="text-red-800">
+                        Curr: <span className="font-bold">{alert.currRate}%</span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => navigate('/students', { state: { searchTerm: alert.studentRegistrationId } })}
+                      className="mt-3 w-full inline-flex justify-center items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    >
+                      Investigate
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Quick Actions */}
           <div className="bg-white shadow rounded-lg p-6 animate-fade-in-up hover-lift transition-all duration-300">
             <h2 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h2>
@@ -109,21 +156,21 @@ const Dashboard = () => {
               {isAdmin && (
                 <>
                   <button
-                    onClick={() => window.location.href = '/students'}
+                    onClick={() => navigate('/students')}
                     className="flex items-center justify-center px-4 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 hover:shadow-md hover:scale-105 hover:border-blue-300"
                   >
                     <AcademicCapIcon className="h-5 w-5 mr-2 transition-transform duration-200 hover:rotate-12" />
                     Manage Students
                   </button>
                   <button
-                    onClick={() => window.location.href = '/teachers'}
+                    onClick={() => navigate('/teachers')}
                     className="flex items-center justify-center px-4 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 hover:shadow-md hover:scale-105 hover:border-green-300"
                   >
                     <UserGroupIcon className="h-5 w-5 mr-2 transition-transform duration-200 hover:rotate-12" />
                     Manage Teachers
                   </button>
                   <button
-                    onClick={() => window.location.href = '/classes'}
+                    onClick={() => navigate('/classes')}
                     className="flex items-center justify-center px-4 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 hover:shadow-md hover:scale-105 hover:border-purple-300"
                   >
                     <BookOpenIcon className="h-5 w-5 mr-2 transition-transform duration-200 hover:rotate-12" />
@@ -134,19 +181,19 @@ const Dashboard = () => {
               {isTeacher && (
                 <>
                   <button
-                    onClick={() => window.location.href = '/attendance'}
+                    onClick={() => navigate('/attendance')}
                     className="flex items-center justify-center px-4 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 hover:shadow-md hover:scale-105 hover:border-yellow-300"
                   >
                     Mark Attendance
                   </button>
                   <button
-                    onClick={() => window.location.href = '/grades'}
+                    onClick={() => navigate('/grades')}
                     className="flex items-center justify-center px-4 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 hover:shadow-md hover:scale-105 hover:border-indigo-300"
                   >
                     Enter Grades
                   </button>
                   <button
-                    onClick={() => window.location.href = '/reports'}
+                    onClick={() => navigate('/reports')}
                     className="flex items-center justify-center px-4 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 hover:shadow-md hover:scale-105 hover:border-red-300"
                   >
                     View Reports
@@ -156,13 +203,13 @@ const Dashboard = () => {
               {isStudent && (
                 <>
                   <button
-                    onClick={() => window.location.href = '/attendance'}
+                    onClick={() => navigate('/attendance')}
                     className="flex items-center justify-center px-4 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 hover:shadow-md hover:scale-105 hover:border-green-300"
                   >
                     View Attendance
                   </button>
                   <button
-                    onClick={() => window.location.href = '/grades'}
+                    onClick={() => navigate('/grades')}
                     className="flex items-center justify-center px-4 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 hover:shadow-md hover:scale-105 hover:border-blue-300"
                   >
                     View Grades
@@ -208,4 +255,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-

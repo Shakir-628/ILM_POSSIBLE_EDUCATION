@@ -9,6 +9,7 @@ import {
   checkConflicts,
   exportToExcel,
   exportToPDF,
+  generateSmartTimetable,
 } from "../controllers/timetableController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { authorize } from "../middleware/roleMiddleware.js";
@@ -18,6 +19,7 @@ const router = express.Router();
 
 // Conflict checking
 router.post("/check-conflicts", protect, authorize("admin"), checkConflicts);
+router.post("/smart-generate", protect, authorize("admin"), generateSmartTimetable);
 
 // Get timetable by class
 router.get("/class/:classId", protect, getTimetableByClass);

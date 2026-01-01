@@ -1,5 +1,7 @@
 import Timetable from "../models/Timetable.js";
 import Class from "../models/Class.js";
+import Teacher from "../models/Teacher.js";
+import Subject from "../models/Subject.js";
 import ExcelJS from "exceljs";
 import PDFDocument from "pdfkit";
 
@@ -10,7 +12,7 @@ export const getAllTimetables = async (req, res) => {
   try {
     const { classId, academicYear } = req.query;
     const filter = {};
-    
+
     if (classId) filter.class = classId;
     if (academicYear) filter.academicYear = academicYear;
 
@@ -85,7 +87,7 @@ export const getTimetableByClass = async (req, res) => {
   try {
     const { academicYear, term } = req.query;
     const filter = { class: req.params.classId };
-    
+
     if (academicYear) filter.academicYear = academicYear;
     if (term) filter.term = term;
 
@@ -376,7 +378,7 @@ export const exportToExcel = async (req, res) => {
     ];
 
     const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-    
+
     let periodIndex = 0;
     timeSlots.forEach((slot, slotIndex) => {
       const row = worksheet.getRow(slotIndex + 3);
@@ -412,7 +414,7 @@ export const exportToExcel = async (req, res) => {
             const cell = row.getCell(dayIndex + 2);
             cell.value = cellValue;
             cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
-            
+
             if (period.subject) {
               cell.fill = {
                 type: "pattern",
@@ -640,6 +642,148 @@ export const exportToPDF = async (req, res) => {
     doc.end();
   } catch (error) {
     console.error("Export to PDF error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// @desc    Smart Generate Timetable
+// @route   POST /api/timetables/smart-generate
+// @access  Private (Admin)
+export const generateSmartTimetable = async (req, res) => {
+  try {
+    const { classId, academicYear, term } = req.body;
+
+    if (!classId || !academicYear) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide classId and academicYear",
+      });
+    }
+
+    // 1. Fetch Class and its required subjects
+    const targetClass = await Class.findById(classId).populate("subjects");
+    if (!targetClass) {
+      return res.status(404).json({
+        success: false,
+        message: "Class not found",
+      });
+    }
+
+    const classSubjects = targetClass.subjects;
+    if (!classSubjects || classSubjects.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No subjects assigned to this class. Please assign subjects first.",
+      });
+    }
+
+    // 2. Fetch all active teachers and their expert subjects
+    const allTeachers = await Teacher.find({ status: "active" }).populate("subjects");
+
+    // 3. Define standard period slots (can be customized later)
+    const timeSlots = [
+      { start: "08:00", end: "08:45" },
+      { start: "08:45", end: "09:30" },
+      { start: "09:30", end: "10:15" },
+      { start: "10:15", end: "11:00" },
+      { start: "11:00", end: "11:45" },
+      { start: "11:45", end: "12:30" },
+      { start: "13:15", end: "14:00" },
+      { start: "14:00", end: "14:45" },
+    ];
+
+    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const generatedSchedule = [];
+
+    // 4. Fetch all existing timetables for this year/term to check teacher availability globally
+    const currentTimetables = await Timetable.find({ academicYear, term });
+
+    function isTeacherAvailable(teacherId, day, startTime, endTime) {
+      for (const timetable of currentTimetables) {
+        const daySched = timetable.schedule.find(s => s.day === day);
+        if (daySched) {
+          const match = daySched.periods.find(p =>
+            p.teacher &&
+            p.teacher.toString() === teacherId.toString() &&
+            p.startTime === startTime
+          );
+          if (match) return false;
+        }
+      }
+      return true;
+    }
+
+    // 5. Generate schedule
+    for (const day of days) {
+      const periods = [];
+
+      // Shuffle subjects for each day and make sure we have enough to fill slots
+      let dailySubjects = [...classSubjects].sort(() => Math.random() - 0.5);
+      while (dailySubjects.length < timeSlots.length) {
+        dailySubjects = [...dailySubjects, ...[...classSubjects].sort(() => Math.random() - 0.5)];
+      }
+
+      let lastSubjectId = null;
+
+      for (let i = 0; i < timeSlots.length; i++) {
+        const slot = timeSlots[i];
+
+        // Try to avoid consecutive subjects
+        let subjectIndex = i;
+        if (dailySubjects[subjectIndex]._id.toString() === lastSubjectId && dailySubjects.length > i + 1) {
+          // Swap with next one if available
+          [dailySubjects[subjectIndex], dailySubjects[subjectIndex + 1]] = [dailySubjects[subjectIndex + 1], dailySubjects[subjectIndex]];
+        }
+
+        const subject = dailySubjects[subjectIndex];
+        lastSubjectId = subject._id.toString();
+
+        // Find a teacher who can teach this subject and is available
+        const eligibleTeachers = allTeachers.filter(t =>
+          t.subjects.some(s => s._id.toString() === subject._id.toString())
+        );
+
+        // Sort teachers by workload if we had that data, for now just find first available
+        let assignedTeacher = null;
+        for (const teacher of eligibleTeachers) {
+          if (isTeacherAvailable(teacher._id, day, slot.start, slot.end)) {
+            assignedTeacher = teacher._id;
+            break;
+          }
+        }
+
+        periods.push({
+          periodNumber: i + 1,
+          startTime: slot.start,
+          endTime: slot.end,
+          subject: subject._id,
+          teacher: assignedTeacher,
+          periodType: "lecture",
+          roomNumber: targetClass.room || ""
+        });
+      }
+
+      generatedSchedule.push({
+        day,
+        periods
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        class: classId,
+        academicYear,
+        term: term || "1st",
+        schedule: generatedSchedule
+      }
+    });
+
+  } catch (error) {
+    console.error("Smart generate error:", error);
     res.status(500).json({
       success: false,
       message: error.message,

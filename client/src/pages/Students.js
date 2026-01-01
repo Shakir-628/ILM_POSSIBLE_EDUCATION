@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { studentService } from '../services/studentService';
 import { classService } from '../services/classService';
 import { useTableData } from '../hooks/useTableData';
@@ -30,6 +31,7 @@ import {
 } from '../utils/validation';
 
 const Students = () => {
+  const location = useLocation();
   const toast = useToast();
   const [students, setStudents] = useState([]);
   const [classes, setClasses] = useState([]);
@@ -76,7 +78,12 @@ const Students = () => {
   useEffect(() => {
     fetchStudents();
     fetchClasses();
-  }, []);
+
+    // Check if we came from an "investigate" button on the dashboard
+    if (location.state && location.state.searchTerm) {
+      setSearchTerm(location.state.searchTerm);
+    }
+  }, [location]);
 
   const fetchStudents = async () => {
     try {

@@ -8,6 +8,7 @@ import {
   getSubjectPerformance,
   getAttendanceByClass,
   getDashboardAnalytics,
+  getSmartAlerts,
 } from "../controllers/analyticsController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { teacherOrAdmin, admin } from "../middleware/roleMiddleware.js";
@@ -22,6 +23,7 @@ router.get("/enrollment-trends", protect, admin, getEnrollmentTrends);
 router.get("/teacher-workload", protect, admin, getTeacherWorkload);
 router.get("/subject-performance", protect, teacherOrAdmin, getSubjectPerformance);
 router.get("/attendance-by-class", protect, teacherOrAdmin, getAttendanceByClass);
+router.get("/smart-alerts", protect, teacherOrAdmin, getSmartAlerts);
 
 export default router;
 

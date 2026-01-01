@@ -26,6 +26,7 @@ import {
   validationPatterns,
   validationMessages,
 } from '../utils/validation';
+import OcrScanner from '../components/OcrScanner';
 
 const Admissions = () => {
   const toast = useToast();
@@ -35,7 +36,7 @@ const Admissions = () => {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
   const [academicYear, setAcademicYear] = useState(new Date().getFullYear().toString());
-  
+
   // Modals
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
@@ -95,7 +96,7 @@ const Admissions = () => {
       const params = {};
       if (statusFilter !== 'all') params.status = statusFilter;
       if (academicYear) params.academicYear = academicYear;
-      
+
       const response = await admissionService.getAllApplications(params);
       setApplications(response.data);
     } catch (error) {
@@ -124,8 +125,8 @@ const Admissions = () => {
   };
 
   // Filter and search
-  const filteredApplications = statusFilter === 'all' 
-    ? applications 
+  const filteredApplications = statusFilter === 'all'
+    ? applications
     : applications.filter(app => app.status === statusFilter);
 
   const {
@@ -147,7 +148,7 @@ const Admissions = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Use generic validation handler for simple fields
     switch (name) {
       case 'firstName':
@@ -158,21 +159,21 @@ const Admissions = () => {
       case 'previousSchool.name':
         handleValidatedInput(e, 'name', setFormData, formData, { maxLength: 50 });
         return;
-        
+
       case 'email':
         handleValidatedInput(e, 'email', setFormData, formData);
         return;
-        
+
       case 'phone':
       case 'fatherPhone':
       case 'motherPhone':
         handleValidatedInput(e, 'phone', setFormData, formData, { maxLength: 15 });
         return;
-        
+
       case 'academicYear':
         handleValidatedInput(e, 'studentId', setFormData, formData, { maxLength: 10 });
         return;
-        
+
       default:
         // For nested objects and other fields, use original logic
         if (name.includes('.')) {
@@ -196,7 +197,7 @@ const Admissions = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Define validation rules for admission form
     const validationRules = {
       firstName: { type: 'name', required: true, label: 'First Name' },
@@ -212,10 +213,10 @@ const Admissions = () => {
       appliedForClass: { type: 'select', required: true, label: 'Applied For Class' },
       academicYear: { type: 'text', required: true, label: 'Academic Year' },
     };
-    
+
     // Validate form
     const validation = validateForm(formData, validationRules);
-    
+
     if (!validation.isValid) {
       // Show error messages for each field
       Object.values(validation.errors).forEach(error => {
@@ -223,7 +224,7 @@ const Admissions = () => {
       });
       return;
     }
-    
+
     try {
       await admissionService.submitApplication(formData);
       toast.success('Application submitted successfully');
@@ -341,6 +342,35 @@ const Admissions = () => {
         country: 'Pakistan',
       },
     });
+  };
+
+  const handleOcrData = (extracted) => {
+    console.log('Admissions: Received OCR Data', extracted);
+
+    setFormData(prev => {
+      const updated = { ...prev };
+
+      if (extracted.firstName) updated.firstName = extracted.firstName;
+      if (extracted.lastName) updated.lastName = extracted.lastName;
+      if (extracted.dateOfBirth) updated.dateOfBirth = extracted.dateOfBirth;
+      if (extracted.gender) updated.gender = extracted.gender;
+
+      // Parent info
+      if (extracted.fatherName) updated.fatherName = extracted.fatherName;
+      if (extracted.motherName) updated.motherName = extracted.motherName;
+
+      // Address/Birthplace info
+      if (extracted.city) {
+        updated.address = {
+          ...prev.address,
+          city: extracted.city
+        };
+      }
+
+      return updated;
+    });
+
+    toast.success('AI Scanner: Information extracted and filled!');
   };
 
   const columns = [
@@ -555,6 +585,10 @@ const Admissions = () => {
           title="New Admission Application"
           size="large"
         >
+          <div className="mb-6">
+            <OcrScanner onDataExtracted={handleOcrData} />
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <Input
@@ -630,10 +664,10 @@ const Admissions = () => {
                 required
               />
             </div>
-            
+
             <hr className="my-4" />
             <h3 className="text-lg font-medium">Parent Information</h3>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <Input
                 label="Father Name"
@@ -693,10 +727,10 @@ const Admissions = () => {
                 maxLength="15"
               />
             </div>
-            
+
             <hr className="my-4" />
             <h3 className="text-lg font-medium">Academic Information</h3>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <Select
                 label="Applied For Class"
@@ -752,7 +786,7 @@ const Admissions = () => {
                 maxLength="5"
               />
             </div>
-            
+
             <div className="flex justify-end space-x-3 mt-6">
               <Button
                 variant="secondary"
@@ -783,7 +817,7 @@ const Admissions = () => {
                 <p className="text-sm"><strong>Applicant:</strong> {selectedApplication.firstName} {selectedApplication.lastName}</p>
                 <p className="text-sm"><strong>Application No:</strong> {selectedApplication.applicationNumber}</p>
               </div>
-              
+
               <Select
                 label="Decision"
                 value={reviewData.status}
@@ -795,7 +829,7 @@ const Admissions = () => {
                 ]}
                 required
               />
-              
+
               <Input
                 label="Comments"
                 value={reviewData.reviewComments}
@@ -804,7 +838,7 @@ const Admissions = () => {
                 className="text-sm"
                 maxLength="500"
               />
-              
+
               <div className="flex justify-end space-x-3 mt-6">
                 <Button variant="secondary" onClick={() => setIsReviewModalOpen(false)}>
                   Cancel
@@ -829,7 +863,7 @@ const Admissions = () => {
               <div className="bg-gray-50 p-4 rounded-md">
                 <p className="text-sm"><strong>Applicant:</strong> {selectedApplication.firstName} {selectedApplication.lastName}</p>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <Input
                   label="Entrance Test Score"
@@ -848,7 +882,7 @@ const Admissions = () => {
                   className="text-sm"
                 />
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <Input
                   label="Interview Score"
@@ -867,7 +901,7 @@ const Admissions = () => {
                   className="text-sm"
                 />
               </div>
-              
+
               <div className="flex justify-end space-x-3 mt-6">
                 <Button variant="secondary" onClick={() => setIsScoresModalOpen(false)}>
                   Cancel
