@@ -11,7 +11,6 @@ import Pagination from '../components/Pagination';
 import {
   PlusIcon,
   CheckCircleIcon,
-  XCircleIcon,
   ClockIcon,
   UserPlusIcon,
   DocumentTextIcon,
@@ -275,7 +274,8 @@ const Admissions = () => {
   };
 
   const handleEnroll = async (application) => {
-    if (window.confirm(`Are you sure you want to enroll ${application.firstName} ${application.lastName}?`)) {
+    /* eslint-disable-next-line */
+    if (typeof globalThis !== 'undefined' && globalThis.confirm(`Are you sure you want to enroll ${application.firstName} ${application.lastName}?`)) {
       try {
         await admissionService.enrollStudent(application._id);
         toast.success('Student enrolled successfully');
@@ -289,7 +289,8 @@ const Admissions = () => {
   };
 
   const handleDelete = async (application) => {
-    if (window.confirm(`Are you sure you want to delete this application?`)) {
+    /* eslint-disable-next-line */
+    if (typeof globalThis !== 'undefined' && globalThis.confirm(`Are you sure you want to delete this application?`)) {
       try {
         await admissionService.deleteApplication(application._id);
         toast.success('Application deleted successfully');
@@ -363,17 +364,21 @@ const Admissions = () => {
     {
       header: 'Status',
       accessor: 'status',
-      render: (row) => (
-        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-          row.status === 'enrolled' ? 'bg-green-100 text-green-800' :
-          row.status === 'approved' ? 'bg-blue-100 text-blue-800' :
-          row.status === 'rejected' ? 'bg-red-100 text-red-800' :
-          row.status === 'under-review' ? 'bg-yellow-100 text-yellow-800' :
-          'bg-gray-100 text-gray-800'
-        }`}>
-          {row.status}
-        </span>
-      ),
+      render: (row) => {
+        const getStatusClass = (status) => {
+          if (status === 'enrolled') return 'bg-green-100 text-green-800';
+          if (status === 'approved') return 'bg-blue-100 text-blue-800';
+          if (status === 'rejected') return 'bg-red-100 text-red-800';
+          if (status === 'under-review') return 'bg-yellow-100 text-yellow-800';
+          return 'bg-gray-100 text-gray-800';
+        };
+
+        return (
+          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(row.status)}`}>
+            {row.status}
+          </span>
+        );
+      },
     },
     {
       header: 'Actions',

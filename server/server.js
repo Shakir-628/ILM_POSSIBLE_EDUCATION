@@ -49,6 +49,7 @@ import libraryRoutes from "./routes/library.js";
 import transportRoutes from "./routes/transport.js";
 import hostelRoutes from "./routes/hostel.js";
 import superadminRoutes from "./routes/superadminRoutes.js";
+import aiExamRoutes from "./routes/aiExamRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -130,6 +131,7 @@ app.use("/api/certificate-templates", certificateTemplateRoutes);
 app.use("/api/library", libraryRoutes);
 app.use("/api/transport", transportRoutes);
 app.use("/api/hostel", hostelRoutes);
+app.use("/api/ai-exams", aiExamRoutes);
 
 // Error handler middleware (must be last)
 app.use(errorHandler);

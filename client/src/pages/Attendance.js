@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import Button from '../components/Button';
 import Select from '../components/Select';
-import { useAuth } from '../context/AuthContext';
 import { attendanceService } from '../services/attendanceService';
 import { useToast } from '../context/ToastContext';
 import { studentService } from '../services/studentService';
@@ -19,6 +18,8 @@ const Attendance = () => {
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isMarking, setIsMarking] = useState(false);
+  const [editingStudentId, setEditingStudentId] = useState(null);
+  const [editingStatus, setEditingStatus] = useState('');
 
   useEffect(() => {
     fetchClasses();
@@ -33,7 +34,7 @@ const Attendance = () => {
   const fetchClasses = async () => {
     try {
       const data = await classService.getAllClasses();
-      setClasses(data);
+      setClasses(data || []);
     } catch (error) {
       console.error('Error fetching classes:', error);
     }
@@ -42,71 +43,118 @@ const Attendance = () => {
   const fetchStudents = async () => {
     try {
       const data = await studentService.getStudentsByClass(selectedClass);
-      setStudents(data);
-      // Initialize attendance data
-      setAttendanceData(
-        data.map((student) => ({
-          studentId: student._id,
-          name: `${student.firstName} ${student.lastName}`,
-          status: 'present',
-          isMarked: false
-        }))
-      );
-      
-      // Check for existing attendance after setting up the initial data
+      setStudents(data || []);
+
+      const initialAttendance = (data || []).map((student) => ({
+        studentId: student._id,
+        name: `${student.firstName} ${student.lastName}`,
+        status: 'present',
+        isMarked: false,
+      }));
+
       if (attendanceDate) {
-        checkExistingAttendance();
+        try {
+          const existingAttendance = await attendanceService.getAllAttendance({
+            classId: selectedClass,
+            date: attendanceDate,
+          });
+
+          console.log('Raw API response:', existingAttendance);
+
+          const attendanceMap = new Map();
+          if (existingAttendance && existingAttendance.length > 0) {
+            existingAttendance.forEach((record) => {
+              console.log('Processing record:', record);
+              // Try different field names for student ID
+              const studentId = record.studentId || record.student?._id || record.student?.id || record.student;
+              console.log('Extracted studentId:', studentId);
+              if (studentId) {
+                attendanceMap.set(studentId, record);
+              }
+            });
+          }
+
+          console.log('Attendance map:', Array.from(attendanceMap.entries()));
+
+          const merged = initialAttendance.map((item) => {
+            const existing = attendanceMap.get(item.studentId);
+            if (existing) {
+              console.log('Found existing attendance for:', item.name, existing);
+              return {
+                ...item,
+                status: existing.status,
+                isMarked: true,
+                attendanceId: existing._id || existing.id,
+                updatedAt: existing.updatedAt,
+              };
+            }
+            return item;
+          });
+
+          console.log('Final merged attendance:', merged);
+          setAttendanceData(merged);
+        } catch (err) {
+          console.error('Error checking existing attendance (fetchStudents):', err);
+          setAttendanceData(initialAttendance);
+        }
+      } else {
+        setAttendanceData(initialAttendance);
       }
     } catch (error) {
       console.error('Error fetching students:', error);
     }
   };
-  
+
   const checkExistingAttendance = async () => {
     if (!selectedClass || !attendanceDate) return;
-    
+
     try {
       const existingAttendance = await attendanceService.getAllAttendance({
         classId: selectedClass,
-        date: attendanceDate
+        date: attendanceDate,
       });
-      
-      // Always update the attendance data with the latest from the database
-      setAttendanceData(prev => {
-        // Create a map of existing attendance for quick lookup
-        const attendanceMap = new Map();
-        if (existingAttendance && existingAttendance.length > 0) {
-          existingAttendance.forEach(record => {
-            attendanceMap.set(record.studentId, record);
-          });
-        }
-        
-        // Update each student's status based on the latest data
-        return prev.map(item => {
-          const existingRecord = attendanceMap.get(item.studentId);
-          if (existingRecord) {
-            return {
-              ...item,
-              status: existingRecord.status,
-              isMarked: true,
-              updatedAt: existingRecord.updatedAt // Store when it was last updated
-            };
-          }
-          // If no existing record, keep current data but ensure isMarked is false
-          return { ...item, isMarked: false };
+
+      const attendanceMap = new Map();
+      if (existingAttendance && existingAttendance.length > 0) {
+        console.log('checkExistingAttendance - Found records:', existingAttendance);
+        existingAttendance.forEach((record) => {
+          attendanceMap.set(record.studentId, record);
         });
+      }
+
+      const rebuilt = (students || []).map((student) => {
+        const existingRecord = attendanceMap.get(student._id);
+        if (existingRecord) {
+          return {
+            studentId: student._id,
+            name: `${student.firstName} ${student.lastName}`,
+            status: existingRecord.status,
+            isMarked: true,
+            attendanceId: existingRecord._id || existingRecord.id,
+            updatedAt: existingRecord.updatedAt,
+          };
+        }
+
+        return {
+          studentId: student._id,
+          name: `${student.firstName} ${student.lastName}`,
+          status: 'present',
+          isMarked: false,
+        };
       });
+
+      setAttendanceData(rebuilt);
     } catch (error) {
       console.error('Error checking existing attendance:', error);
     }
   };
   
-  // Check for existing attendance when date changes
+  // Check for existing attendance when date or class changes
   useEffect(() => {
     if (selectedClass && attendanceDate) {
       checkExistingAttendance();
     }
-  }, [attendanceDate]);
+  }, [selectedClass, attendanceDate, students]);
 
   const handleStatusChange = (studentId, status) => {
     setAttendanceData((prev) =>
@@ -114,6 +162,59 @@ const Attendance = () => {
         item.studentId === studentId ? { ...item, status } : item
       )
     );
+  };
+
+  const handleStartEdit = (item) => {
+    setEditingStudentId(item.studentId);
+    setEditingStatus(item.status);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingStudentId(null);
+    setEditingStatus('');
+    // Revert any local changes by reloading existing attendance
+    checkExistingAttendance();
+  };
+
+  const handleSaveEdit = async (item) => {
+    if (!item.attendanceId) {
+      // No attendanceId means record doesn't exist on server; fallback to marking normally
+      setAttendanceData((prev) => prev.map(it => it.studentId === item.studentId ? { ...it, status: editingStatus, isMarked: false } : it));
+      setEditingStudentId(null);
+      setEditingStatus('');
+      return;
+    }
+
+    try {
+      setIsMarking(true);
+      console.log('Saving attendance update:', item.attendanceId, editingStatus);
+      await attendanceService.updateAttendance(item.attendanceId, { status: editingStatus });
+      
+      // Directly update the state with the new status
+      setAttendanceData((prev) =>
+        prev.map((record) => {
+          if (record.studentId === item.studentId) {
+            console.log('Updated attendance for:', item.name, 'New status:', editingStatus);
+            return {
+              ...record,
+              status: editingStatus,
+              isMarked: true,
+              updatedAt: new Date().toISOString(),
+            };
+          }
+          return record;
+        })
+      );
+      
+      toast.success('Attendance updated');
+    } catch (err) {
+      console.error('Error updating attendance:', err);
+      toast.error('Failed to update attendance');
+    } finally {
+      setIsMarking(false);
+      setEditingStudentId(null);
+      setEditingStatus('');
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -177,10 +278,11 @@ const Attendance = () => {
               />
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="attendanceDate" className="block text-sm font-medium text-gray-700 mb-1">
                   Date <span className="text-red-500">*</span>
                 </label>
                 <input
+                  id="attendanceDate"
                   type="date"
                   value={attendanceDate}
                   onChange={(e) => setAttendanceDate(e.target.value)}
@@ -222,8 +324,10 @@ const Attendance = () => {
                               )}
                               <div className="flex space-x-4">
                                 {['present', 'absent', 'late', 'excused'].map((status) => {
-                                  const isCurrentStatus = item.status === status;
-                                  const isMarked = item.isMarked && isCurrentStatus;
+                                  const currentStatus = editingStudentId === item.studentId ? editingStatus : item.status;
+                                  const isCurrentStatus = currentStatus === status;
+                                  const isMarked = item.isMarked && isCurrentStatus && editingStudentId !== item.studentId;
+                                  const disabledInput = item.isMarked && editingStudentId !== item.studentId;
                                   
                                   return (
                                     <label 
@@ -235,8 +339,11 @@ const Attendance = () => {
                                         name={`status-${item.studentId}`}
                                         value={status}
                                         checked={isCurrentStatus}
-                                        onChange={() => handleStatusChange(item.studentId, status)}
-                                        disabled={item.isMarked}
+                                        onChange={() => {
+                                          if (editingStudentId === item.studentId) setEditingStatus(status);
+                                          else handleStatusChange(item.studentId, status);
+                                        }}
+                                        disabled={disabledInput}
                                         className={`h-4 w-4 ${isMarked ? 'text-green-500' : 'text-primary-600'} focus:ring-primary-500 border-gray-300`}
                                       />
                                       <span className={`ml-2 text-sm ${isMarked ? 'text-green-700 font-medium' : 'text-gray-700'} capitalize`}>
@@ -245,6 +352,34 @@ const Attendance = () => {
                                     </label>
                                   );
                                 })}
+                                {/* Edit controls for marked attendance */}
+                                {item.isMarked && editingStudentId !== item.studentId && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleStartEdit(item)}
+                                    className="ml-2 text-xs text-blue-600 hover:underline"
+                                  >
+                                    Edit
+                                  </button>
+                                )}
+                                {editingStudentId === item.studentId && (
+                                  <div className="ml-2 flex items-center space-x-2">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleSaveEdit(item)}
+                                      className="text-xs text-green-600 hover:underline"
+                                    >
+                                      Save
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={handleCancelEdit}
+                                      className="text-xs text-gray-600 hover:underline"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             </td>
                           </tr>

@@ -126,7 +126,7 @@ const bookSchema = new mongoose.Schema({
 });
 
 // Auto-generate bookId before saving
-bookSchema.pre('save', async function(next) {
+bookSchema.pre('save', async function (next) {
   if (!this.bookId) {
     const count = await mongoose.model('Book').countDocuments();
     this.bookId = `BK${String(count + 1).padStart(4, '0')}`;
@@ -135,23 +135,22 @@ bookSchema.pre('save', async function(next) {
 });
 
 // Update availableCopies when issuedCopies changes
-bookSchema.pre('save', function(next) {
+bookSchema.pre('save', function (next) {
   this.availableCopies = this.totalCopies - this.issuedCopies;
-  
+
   // Update status based on availability
   if (this.availableCopies === 0) {
     this.status = 'Issued';
   } else if (this.availableCopies > 0 && this.status === 'Issued') {
     this.status = 'Available';
   }
-  
+
   next();
 });
 
 // Indexes for better query performance
 bookSchema.index({ title: 'text', author: 'text', isbn: 'text' });
 bookSchema.index({ category: 1, status: 1 });
-bookSchema.index({ bookId: 1 });
 
 export default mongoose.model('Book', bookSchema);
 

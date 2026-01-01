@@ -1,0 +1,614 @@
+{
+  "chatbot_training_data": {
+    "metadata": {
+      "name": "ILM Possible Education - School Management System",
+      "version": "1.0",
+      "created": "2025-12-31",
+      "language": "English",
+      "total_qa_pairs": 100,
+      "categories": 15
+    },
+    "qa_pairs": [
+      {
+        "id": 1,
+        "category": "Account & Authentication",
+        "question": "How do I log in to the system?",
+        "answer": "To log in, visit the login page and enter your email/username and password. If you don't have an account, contact your school administrator to create one."
+      },
+      {
+        "id": 2,
+        "category": "Account & Authentication",
+        "question": "I forgot my password. What should I do?",
+        "answer": "Click on 'Forgot Password' on the login page, enter your email address, and follow the instructions sent to your email to reset your password."
+      },
+      {
+        "id": 3,
+        "category": "Account & Authentication",
+        "question": "How do I update my profile information?",
+        "answer": "Log in to the system, click on your profile icon in the top-right corner, select 'My Profile', and make the changes you need. Click 'Save' to update."
+      },
+      {
+        "id": 4,
+        "category": "Account & Authentication",
+        "question": "What user roles are available in the system?",
+        "answer": "The system has multiple roles: Admin (full access), Superadmin (system management), Teacher (class management), Student (view grades/attendance), and Parent (view child's information)."
+      },
+      {
+        "id": 5,
+        "category": "Account & Authentication",
+        "question": "Can I change my password?",
+        "answer": "Yes, go to your profile, click on 'Settings', and select 'Change Password'. Enter your current password and the new password you want to use."
+      },
+      {
+        "id": 6,
+        "category": "Attendance",
+        "question": "How do I check my attendance record?",
+        "answer": "Log in as a Student or Parent, go to 'Attendance' section, select your class and date to view your attendance status (Present/Absent/Leave)."
+      },
+      {
+        "id": 7,
+        "category": "Attendance",
+        "question": "How do teachers mark attendance?",
+        "answer": "Teachers go to 'Attendance' page, select the class and date, then mark each student as Present, Absent, or Leave. They can bulk mark and save all records."
+      },
+      {
+        "id": 8,
+        "category": "Attendance",
+        "question": "Can attendance be edited after it's marked?",
+        "answer": "Yes, if a mistake is made, the teacher can click 'Edit' on the attendance record and correct the status, then save the changes."
+      },
+      {
+        "id": 9,
+        "category": "Attendance",
+        "question": "How do I view attendance reports?",
+        "answer": "Go to 'Reports' section, select 'Attendance Reports', choose your class/student, and select the date range. You can view and export the report."
+      },
+      {
+        "id": 10,
+        "category": "Attendance",
+        "question": "What does the attendance status 'Leave' mean?",
+        "answer": "'Leave' indicates that the student has taken authorized leave on that day and is not counted as absent."
+      },
+      {
+        "id": 11,
+        "category": "Fees",
+        "question": "How do I check my fee status?",
+        "answer": "Log in, go to 'Accounting' or 'Fees' section, and you'll see your fee breakdown, due dates, paid amount, and remaining balance."
+      },
+      {
+        "id": 12,
+        "category": "Fees",
+        "question": "How do I pay school fees?",
+        "answer": "Check your fee statement in the Fees section for payment methods. You can pay online, bank transfer, or in-person at the school office."
+      },
+      {
+        "id": 13,
+        "category": "Fees",
+        "question": "What happens if I miss a fee payment deadline?",
+        "answer": "Late fees will be charged. You'll receive a notification alert. Contact the school office immediately to discuss payment options or apply for an extension."
+      },
+      {
+        "id": 14,
+        "category": "Fees",
+        "question": "Is there a fee discount available?",
+        "answer": "Fee discounts are determined by the school based on individual circumstances. Contact the school administration to inquire about available discounts."
+      },
+      {
+        "id": 15,
+        "category": "Fees",
+        "question": "How can I get a fee receipt?",
+        "answer": "After payment, the system generates a receipt automatically. You can download it from the Fees section or contact the administration office."
+      },
+      {
+        "id": 16,
+        "category": "Grades",
+        "question": "How do I view my grades?",
+        "answer": "Log in as a Student, go to 'Grades' section, select a subject to view your grades for tests, assignments, and overall performance."
+      },
+      {
+        "id": 17,
+        "category": "Grades",
+        "question": "How is GPA calculated?",
+        "answer": "GPA is calculated based on your grades in all subjects using a standard 4.0 scale. It's automatically updated after each assessment."
+      },
+      {
+        "id": 18,
+        "category": "Grades",
+        "question": "How do teachers enter grades?",
+        "answer": "Teachers go to 'Grades' section, select the class and subject, enter grades for each student for assignments, tests, and exams."
+      },
+      {
+        "id": 19,
+        "category": "Grades",
+        "question": "Can grades be edited after entry?",
+        "answer": "Yes, teachers can edit grades within a grace period. Contact your teacher or the administration if you see an error."
+      },
+      {
+        "id": 20,
+        "category": "Grades",
+        "question": "How do I get a grade report?",
+        "answer": "Go to 'Reports' section, select 'Grade Reports' or 'Report Card', choose the academic term, and download your comprehensive grade report."
+      },
+      {
+        "id": 21,
+        "category": "Exams",
+        "question": "Where can I find the exam schedule?",
+        "answer": "Go to 'Exams' section to view the exam schedule including dates, times, subjects, and venues for your class."
+      },
+      {
+        "id": 22,
+        "category": "Exams",
+        "question": "What should I do if I'm sick on exam day?",
+        "answer": "Contact the school office immediately with a medical certificate. You may be allowed to appear for a make-up exam."
+      },
+      {
+        "id": 23,
+        "category": "Exams",
+        "question": "How are exam results published?",
+        "answer": "Exam results are published after grading is complete. You'll receive a notification, and results will be visible in your Grades section."
+      },
+      {
+        "id": 24,
+        "category": "Exams",
+        "question": "Can I request a re-evaluation of my exam?",
+        "answer": "Yes, contact your teacher or the administration within the specified timeframe to request a re-evaluation."
+      },
+      {
+        "id": 25,
+        "category": "Exams",
+        "question": "What is the exam hall seating arrangement?",
+        "answer": "The exam seating arrangement is posted 2-3 days before the exam. Check the Exams section or the school notice board."
+      },
+      {
+        "id": 26,
+        "category": "Assignments",
+        "question": "How do I submit an assignment?",
+        "answer": "Go to 'Assignments' section, find your assignment, upload your file, and click submit before the deadline."
+      },
+      {
+        "id": 27,
+        "category": "Assignments",
+        "question": "What if I miss the assignment deadline?",
+        "answer": "Late submissions may result in grade penalties. Contact your teacher to explain and request an extension if necessary."
+      },
+      {
+        "id": 28,
+        "category": "Assignments",
+        "question": "How do I see feedback on my submission?",
+        "answer": "Go to 'Assignments' and click on the assignment you submitted. Your teacher's feedback and grade will be displayed."
+      },
+      {
+        "id": 29,
+        "category": "Assignments",
+        "question": "What file formats are accepted for assignments?",
+        "answer": "Most common formats are accepted: PDF, Word (.doc/.docx), Excel (.xls/.xlsx), PowerPoint, Images (.jpg/.png), and Text files."
+      },
+      {
+        "id": 30,
+        "category": "Assignments",
+        "question": "Can I resubmit an assignment?",
+        "answer": "Yes, you can resubmit before the deadline. The latest submission will be graded. Contact your teacher if you need to resubmit after the deadline."
+      },
+      {
+        "id": 31,
+        "category": "Timetable",
+        "question": "Where can I view the class timetable?",
+        "answer": "Go to 'Timetable' section, select your class, and view the weekly schedule with all periods, subjects, and teachers."
+      },
+      {
+        "id": 32,
+        "category": "Timetable",
+        "question": "What if there's a class schedule change?",
+        "answer": "Schedule changes will be posted on the timetable with notifications. Check the 'Timetable' section regularly for updates."
+      },
+      {
+        "id": 33,
+        "category": "Timetable",
+        "question": "Can I download the timetable?",
+        "answer": "Yes, most systems allow you to download or print the timetable in PDF format for easy reference."
+      },
+      {
+        "id": 34,
+        "category": "Timetable",
+        "question": "How do I know which teacher teaches which subject?",
+        "answer": "The timetable displays the teacher name for each subject in each period. You can also check the teacher list in the system."
+      },
+      {
+        "id": 35,
+        "category": "Timetable",
+        "question": "Are there different timetables for different batches?",
+        "answer": "Yes, each class has its own timetable. Select your specific class to view the correct schedule."
+      },
+      {
+        "id": 36,
+        "category": "Events",
+        "question": "How can I see upcoming school events?",
+        "answer": "Go to 'Events' section to view all upcoming events including dates, times, venues, and descriptions."
+      },
+      {
+        "id": 37,
+        "category": "Events",
+        "question": "Will I get a notification about school events?",
+        "answer": "Yes, you'll receive notifications in the notification bell for important upcoming events within 7 days."
+      },
+      {
+        "id": 38,
+        "category": "Events",
+        "question": "How do I register for school events?",
+        "answer": "Go to the event details page and click 'Register' or 'Participate'. Some events may be automatic for all students."
+      },
+      {
+        "id": 39,
+        "category": "Events",
+        "question": "What events are mandatory to attend?",
+        "answer": "Check the event details to see if it's mandatory. School assemblies and important ceremonies are usually mandatory."
+      },
+      {
+        "id": 40,
+        "category": "Events",
+        "question": "How do I know the event location and time?",
+        "answer": "All event details including location, start time, end time, and venue are listed in the Events section."
+      },
+      {
+        "id": 41,
+        "category": "Library",
+        "question": "How do I borrow books from the library?",
+        "answer": "Visit the library section, find the book you want, and request it. The librarian will process your request and notify you when it's ready."
+      },
+      {
+        "id": 42,
+        "category": "Library",
+        "question": "How long can I keep a borrowed book?",
+        "answer": "The loan period is typically 14 days. Check the book details for the specific due date."
+      },
+      {
+        "id": 43,
+        "category": "Library",
+        "question": "What happens if I don't return the book on time?",
+        "answer": "Late fees will be charged. Return the book as soon as possible to avoid additional charges."
+      },
+      {
+        "id": 44,
+        "category": "Library",
+        "question": "Can I renew a borrowed book?",
+        "answer": "Yes, you can renew the book if no one else has requested it. Go to your library account and click renew."
+      },
+      {
+        "id": 45,
+        "category": "Library",
+        "question": "How do I search for books in the library?",
+        "answer": "Use the search function to find books by title, author, or category. You can also browse by subject."
+      },
+      {
+        "id": 46,
+        "category": "Hostel",
+        "question": "How do I apply for hostel accommodation?",
+        "answer": "Go to 'Hostel' section and submit your application. The hostel administration will review and allocate a room based on availability."
+      },
+      {
+        "id": 47,
+        "category": "Hostel",
+        "question": "What is the hostel fee?",
+        "answer": "Hostel fees vary based on room type (single, shared). Check the fees section or contact the hostel office for detailed pricing."
+      },
+      {
+        "id": 48,
+        "category": "Hostel",
+        "question": "What are the hostel rules and regulations?",
+        "answer": "All hostel rules are available in the Hostel section. They cover curfew, guest policies, room maintenance, and conduct."
+      },
+      {
+        "id": 49,
+        "category": "Hostel",
+        "question": "Can I change my hostel room?",
+        "answer": "Room changes are subject to availability. Submit a request through the Hostel section. Approval depends on valid reasons."
+      },
+      {
+        "id": 50,
+        "category": "Hostel",
+        "question": "Who do I contact for hostel maintenance issues?",
+        "answer": "Report any maintenance issues to the hostel warden or through the Hostel section. They will address it promptly."
+      },
+      {
+        "id": 51,
+        "category": "Transport",
+        "question": "How do I register for school transportation?",
+        "answer": "Go to 'Transport' section, select your route and stop, and complete the registration. Payment details will be provided."
+      },
+      {
+        "id": 52,
+        "category": "Transport",
+        "question": "What are the transportation routes available?",
+        "answer": "Check the Transport section to see all available routes with stops, timing, vehicle details, and drivers."
+      },
+      {
+        "id": 53,
+        "category": "Transport",
+        "question": "What is the transport fee per month?",
+        "answer": "Transport fees vary by route distance. Check your selected route in the Transport section for the exact fee."
+      },
+      {
+        "id": 54,
+        "category": "Transport",
+        "question": "What if I want to discontinue transport service?",
+        "answer": "Notify the transport office through the system or in person. You'll receive a refund for unused balance if applicable."
+      },
+      {
+        "id": 55,
+        "category": "Transport",
+        "question": "How do I know my pick-up and drop-off time?",
+        "answer": "Your transport timings are shown in your Transport profile. Each route has specific pick-up and drop-off times."
+      },
+      {
+        "id": 56,
+        "category": "Announcements",
+        "question": "How do I view school announcements?",
+        "answer": "Go to 'Announcements' section to see all latest school notices and important information."
+      },
+      {
+        "id": 57,
+        "category": "Announcements",
+        "question": "Will I be notified of important announcements?",
+        "answer": "Yes, you'll receive notifications for important announcements. Check your notification bell for latest updates."
+      },
+      {
+        "id": 58,
+        "category": "Announcements",
+        "question": "What types of announcements are posted?",
+        "answer": "School announcements include notices, circulars, holiday dates, event information, and important administrative updates."
+      },
+      {
+        "id": 59,
+        "category": "Announcements",
+        "question": "Can I download announcements?",
+        "answer": "Yes, announcements with attachments can be downloaded. Click on the announcement to view and download."
+      },
+      {
+        "id": 60,
+        "category": "Announcements",
+        "question": "How often are announcements updated?",
+        "answer": "Announcements are updated regularly by school administration. Check back frequently or enable notifications for updates."
+      },
+      {
+        "id": 61,
+        "category": "Certificates",
+        "question": "How do I request a school certificate?",
+        "answer": "Go to 'Certificates' section, select the certificate type you need, and submit your request."
+      },
+      {
+        "id": 62,
+        "category": "Certificates",
+        "question": "What certificates can I request?",
+        "answer": "Available certificates include Character Certificate, Transfer Certificate, Provisional Certificate, and Academic Performance Certificate."
+      },
+      {
+        "id": 63,
+        "category": "Certificates",
+        "question": "How long does it take to get a certificate?",
+        "answer": "Certificate processing typically takes 5-7 business days. You'll be notified when it's ready for pickup."
+      },
+      {
+        "id": 64,
+        "category": "Certificates",
+        "question": "What is the certificate fee?",
+        "answer": "Certificate fees are minimal and vary by type. Check the Certificates section for exact pricing."
+      },
+      {
+        "id": 65,
+        "category": "Certificates",
+        "question": "Can I get a digital copy of my certificate?",
+        "answer": "Yes, digital certificates with QR codes are available. You can download and share them digitally."
+      },
+      {
+        "id": 66,
+        "category": "Dashboard & Navigation",
+        "question": "What is shown on the dashboard?",
+        "answer": "The dashboard displays your quick stats including attendance percentage, fee status, recent grades, and upcoming events."
+      },
+      {
+        "id": 67,
+        "category": "Dashboard & Navigation",
+        "question": "How do I navigate through different sections?",
+        "answer": "Use the left sidebar menu to navigate to different sections like Attendance, Grades, Exams, Fees, etc."
+      },
+      {
+        "id": 68,
+        "category": "Dashboard & Navigation",
+        "question": "How do I search for specific information?",
+        "answer": "Use the search bar at the top of the page to quickly find students, teachers, classes, events, or other information."
+      },
+      {
+        "id": 69,
+        "category": "Dashboard & Navigation",
+        "question": "Can I customize my dashboard?",
+        "answer": "Some systems allow dashboard customization. Check settings to arrange widgets according to your preference."
+      },
+      {
+        "id": 70,
+        "category": "Dashboard & Navigation",
+        "question": "How do I access the mobile version?",
+        "answer": "The system is responsive and works on mobile browsers. Visit the same URL on your mobile device or use the mobile app."
+      },
+      {
+        "id": 71,
+        "category": "Notifications",
+        "question": "How do I receive notifications?",
+        "answer": "Check the notification bell icon in the top-right corner of your dashboard. All important updates appear there."
+      },
+      {
+        "id": 72,
+        "category": "Notifications",
+        "question": "What notifications will I receive?",
+        "answer": "You'll receive notifications for assignments, grades, fee reminders, event updates, exam schedules, and important announcements."
+      },
+      {
+        "id": 73,
+        "category": "Notifications",
+        "question": "Can I disable notifications?",
+        "answer": "Go to your settings and notification preferences to choose which notifications you want to receive."
+      },
+      {
+        "id": 74,
+        "category": "Notifications",
+        "question": "When will I be notified of late fees?",
+        "answer": "You'll receive a notification when fees become overdue, usually on the due date and periodically after."
+      },
+      {
+        "id": 75,
+        "category": "Notifications",
+        "question": "How do I mark a notification as read?",
+        "answer": "Click on the notification to view it, or click the checkmark icon to mark it as read."
+      },
+      {
+        "id": 76,
+        "category": "Technical Support",
+        "question": "What should I do if I encounter a technical error?",
+        "answer": "Try refreshing the page first. If the error persists, contact the IT support team with details of the issue."
+      },
+      {
+        "id": 77,
+        "category": "Technical Support",
+        "question": "Which browsers are supported?",
+        "answer": "Chrome, Firefox, Safari, and Edge are fully supported. For best experience, use the latest version of your browser."
+      },
+      {
+        "id": 78,
+        "category": "Technical Support",
+        "question": "The page is loading slowly. What can I do?",
+        "answer": "Clear your browser cache, disable extensions, or try a different browser. Contact support if the issue continues."
+      },
+      {
+        "id": 79,
+        "category": "Technical Support",
+        "question": "How do I report a bug?",
+        "answer": "Click on 'Support' or 'Report Issue' and provide details about the bug. The technical team will investigate."
+      },
+      {
+        "id": 80,
+        "category": "Technical Support",
+        "question": "Is my data secure in this system?",
+        "answer": "Yes, all data is encrypted and secure. Your personal information is protected with the highest security standards."
+      },
+      {
+        "id": 81,
+        "category": "Parents",
+        "question": "How do I create a parent account?",
+        "answer": "The school administration creates parent accounts. You'll receive login credentials via email."
+      },
+      {
+        "id": 82,
+        "category": "Parents",
+        "question": "How can I monitor my child's progress?",
+        "answer": "Log in to your parent account and view your child's attendance, grades, assignment submissions, and notifications."
+      },
+      {
+        "id": 83,
+        "category": "Parents",
+        "question": "Can I communicate with teachers?",
+        "answer": "Yes, use the Messages section to send messages to teachers. They'll respond within 24-48 hours."
+      },
+      {
+        "id": 84,
+        "category": "Parents",
+        "question": "How do I pay fees through the system?",
+        "answer": "Go to your Fees section, review the fee details, and use the online payment option to pay securely."
+      },
+      {
+        "id": 85,
+        "category": "Parents",
+        "question": "Can I view my child's timetable?",
+        "answer": "Yes, in your parent account, you can view your child's class timetable, exam schedule, and upcoming events."
+      },
+      {
+        "id": 86,
+        "category": "Teachers",
+        "question": "How do I mark attendance for my class?",
+        "answer": "Go to 'Attendance' section, select the class and date, mark each student's status, and save the records."
+      },
+      {
+        "id": 87,
+        "category": "Teachers",
+        "question": "How do I enter grades?",
+        "answer": "Go to 'Grades' section, select the class and subject, and enter grades for each assessment (assignment, test, exam)."
+      },
+      {
+        "id": 88,
+        "category": "Teachers",
+        "question": "How do I create and post assignments?",
+        "answer": "Go to 'Assignments' section, click 'Create New', add assignment details, set deadline, and post for students."
+      },
+      {
+        "id": 89,
+        "category": "Teachers",
+        "question": "How do I grade student assignments?",
+        "answer": "Go to 'Assignments', click on the assignment, review submissions, add feedback and grade, and save."
+      },
+      {
+        "id": 90,
+        "category": "Teachers",
+        "question": "Can I communicate with parents?",
+        "answer": "Yes, use Messages section to send individual or bulk messages to parents about student progress."
+      },
+      {
+        "id": 91,
+        "category": "Admins",
+        "question": "How do I manage user accounts?",
+        "answer": "In Admin panel, go to 'User Management' to create, edit, or deactivate user accounts by role."
+      },
+      {
+        "id": 92,
+        "category": "Admins",
+        "question": "How do I configure system settings?",
+        "answer": "Go to 'Settings' to manage school profile, academic calendar, fee structures, and other system parameters."
+      },
+      {
+        "id": 93,
+        "category": "Admins",
+        "question": "How do I view system reports?",
+        "answer": "Go to 'Reports' section to generate and view comprehensive reports on attendance, grades, fees, and more."
+      },
+      {
+        "id": 94,
+        "category": "Admins",
+        "question": "How do I backup the system data?",
+        "answer": "Go to 'Settings' > 'Backup & Security' to create automatic or manual backups of all system data."
+      },
+      {
+        "id": 95,
+        "category": "Admins",
+        "question": "How do I manage role permissions?",
+        "answer": "In 'Settings' > 'Role Permissions', define what each role can access and modify in the system."
+      },
+      {
+        "id": 96,
+        "category": "General",
+        "question": "What is ILM Possible Education?",
+        "answer": "ILM Possible Education is a comprehensive school management system that handles attendance, grades, fees, exams, and more in one platform."
+      },
+      {
+        "id": 97,
+        "category": "General",
+        "question": "Is there a mobile app available?",
+        "answer": "Yes, the system is fully mobile-responsive. You can also download the dedicated mobile app from your app store."
+      },
+      {
+        "id": 98,
+        "category": "General",
+        "question": "How do I contact support?",
+        "answer": "Use the 'Support' or 'Help' section in the system or email support@ilmpossible.edu for assistance."
+      },
+      {
+        "id": 99,
+        "category": "General",
+        "question": "Is my information private?",
+        "answer": "Yes, your information is private and secure. Only authorized school personnel can access your data based on their role."
+      },
+      {
+        "id": 100,
+        "category": "General",
+        "question": "How often is the system updated?",
+        "answer": "The system is updated regularly with new features and improvements. Updates are done during maintenance windows to minimize disruption."
+      }
+    ]
+  }
+}

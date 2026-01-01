@@ -1,6 +1,5 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { authService } from '../services/authService';
-
 
 const AuthContext = createContext();
 
@@ -15,38 +14,68 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const userInfo = authService.getCurrentUser();
-    if (userInfo) {
-      setUser(userInfo);
+  // Initialize auth state
+  const initAuth = useCallback(() => {
+    try {
+      const userInfo = authService.getCurrentUser();
+      if (userInfo) {
+        setUser(userInfo);
+      }
+    } catch (error) {
+      console.error('Auth initialization error:', error);
+      setError('Failed to initialize authentication');
+      authService.logout();
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
+  // Initialize on mount
+  useEffect(() => {
+    initAuth();
+    
+    // Set up storage event listener to sync auth state across tabs
+    const handleStorageChange = () => {
+      initAuth();
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [initAuth]);
+
   const login = async (email, password) => {
+    setLoading(true);
+    setError(null);
+    
     try {
       const data = await authService.login(email, password);
       setUser(data);
       return { success: true, data };
     } catch (error) {
-      return {
-        success: false,
-        error: error.response?.data?.message || 'Login failed'
-      };
+      const errorMessage = error.response?.data?.message || error.message || 'Login failed';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
     }
   };
 
   const register = async (userData) => {
+    setLoading(true);
+    setError(null);
+    
     try {
       const data = await authService.register(userData);
       setUser(data);
       return { success: true, data };
     } catch (error) {
-      return {
-        success: false,
-        error: error.response?.data?.message || 'Registration failed'
-      };
+      const errorMessage = error.response?.data?.message || error.message || 'Registration failed';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -70,6 +99,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    token: user?.token,
     loading,
     login,
     register,

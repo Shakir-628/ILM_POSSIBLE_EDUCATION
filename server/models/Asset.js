@@ -93,7 +93,6 @@ const assetSchema = new mongoose.Schema(
 );
 
 // Index for faster queries
-assetSchema.index({ assetId: 1 });
 assetSchema.index({ category: 1 });
 assetSchema.index({ status: 1 });
 assetSchema.index({ location: 1 });

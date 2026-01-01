@@ -1,4 +1,16 @@
 import Notification from "../models/Notification.js";
+import {
+  createAdminNotifications,
+  refreshAdminNotifications,
+  getLateFees,
+  getUpcomingEvents,
+  getUpcomingExams,
+} from "../services/adminNotificationService.js";
+import {
+  createAndEmitNotification,
+  createAndEmitBulkNotifications,
+  broadcastNotificationUpdate,
+} from "../utils/notificationEmitter.js";
 
 // @desc    Get all notifications for a user
 // @route   GET /api/notifications
@@ -157,7 +169,7 @@ export const deleteNotification = async (req, res) => {
 // @access  Private (Admin)
 export const createNotification = async (req, res) => {
   try {
-    const notification = await Notification.create(req.body);
+    const notification = await createAndEmitNotification(req.body);
 
     res.status(201).json({
       success: true,
@@ -180,15 +192,10 @@ export const createBulkNotifications = async (req, res) => {
   try {
     const { recipients, title, message, type, link } = req.body;
 
-    const notifications = recipients.map((recipientId) => ({
-      recipient: recipientId,
-      title,
-      message,
-      type,
-      link,
-    }));
-
-    await Notification.insertMany(notifications);
+    const notifications = await createAndEmitBulkNotifications(
+      recipients,
+      { title, message, type, link }
+    );
 
     res.status(201).json({
       success: true,
@@ -203,4 +210,64 @@ export const createBulkNotifications = async (req, res) => {
     });
   }
 };
+
+// @desc    Refresh admin notifications (late fees, upcoming events, exams)
+// @route   POST /api/notifications/admin/refresh
+// @access  Private (Admin/Superadmin)
+export const refreshAdminNotificationsHandler = async (req, res) => {
+  try {
+    const results = await refreshAdminNotifications();
+
+    res.status(200).json({
+      success: true,
+      message: "Admin notifications refreshed successfully",
+      data: results,
+    });
+  } catch (error) {
+    console.error("Refresh admin notifications error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// @desc    Get admin notification summary (late fees count, upcoming events, exams)
+// @route   GET /api/notifications/admin/summary
+// @access  Private (Admin/Superadmin)
+export const getAdminNotificationSummary = async (req, res) => {
+  try {
+    const lateFees = await getLateFees();
+    const upcomingEvents = await getUpcomingEvents(7);
+    const upcomingExams = await getUpcomingExams(7);
+
+    const summary = {
+      lateFees: {
+        count: lateFees.length,
+        totalAmount: lateFees.reduce((sum, payment) => sum + payment.balance, 0),
+        details: lateFees,
+      },
+      upcomingEvents: {
+        count: upcomingEvents.length,
+        details: upcomingEvents,
+      },
+      upcomingExams: {
+        count: upcomingExams.length,
+        details: upcomingExams,
+      },
+    };
+
+    res.status(200).json({
+      success: true,
+      data: summary,
+    });
+  } catch (error) {
+    console.error("Get admin notification summary error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 

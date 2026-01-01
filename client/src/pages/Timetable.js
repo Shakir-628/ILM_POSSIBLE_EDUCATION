@@ -180,7 +180,8 @@ const Timetable = () => {
   };
 
   const handleDeleteTimetable = async () => {
-    if (window.confirm('Are you sure you want to delete this timetable?')) {
+    /* eslint-disable-next-line */
+    if (typeof globalThis !== 'undefined' && globalThis.confirm('Are you sure you want to delete this timetable?')) {
       try {
         await timetableService.deleteTimetable(currentTimetable._id);
         toast.success('Timetable deleted successfully');
@@ -244,7 +245,7 @@ const Timetable = () => {
     const subjectId = typeof period.subject === 'object' ? period.subject._id : period.subject;
     
     // Simple hash to get consistent color for same subject
-    const hash = subjectId ? subjectId.toString().charCodeAt(0) % colors.length : 0;
+    const hash = subjectId ? subjectId.toString().codePointAt(0) % colors.length : 0;
     return colors[hash];
   };
 
@@ -279,7 +280,7 @@ const Timetable = () => {
   };
 
   const handleExportExcel = async () => {
-    if (!currentTimetable || !currentTimetable._id) {
+    if (!currentTimetable?._id) {
       toast.warning('No timetable to export');
       return;
     }
@@ -295,7 +296,7 @@ const Timetable = () => {
   };
 
   const handleExportPDF = async () => {
-    if (!currentTimetable || !currentTimetable._id) {
+    if (!currentTimetable?._id) {
       toast.warning('No timetable to export');
       return;
     }
@@ -383,12 +384,14 @@ const Timetable = () => {
         </div>
 
         {/* Timetable Grid */}
-        {loading ? (
+        {loading && (
           <div className="bg-white shadow rounded-lg p-12 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading timetable...</p>
           </div>
-        ) : currentTimetable ? (
+        )}
+
+        {!loading && currentTimetable && (
           <div className="bg-white shadow-lg rounded-lg overflow-hidden">
             {/* Legend */}
             <div className="bg-gradient-to-r from-primary-600 to-primary-800 p-4 text-white">
@@ -418,7 +421,7 @@ const Timetable = () => {
                   {timeSlots.map((timeSlot, slotIndex) => {
                     if (timeSlot.isBreak) {
                       return (
-                        <tr key={slotIndex} className="bg-yellow-50">
+                        <tr key={`${timeSlot.value ?? 'break'}-${slotIndex}`} className="bg-yellow-50">
                           <td className="px-4 py-3 text-sm font-medium text-gray-700 border-r">
                             {timeSlot.label}
                           </td>
@@ -432,7 +435,7 @@ const Timetable = () => {
                     const actualPeriodIndex = timeSlots.slice(0, slotIndex).filter(ts => !ts.isBreak).length;
 
                     return (
-                      <tr key={slotIndex} className="border-b hover:bg-gray-50 transition-colors">
+                      <tr key={`${timeSlot.value ?? 'slot'}-${slotIndex}`} className="border-b hover:bg-gray-50 transition-colors">
                         <td className="px-4 py-4 text-sm font-medium text-gray-700 border-r bg-gray-50">
                           <div className="flex items-center">
                             <ClockIcon className="h-4 w-4 mr-2 text-gray-500" />
@@ -447,10 +450,10 @@ const Timetable = () => {
                               key={day}
                               onClick={() => isAdmin && handlePeriodClick(dayIndex, actualPeriodIndex)}
                               className={`px-3 py-4 text-sm border-r cursor-pointer transition-all duration-200 hover:shadow-inner ${
-                                period && period.subject ? getPeriodColor(period) : 'bg-white hover:bg-gray-50'
+                                period?.subject ? getPeriodColor(period) : 'bg-white hover:bg-gray-50'
                               } ${isAdmin ? 'hover:scale-105' : ''}`}
                             >
-                              {period && period.subject ? (
+                              {period?.subject ? (
                                 <div className="text-center">
                                   <div className="font-semibold text-gray-900 mb-1">
                                     {getSubjectName(period.subject)}
@@ -483,12 +486,12 @@ const Timetable = () => {
             <div className="bg-gray-50 px-4 py-3 text-sm text-gray-600 flex justify-between items-center">
               <div className="flex space-x-4">
                 <span className="flex items-center">
-                  <span className="w-3 h-3 bg-blue-200 rounded mr-2"></span>
-                  Lecture Period
+                  <span className="w-3 h-3 bg-blue-200 rounded mr-2" />
+                  <span>Lecture Period</span>
                 </span>
                 <span className="flex items-center">
-                  <span className="w-3 h-3 bg-yellow-200 rounded mr-2"></span>
-                  Break
+                  <span className="w-3 h-3 bg-yellow-200 rounded mr-2" />
+                  <span>Break</span>
                 </span>
               </div>
               <div className="text-xs">
@@ -496,7 +499,9 @@ const Timetable = () => {
               </div>
             </div>
           </div>
-        ) : selectedClass ? (
+        )}
+
+        {!loading && !currentTimetable && selectedClass && (
           <div className="bg-white shadow rounded-lg p-12 text-center">
             <CalendarDaysIcon className="h-24 w-24 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No Timetable Found</h3>
@@ -507,7 +512,9 @@ const Timetable = () => {
               </Button>
             )}
           </div>
-        ) : (
+        )}
+
+        {!loading && !currentTimetable && !selectedClass && (
           <div className="bg-gradient-to-br from-blue-50 to-indigo-100 shadow rounded-lg p-12 text-center">
             <CalendarDaysIcon className="h-24 w-24 text-indigo-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Welcome to Timetable Management</h3>

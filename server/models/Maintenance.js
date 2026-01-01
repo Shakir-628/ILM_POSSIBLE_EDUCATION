@@ -88,7 +88,6 @@ const maintenanceSchema = new mongoose.Schema(
 );
 
 // Index for faster queries
-maintenanceSchema.index({ maintenanceId: 1 });
 maintenanceSchema.index({ asset: 1 });
 maintenanceSchema.index({ status: 1 });
 maintenanceSchema.index({ scheduledDate: 1 });

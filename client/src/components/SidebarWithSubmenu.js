@@ -122,6 +122,8 @@ const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
         { name: 'Grades & Marks', href: '/grades', roles: ['admin', 'teacher', 'student'] },
         { name: 'Report Cards', href: '/report-cards', roles: ['admin', 'teacher', 'student', 'parent'] },
         { name: 'Exam Analytics', href: '/exam-analytics', roles: ['admin', 'teacher'] },
+        { name: 'AI Exams', href: '/ai-exams', roles: ['admin', 'teacher', 'student'] },
+        { name: 'Create AI Exam', href: '/exams/create', roles: ['admin', 'teacher'] },
       ],
     },
     {

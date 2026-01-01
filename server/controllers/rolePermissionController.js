@@ -177,6 +177,17 @@ export const initializeDefaultPermissions = async (req, res) => {
         submodules: [],
       },
       {
+        moduleName: 'AI Exams',
+        enabled: true,
+        submodules: [
+          { name: 'Create Exam', enabled: true },
+          { name: 'Manage Exams', enabled: true },
+          { name: 'View Results', enabled: true },
+          { name: 'Generate Questions', enabled: true },
+          { name: 'Take Exam', enabled: true }
+        ],
+      },
+      {
         moduleName: 'Students',
         enabled: true,
         submodules: [

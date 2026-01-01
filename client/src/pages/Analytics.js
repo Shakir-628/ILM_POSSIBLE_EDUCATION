@@ -170,33 +170,30 @@ const Analytics = () => {
             </div>
             <div className="px-4 py-5 sm:p-6">
               <div className="space-y-3">
-                {attendanceByClass.map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
-                  >
-                    <span className="text-sm font-medium text-gray-900">
-                      {item.className}
-                    </span>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-48 bg-gray-200 rounded-full h-2.5">
-                        <div
-                          className={`h-2.5 rounded-full ${
-                            item.attendanceRate >= 90
-                              ? 'bg-green-600'
-                              : item.attendanceRate >= 75
-                              ? 'bg-yellow-600'
-                              : 'bg-red-600'
-                          }`}
-                          style={{ width: `${item.attendanceRate}%` }}
-                        ></div>
-                      </div>
-                      <span className="text-sm font-semibold text-gray-700 w-16 text-right">
-                        {item.attendanceRate.toFixed(1)}%
+                {attendanceByClass.map((item) => {
+                  const colorClass = item.attendanceRate >= 90 ? 'bg-green-600' : item.attendanceRate >= 75 ? 'bg-yellow-600' : 'bg-red-600';
+                  return (
+                    <div
+                      key={item.className}
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                    >
+                      <span className="text-sm font-medium text-gray-900">
+                        {item.className}
                       </span>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-48 bg-gray-200 rounded-full h-2.5">
+                          <div
+                            className={`h-2.5 rounded-full ${colorClass}`}
+                            style={{ width: `${item.attendanceRate}%` }}
+                          ></div>
+                        </div>
+                        <span className="text-sm font-semibold text-gray-700 w-16 text-right">
+                          {item.attendanceRate.toFixed(1)}%
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>

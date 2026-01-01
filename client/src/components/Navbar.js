@@ -4,11 +4,11 @@ import { useAuth } from '../context/AuthContext';
 import { Menu, Transition } from '@headlessui/react';
 import {
   Bars3Icon,
-  BellIcon,
   UserCircleIcon,
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/outline';
+import NotificationBell from './NotificationBell';
 
 const Navbar = ({ toggleSidebar }) => {
   const { user, logout } = useAuth();
@@ -52,14 +52,8 @@ const Navbar = ({ toggleSidebar }) => {
 
           {/* Right section */}
           <div className="flex items-center space-x-3">
-            {/* Notifications */}
-            <button className="relative text-gray-600 hover:text-primary-600 hover:bg-primary-50 p-2.5 rounded-xl transition-all duration-200 hover:scale-110 group">
-              <BellIcon className="h-6 w-6" />
-              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-danger-500 border-2 border-white rounded-full animate-pulse"></span>
-              <span className="absolute -top-1 -right-1 bg-gradient-to-br from-danger-500 to-danger-600 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                3
-              </span>
-            </button>
+            {/* Notifications Bell */}
+            <NotificationBell />
 
             {/* User menu */}
             <Menu as="div" className="relative">

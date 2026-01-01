@@ -95,7 +95,7 @@ const bookIssueSchema = new mongoose.Schema({
 });
 
 // Auto-generate issueId before saving
-bookIssueSchema.pre('save', async function(next) {
+bookIssueSchema.pre('save', async function (next) {
   if (!this.issueId) {
     const count = await mongoose.model('BookIssue').countDocuments();
     this.issueId = `ISS${String(count + 1).padStart(5, '0')}`;
@@ -104,14 +104,14 @@ bookIssueSchema.pre('save', async function(next) {
 });
 
 // Calculate fine for overdue books
-bookIssueSchema.methods.calculateFine = function() {
+bookIssueSchema.methods.calculateFine = function () {
   if (this.status === 'Returned' && this.fine.paid) {
     return 0;
   }
 
   const today = new Date();
   const dueDate = new Date(this.dueDate);
-  
+
   if (today > dueDate && this.status !== 'Returned') {
     const daysOverdue = Math.ceil((today - dueDate) / (1000 * 60 * 60 * 24));
     const finePerDay = 5; // PKR 5 per day
@@ -119,29 +119,28 @@ bookIssueSchema.methods.calculateFine = function() {
     this.fine.reason = 'Overdue';
     this.status = 'Overdue';
   }
-  
+
   return this.fine.amount;
 };
 
 // Auto-update status based on dates
-bookIssueSchema.pre('save', function(next) {
+bookIssueSchema.pre('save', function (next) {
   const today = new Date();
   const dueDate = new Date(this.dueDate);
-  
+
   if (this.actualReturnDate) {
     this.status = 'Returned';
   } else if (today > dueDate && this.status === 'Issued') {
     this.status = 'Overdue';
     this.calculateFine();
   }
-  
+
   next();
 });
 
 // Indexes
 bookIssueSchema.index({ book: 1, student: 1 });
 bookIssueSchema.index({ status: 1, dueDate: 1 });
-bookIssueSchema.index({ issueId: 1 });
 
 export default mongoose.model('BookIssue', bookIssueSchema);
 
