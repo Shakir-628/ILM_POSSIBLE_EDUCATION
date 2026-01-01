@@ -61,6 +61,7 @@ import LibraryIssues from './pages/LibraryIssues';
 import Transport from './pages/Transport';
 import Hostel from './pages/Hostel';
 import AIExams from './pages/AIExams';
+import EPortfolio from './pages/EPortfolio';
 // AI Exam Components
 import CreateExam from './components/CreateExam';
 import StudentExamTaking from './components/StudentExamTaking';
@@ -545,6 +546,14 @@ function App() {
                 </PrivateRoute>
               }
             />
+            <Route
+              path="/e-portfolio"
+              element={
+                <PrivateRoute>
+                  <EPortfolio />
+                </PrivateRoute>
+              }
+            />
 
             {/* Redirect */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -552,7 +561,7 @@ function App() {
           </Routes>
         </PermissionProvider>
       </AuthProvider>
-    </ToastProvider>
+    </ToastProvider >
   );
 }
 

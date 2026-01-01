@@ -69,7 +69,9 @@ const OcrScanner = ({ onDataExtracted }) => {
             fatherName: '',
             motherName: '',
             birthplace: '',
-            city: ''
+            city: '',
+            title: '',
+            achievementLevel: ''
         };
 
         console.log('Lines for parsing:', lines);
@@ -228,6 +230,32 @@ const OcrScanner = ({ onDataExtracted }) => {
             else if (text.toLowerCase().includes('male')) data.gender = 'male';
             else if (/\bF\b/.test(text)) data.gender = 'female';
             else if (/\bM\b/.test(text)) data.gender = 'male';
+        }
+
+        // 5. Look for Certificate Title & Achievement Level (for E-Portfolio)
+        const titleKeywords = ['Certificate of', 'Awarded to', 'Achievement', 'Participation', 'Excellence', 'Diploma'];
+        const achievementKeywords = ['First Place', 'Second Place', 'Third Place', 'Gold', 'Silver', 'Bronze', 'Winner', 'Distinction', 'Merit'];
+
+        for (const line of lines) {
+            // Title Detection
+            if (!data.title) {
+                for (const kw of titleKeywords) {
+                    if (line.toLowerCase().includes(kw.toLowerCase())) {
+                        data.title = line.trim();
+                        break;
+                    }
+                }
+            }
+
+            // Achievement Level Detection
+            if (!data.achievementLevel) {
+                for (const kw of achievementKeywords) {
+                    if (line.toLowerCase().includes(kw.toLowerCase())) {
+                        data.achievementLevel = kw;
+                        break;
+                    }
+                }
+            }
         }
 
         return data;

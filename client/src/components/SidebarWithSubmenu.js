@@ -189,6 +189,7 @@ const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
       roles: ['admin', 'teacher', 'student', 'parent'],
       submenu: [
         { name: 'Certificates', href: '/certificates', roles: ['admin', 'student', 'parent'] },
+        { name: 'E-Portfolio', href: '/e-portfolio', roles: ['admin', 'teacher', 'student'] },
         { name: 'Document Templates', href: '/documents/templates', roles: ['admin'] },
       ],
     },

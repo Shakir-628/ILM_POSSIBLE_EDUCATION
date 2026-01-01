@@ -50,6 +50,7 @@ import transportRoutes from "./routes/transport.js";
 import hostelRoutes from "./routes/hostel.js";
 import superadminRoutes from "./routes/superadminRoutes.js";
 import aiExamRoutes from "./routes/aiExamRoutes.js";
+import ePortfolioRoutes from "./routes/ePortfolioRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -78,7 +79,7 @@ connectDB();
 
 // Routes
 app.get("/", (req, res) => {
-  res.json({ 
+  res.json({
     message: "School Management API Running",
     version: "2.0.0",
     features: [
@@ -132,6 +133,7 @@ app.use("/api/library", libraryRoutes);
 app.use("/api/transport", transportRoutes);
 app.use("/api/hostel", hostelRoutes);
 app.use("/api/ai-exams", aiExamRoutes);
+app.use("/api/e-portfolio", ePortfolioRoutes);
 
 // Error handler middleware (must be last)
 app.use(errorHandler);

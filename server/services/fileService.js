@@ -11,8 +11,9 @@ const uploadsDir = path.join(__dirname, "../uploads");
 const documentsDir = path.join(uploadsDir, "documents");
 const assignmentsDir = path.join(uploadsDir, "assignments");
 const qrcodesDir = path.join(uploadsDir, "qrcodes");
+const portfolioDir = path.join(uploadsDir, "portfolio");
 
-[uploadsDir, documentsDir, assignmentsDir, qrcodesDir].forEach((dir) => {
+[uploadsDir, documentsDir, assignmentsDir, qrcodesDir, portfolioDir].forEach((dir) => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
@@ -22,7 +23,7 @@ const qrcodesDir = path.join(uploadsDir, "qrcodes");
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     let uploadType = "general";
-    
+
     // Determine upload type from request
     if (req.uploadType) {
       uploadType = req.uploadType;
@@ -31,13 +32,13 @@ const storage = multer.diskStorage({
     } else if (req.originalUrl.includes("/assignments")) {
       uploadType = "assignments";
     }
-    
+
     const dest = path.join(uploadsDir, uploadType);
-    
+
     if (!fs.existsSync(dest)) {
       fs.mkdirSync(dest, { recursive: true });
     }
-    
+
     cb(null, dest);
   },
   filename: (req, file, cb) => {
@@ -92,9 +93,9 @@ export const getFileUrl = (filePath) => {
 // Process uploaded files for response
 export const processUploadedFiles = (files) => {
   if (!files) return [];
-  
+
   const fileArray = Array.isArray(files) ? files : [files];
-  
+
   return fileArray.map((file) => ({
     filename: file.originalname,
     path: file.path.replace(/\\/g, "/").split("/uploads/")[1],
