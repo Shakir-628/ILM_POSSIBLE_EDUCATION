@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import { rolePermissionService } from '../services/rolePermissionService';
 
@@ -9,16 +9,7 @@ export const PermissionProvider = ({ children }) => {
   const [permissions, setPermissions] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (user?.role) {
-      fetchPermissions();
-    } else {
-      setPermissions(null);
-      setLoading(false);
-    }
-  }, [user]);
-
-  const fetchPermissions = async () => {
+  const fetchPermissions = useCallback(async () => {
     try {
       setLoading(true);
       const response = await rolePermissionService.getRolePermissionByRole(user.role);
@@ -30,13 +21,22 @@ export const PermissionProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user?.role) {
+      fetchPermissions();
+    } else {
+      setPermissions(null);
+      setLoading(false);
+    }
+  }, [user, fetchPermissions]);
 
   const hasModulePermission = (moduleName) => {
     if (!permissions || !permissions.modules) {
       return true; // Default to true if no permissions set
     }
-    
+
     const module = permissions.modules.find(m => m.moduleName === moduleName);
     return module ? module.enabled : false;
   };
@@ -45,9 +45,9 @@ export const PermissionProvider = ({ children }) => {
     if (!permissions || !permissions.modules) return true; // Default to true if no permissions set
     const module = permissions.modules.find(m => m.moduleName === moduleName);
     if (!module || !module.enabled) return false;
-    
+
     if (!module.submodules || module.submodules.length === 0) return true;
-    
+
     const submodule = module.submodules.find(s => s.name === submoduleName);
     return submodule ? submodule.enabled : false;
   };

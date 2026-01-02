@@ -10,7 +10,6 @@ const NotificationBell = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [socket, setSocket] = useState(null);
   const { addToast } = useToast();
   const { user, token } = useAuth();
 
@@ -55,12 +54,12 @@ const NotificationBell = () => {
       console.error('Connection error:', error);
     });
 
-    setSocket(newSocket);
-
     return () => {
       newSocket.disconnect();
     };
-  }, [user, token, addToast]);
+  }, [user, token, addToast, fetchNotifications]); // Added fetchNotifications to deps if customized, otherwise rely on useCallback or omit if stable outside.
+
+
 
   // Fetch unread count on mount
   useEffect(() => {
@@ -152,22 +151,7 @@ const NotificationBell = () => {
     return icons[type] || icons.info;
   };
 
-  const getTypeColor = (type) => {
-    const colors = {
-      fee: 'bg-yellow-50 border-yellow-200',
-      exam: 'bg-blue-50 border-blue-200',
-      event: 'bg-purple-50 border-purple-200',
-      assignment: 'bg-green-50 border-green-200',
-      message: 'bg-indigo-50 border-indigo-200',
-      warning: 'bg-orange-50 border-orange-200',
-      error: 'bg-red-50 border-red-200',
-      success: 'bg-green-50 border-green-200',
-      announcement: 'bg-pink-50 border-pink-200',
-      default: 'bg-gray-50 border-gray-200',
-    };
 
-    return colors[type] || colors.default;
-  };
 
   const formatTime = (date) => {
     const now = new Date();

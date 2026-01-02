@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 
 const ExamResults = () => {
   const { attemptId } = useParams();
-  const { token } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [attempt, setAttempt] = useState(null);
@@ -80,8 +80,8 @@ const ExamResults = () => {
 
             <div
               className={`bg-gradient-to-br text-white p-6 rounded ${attemptOverview.isPassed
-                  ? "from-green-500 to-green-600"
-                  : "from-red-500 to-red-600"
+                ? "from-green-500 to-green-600"
+                : "from-red-500 to-red-600"
                 }`}
             >
               <p className="text-sm opacity-90">Status</p>
@@ -105,8 +105,8 @@ const ExamResults = () => {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`flex-1 py-4 font-semibold capitalize border-b-2 transition ${activeTab === tab
-                    ? "border-blue-600 text-blue-600"
-                    : "border-transparent text-gray-600 hover:text-gray-900"
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-600 hover:text-gray-900"
                   }`}
               >
                 {tab === "topics" ? "Topic-wise" : tab}
@@ -160,8 +160,8 @@ const ExamResults = () => {
                     <div
                       key={`question-${question.questionNumber}`}
                       className={`p-4 rounded border-l-4 ${question.isCorrect
-                          ? "border-green-500 bg-green-50"
-                          : "border-red-500 bg-red-50"
+                        ? "border-green-500 bg-green-50"
+                        : "border-red-500 bg-red-50"
                         }`}
                     >
                       <div className="flex justify-between items-start mb-2">
@@ -171,8 +171,8 @@ const ExamResults = () => {
                         </div>
                         <span
                           className={`px-3 py-1 rounded text-sm font-semibold ${question.isCorrect
-                              ? "bg-green-500 text-white"
-                              : "bg-red-500 text-white"
+                            ? "bg-green-500 text-white"
+                            : "bg-red-500 text-white"
                             }`}
                         >
                           {question.isCorrect ? "✓ Correct" : "✗ Wrong"}

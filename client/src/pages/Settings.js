@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
-import Input from '../components/Input';
 import Button from '../components/Button';
 import {
   BellIcon,
   GlobeAltIcon,
   ShieldCheckIcon,
-  Cog6ToothIcon,
 } from '@heroicons/react/24/outline';
 import { useToast } from '../context/ToastContext';
 const Settings = () => {
-    const { user } = useAuth();
-    const toast = useToast();
-    const [settings, setSettings] = useState({
+  const { user } = useAuth();
+  const toast = useToast();
+  const [settings, setSettings] = useState({
     emailNotifications: true,
     assignmentAlerts: true,
     gradeAlerts: true,

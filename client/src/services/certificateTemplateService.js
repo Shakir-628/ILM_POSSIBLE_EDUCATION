@@ -5,7 +5,7 @@ export const getCertificateTemplates = async (filters = {}) => {
   const params = new URLSearchParams();
   if (filters.certificateType) params.append('certificateType', filters.certificateType);
   if (filters.isActive !== undefined) params.append('isActive', filters.isActive);
-  
+
   const response = await api.get(`/certificate-templates?${params.toString()}`);
   return response.data;
 };
@@ -58,7 +58,7 @@ export const getAvailablePlaceholders = async (certificateType) => {
   return response.data;
 };
 
-export default {
+const certificateTemplateService = {
   getCertificateTemplates,
   getCertificateTemplateById,
   createCertificateTemplate,
@@ -69,4 +69,6 @@ export default {
   getTemplatesByCertificateType,
   getAvailablePlaceholders,
 };
+
+export default certificateTemplateService;
 

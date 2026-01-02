@@ -23,9 +23,9 @@ export const validateEmail = (email) => {
 export const validatePhone = (phone, minLength = 10, maxLength = 15) => {
   if (!phone) return true; // Empty is allowed (optional field)
   const phoneRegex = /^\d+$/;
-  return phone.length >= minLength && 
-         phone.length <= maxLength && 
-         phoneRegex.test(phone);
+  return phone.length >= minLength &&
+    phone.length <= maxLength &&
+    phoneRegex.test(phone);
 };
 
 /**
@@ -37,9 +37,9 @@ export const validatePhone = (phone, minLength = 10, maxLength = 15) => {
  */
 export const validateName = (name, minLength = 2, maxLength = 50) => {
   const nameRegex = /^[A-Za-z\s]+$/;
-  return name.length >= minLength && 
-         name.length <= maxLength && 
-         nameRegex.test(name);
+  return name.length >= minLength &&
+    name.length <= maxLength &&
+    nameRegex.test(name);
 };
 
 /**
@@ -52,9 +52,9 @@ export const validateName = (name, minLength = 2, maxLength = 50) => {
 export const validateStudentId = (studentId, minLength = 3, maxLength = 20) => {
   if (!studentId) return true; // Empty is allowed (auto-generated)
   const studentIdRegex = /^[A-Za-z0-9\-_]+$/;
-  return studentId.length >= minLength && 
-         studentId.length <= maxLength && 
-         studentIdRegex.test(studentId);
+  return studentId.length >= minLength &&
+    studentId.length <= maxLength &&
+    studentIdRegex.test(studentId);
 };
 
 /**
@@ -95,8 +95,8 @@ export const validatePassword = (password, minLength = 8) => {
     result.requirements.push('At least one special character');
   }
 
-  result.message = result.isValid ? 
-    'Password meets all requirements' : 
+  result.message = result.isValid ?
+    'Password meets all requirements' :
     `Password must include: ${result.requirements.join(', ')}`;
 
   return result;
@@ -125,11 +125,11 @@ export const validateUrl = (url) => {
  */
 export const validateDateOfBirth = (dateOfBirth, minAge = 5, maxAge = 100) => {
   if (!dateOfBirth) return false;
-  
+
   const dob = new Date(dateOfBirth);
   const today = new Date();
   const age = Math.floor((today - dob) / (365.25 * 24 * 60 * 60 * 1000));
-  
+
   return dob < today && age >= minAge && age <= maxAge;
 };
 
@@ -144,7 +144,7 @@ export const validateDateOfBirth = (dateOfBirth, minAge = 5, maxAge = 100) => {
 export const handleValidatedInput = (e, fieldType, setFormData, formData, options = {}) => {
   const { name, value } = e.target;
   let processedValue = value;
-  
+
   // Process input based on field type
   switch (fieldType) {
     case 'phone':
@@ -152,33 +152,33 @@ export const handleValidatedInput = (e, fieldType, setFormData, formData, option
       processedValue = value.replace(/\D/g, '').slice(0, options.maxLength || 15);
       e.target.value = processedValue;
       break;
-      
+
     case 'name':
       // Remove non-letters and limit length
       processedValue = value.replace(/[^A-Za-z\s]/g, '').slice(0, options.maxLength || 50);
       e.target.value = processedValue;
       break;
-      
+
     case 'studentId':
       // Remove invalid characters and limit length
       processedValue = value.replace(/[^A-Za-z0-9\-_]/g, '').slice(0, options.maxLength || 20);
       e.target.value = processedValue;
       break;
-      
+
     case 'email':
       // Convert to lowercase
       processedValue = value.toLowerCase();
       e.target.value = processedValue;
       break;
-      
+
     default:
       // No processing for other field types
       break;
   }
-  
+
   // Set custom validity message
   setCustomValidation(e, fieldType, processedValue, options);
-  
+
   // Update form data
   setFormData({
     ...formData,
@@ -196,7 +196,7 @@ export const handleValidatedInput = (e, fieldType, setFormData, formData, option
 export const setCustomValidation = (e, fieldType, value, options = {}) => {
   let isValid = true;
   let message = '';
-  
+
   switch (fieldType) {
     case 'email':
       if (value && !validateEmail(value)) {
@@ -204,39 +204,39 @@ export const setCustomValidation = (e, fieldType, value, options = {}) => {
         message = 'Please enter a valid email address';
       }
       break;
-      
+
     case 'phone':
       if (value && !validatePhone(value, options.minLength, options.maxLength)) {
         isValid = false;
         message = `Please enter a valid phone number (${options.minLength || 10}-${options.maxLength || 15} digits)`;
       }
       break;
-      
+
     case 'name':
       if (value && !validateName(value, options.minLength, options.maxLength)) {
         isValid = false;
         message = `Please enter only letters (min ${options.minLength || 2}, max ${options.maxLength || 50} characters)`;
       }
       break;
-      
+
     case 'studentId':
       if (value && !validateStudentId(value, options.minLength, options.maxLength)) {
         isValid = false;
         message = `Please enter a valid student ID (alphanumeric only, min ${options.minLength || 3}, max ${options.maxLength || 20} characters)`;
       }
       break;
-      
+
     case 'dateOfBirth':
       if (value && !validateDateOfBirth(value, options.minAge, options.maxAge)) {
         isValid = false;
         message = `Please enter a valid date of birth (age between ${options.minAge || 5} and ${options.maxAge || 100} years)`;
       }
       break;
-      
+
     default:
       break;
   }
-  
+
   e.target.setCustomValidity(isValid ? '' : message);
 };
 
@@ -249,17 +249,17 @@ export const setCustomValidation = (e, fieldType, value, options = {}) => {
 export const validateForm = (formData, validationRules) => {
   const errors = {};
   let isValid = true;
-  
+
   Object.keys(validationRules).forEach(field => {
     const rule = validationRules[field];
     const value = formData[field];
-    
+
     if (rule.required && !value) {
       errors[field] = `${rule.label || field} is required`;
       isValid = false;
       return;
     }
-    
+
     if (value) {
       switch (rule.type) {
         case 'email':
@@ -268,41 +268,41 @@ export const validateForm = (formData, validationRules) => {
             isValid = false;
           }
           break;
-          
+
         case 'phone':
           if (!validatePhone(value, rule.minLength, rule.maxLength)) {
             errors[field] = `Please enter a valid ${rule.label || field}`;
             isValid = false;
           }
           break;
-          
+
         case 'name':
           if (!validateName(value, rule.minLength, rule.maxLength)) {
             errors[field] = `Please enter a valid ${rule.label || field}`;
             isValid = false;
           }
           break;
-          
+
         case 'studentId':
           if (!validateStudentId(value, rule.minLength, rule.maxLength)) {
             errors[field] = `Please enter a valid ${rule.label || field}`;
             isValid = false;
           }
           break;
-          
+
         case 'dateOfBirth':
           if (!validateDateOfBirth(value, rule.minAge, rule.maxAge)) {
             errors[field] = `Please enter a valid ${rule.label || field}`;
             isValid = false;
           }
           break;
-          
+
         default:
           break;
       }
     }
   });
-  
+
   return {
     isValid,
     errors,
@@ -335,7 +335,7 @@ export const validationMessages = {
   url: 'Please enter a valid URL starting with http:// or https://',
 };
 
-export default {
+const validationUtils = {
   validateEmail,
   validatePhone,
   validateName,
@@ -349,3 +349,5 @@ export default {
   validationPatterns,
   validationMessages,
 };
+
+export default validationUtils;

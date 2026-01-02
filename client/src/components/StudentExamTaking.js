@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 
 const StudentExamTaking = () => {
   const { examId, attemptId } = useParams();
-  const { token } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [exam, setExam] = useState(null);
@@ -41,6 +41,16 @@ const StudentExamTaking = () => {
     fetchExamData();
   }, [examId, attemptId]);
 
+  const handleAutoSubmit = React.useCallback(async () => {
+    if (!attempt) return;
+    try {
+      await api.post(`/ai-exams/attempts/${attempt._id}/submit`, {});
+      navigate(`/exam-results/${attempt._id}`);
+    } catch (err) {
+      console.error("Auto-submit error:", err);
+    }
+  }, [attempt, navigate]);
+
   // Timer countdown
   useEffect(() => {
     if (!attempt || attempt.status !== "in-progress") return;
@@ -57,7 +67,7 @@ const StudentExamTaking = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [attempt]);
+  }, [attempt, handleAutoSubmit]);
 
   // Set initial timer
   useEffect(() => {
@@ -122,14 +132,7 @@ const StudentExamTaking = () => {
     }
   };
 
-  const handleAutoSubmit = async () => {
-    try {
-      await api.post(`/ai-exams/attempts/${attempt._id}/submit`, {});
-      navigate(`/exam-results/${attempt._id}`);
-    } catch (err) {
-      console.error("Auto-submit error:", err);
-    }
-  };
+
 
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);

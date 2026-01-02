@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Tesseract from 'tesseract.js';
-import { CameraIcon, PhotoIcon, ArrowPathIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
-import Button from './Button';
+import { CameraIcon, ArrowPathIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
 const OcrScanner = ({ onDataExtracted }) => {
     const [loading, setLoading] = useState(false);

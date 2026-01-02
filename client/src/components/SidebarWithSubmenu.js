@@ -34,13 +34,8 @@ const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
   const [permissions, setPermissions] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  React.useEffect(() => {
-    if (user?.role) {
-      fetchPermissions();
-    }
-  }, [user?.role]);
-
-  const fetchPermissions = async () => {
+  const fetchPermissions = React.useCallback(async () => {
+    if (!user?.role) return;
     setLoading(true);
     try {
       const response = await rolePermissionService.getRolePermissionByRole(user.role);
@@ -52,7 +47,13 @@ const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.role]);
+
+  React.useEffect(() => {
+    if (user?.role) {
+      fetchPermissions();
+    }
+  }, [user?.role, fetchPermissions]);
 
   const toggleSubmenu = (menuName) => {
     setExpandedMenus((prev) => ({

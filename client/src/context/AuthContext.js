@@ -35,12 +35,12 @@ export const AuthProvider = ({ children }) => {
   // Initialize on mount
   useEffect(() => {
     initAuth();
-    
+
     // Set up storage event listener to sync auth state across tabs
     const handleStorageChange = () => {
       initAuth();
     };
-    
+
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, [initAuth]);
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const data = await authService.login(email, password);
       setUser(data);
@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const data = await authService.register(userData);
       setUser(data);
@@ -101,6 +101,7 @@ export const AuthProvider = ({ children }) => {
     user,
     token: user?.token,
     loading,
+    error,
     login,
     register,
     logout,

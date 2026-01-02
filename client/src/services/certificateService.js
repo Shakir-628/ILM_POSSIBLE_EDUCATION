@@ -6,7 +6,7 @@ export const getCertificates = async (filters = {}) => {
   if (filters.certificateType) params.append('certificateType', filters.certificateType);
   if (filters.status) params.append('status', filters.status);
   if (filters.studentId) params.append('studentId', filters.studentId);
-  
+
   const response = await api.get(`/certificates?${params.toString()}`);
   return response.data;
 };
@@ -71,7 +71,7 @@ export const getCertificateStats = async () => {
   return response.data;
 };
 
-export default {
+const certificateService = {
   getCertificates,
   getCertificateById,
   getCertificatesByStudent,
@@ -84,4 +84,6 @@ export default {
   deleteCertificate,
   getCertificateStats,
 };
+
+export default certificateService;
 

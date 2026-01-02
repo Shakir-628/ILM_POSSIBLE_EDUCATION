@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
-import Card from '../components/Card';
 import Button from '../components/Button';
 import Modal from '../components/Modal';
 import Input from '../components/Input';
@@ -17,7 +16,6 @@ import {
     ArrowDownTrayIcon,
     TrashIcon,
     PencilIcon,
-    GlobeAltIcon,
 } from '@heroicons/react/24/outline';
 import ePortfolioService from '../services/ePortfolioService';
 import { studentService } from '../services/studentService';
@@ -27,7 +25,7 @@ import OcrScanner from '../components/OcrScanner';
 import api from '../services/api';
 
 const EPortfolio = () => {
-    const { user, isAdmin, isTeacher, isStudent } = useAuth();
+    const { isAdmin, isTeacher, isStudent } = useAuth();
     const toast = useToast();
 
     const [portfolioItems, setPortfolioItems] = useState([]);
@@ -57,36 +55,7 @@ const EPortfolio = () => {
 
     const [attachments, setAttachments] = useState([]);
 
-    useEffect(() => {
-        if (isAdmin || isTeacher) {
-            fetchStudents();
-        } else if (isStudent) {
-            // Find the student ID for the current user
-            fetchMyPortfolio();
-        }
-    }, []);
-
-    const fetchStudents = async () => {
-        try {
-            const data = await studentService.getAllStudents();
-            setStudents(data);
-        } catch (error) {
-            console.error('Error fetching students:', error);
-        }
-    };
-
-    const fetchMyPortfolio = async () => {
-        try {
-            // For student, we first need their student record
-            const response = await api.get('/students/me');
-            setSelectedStudent(response.data);
-            fetchPortfolio(response.data._id);
-        } catch (error) {
-            console.error('Error fetching student profile:', error);
-        }
-    };
-
-    const fetchPortfolio = async (studentId) => {
+    const fetchPortfolio = React.useCallback(async (studentId) => {
         setLoading(true);
         try {
             const data = await ePortfolioService.getStudentPortfolio(studentId);
@@ -96,7 +65,36 @@ const EPortfolio = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [toast]);
+
+    const fetchStudents = React.useCallback(async () => {
+        try {
+            const data = await studentService.getAllStudents();
+            setStudents(data);
+        } catch (error) {
+            console.error('Error fetching students:', error);
+        }
+    }, []);
+
+    const fetchMyPortfolio = React.useCallback(async () => {
+        try {
+            // For student, we first need their student record
+            const response = await api.get('/students/me');
+            setSelectedStudent(response.data);
+            fetchPortfolio(response.data._id);
+        } catch (error) {
+            console.error('Error fetching student profile:', error);
+        }
+    }, [fetchPortfolio]);
+
+    useEffect(() => {
+        if (isAdmin || isTeacher) {
+            fetchStudents();
+        } else if (isStudent) {
+            // Find the student ID for the current user
+            fetchMyPortfolio();
+        }
+    }, [isAdmin, isTeacher, isStudent, fetchStudents, fetchMyPortfolio]);
 
     const handleStudentSelect = (studentId) => {
         const student = students.find(s => s._id === studentId);
