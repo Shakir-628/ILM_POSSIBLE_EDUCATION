@@ -63,7 +63,7 @@ const TeacherTabNavigator = () => {
       })}
     >
       <Tab.Screen name="Dashboard" component={TeacherDashboardScreen} />
-      <Tab.Screen name="Attendance" component={MarkAttendanceScreen} options={{ title: 'Mark Attendance' }} />
+      <Tab.Screen name="Attendance" component={MarkAttendanceScreen} options={{ title: 'Mark Attendance', tabBarLabel: 'Attendance' }} />
       <Tab.Screen name="Grades" component={GradeEntryScreen} />
       <Tab.Screen name="Notifications" component={NotificationsScreen} />
       <Tab.Screen name="Profile" component={TeacherProfileScreen} />

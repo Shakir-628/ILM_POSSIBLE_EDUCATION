@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 // Admin Screens
 import AdminDashboardScreen from '../screens/admin/AdminDashboardScreen';
 import StudentsListScreen from '../screens/admin/StudentsListScreen';
+import StudentDetailScreen from '../screens/admin/StudentDetailScreen';
 import TeachersListScreen from '../screens/admin/TeachersListScreen';
 import ClassesListScreen from '../screens/admin/ClassesListScreen';
 import ParentsListScreen from '../screens/admin/ParentsListScreen';
@@ -88,6 +89,7 @@ const AdminNavigator = () => {
       <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
       <Stack.Screen name="AboutApp" component={AboutAppScreen} />
       <Stack.Screen name="StudentsList" component={StudentsListScreen} />
+      <Stack.Screen name="StudentDetail" component={StudentDetailScreen} />
       <Stack.Screen name="TeachersList" component={TeachersListScreen} />
       <Stack.Screen name="ClassesList" component={ClassesListScreen} />
       <Stack.Screen name="ParentsList" component={ParentsListScreen} />

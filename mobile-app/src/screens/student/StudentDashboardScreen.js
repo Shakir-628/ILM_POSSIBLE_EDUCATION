@@ -23,6 +23,7 @@ import { assignmentService } from '../../services/assignmentService';
 import { gradeService } from '../../services/gradeService';
 import { feeService } from '../../services/feeService';
 import { announcementService } from '../../services/announcementService';
+import { timetableService } from '../../services/timetableService';
 import { colors, spacing, fontSize, fontWeight, borderRadius, gradients } from '../../utils/designSystem';
 import { format } from 'date-fns';
 
@@ -57,12 +58,14 @@ const StudentDashboardScreen = ({ navigation }) => {
         gradesData,
         feesData,
         announcementsData,
+        todayClassesData,
       ] = await Promise.all([
         attendanceService.getAttendanceStats(user.id).catch(() => ({ percentage: 0 })),
         assignmentService.getMyAssignments().catch(() => []),
         gradeService.getMyGrades().catch(() => []),
         feeService.getMyFees().catch(() => ({ pending: 0 })),
         announcementService.getAllAnnouncements().catch(() => ({ data: [] })),
+        timetableService.getTodayClasses().catch(() => []),
       ]);
 
       // Calculate stats
@@ -76,6 +79,7 @@ const StudentDashboardScreen = ({ navigation }) => {
         : 0;
 
       const announcements = announcementsData.data || announcementsData || [];
+      const schedule = Array.isArray(todayClassesData) ? todayClassesData : todayClassesData.data || [];
 
       setStats({
         attendancePercentage: attendanceData.percentage || attendanceData.attendancePercentage || 0,
@@ -85,7 +89,8 @@ const StudentDashboardScreen = ({ navigation }) => {
       });
 
       setRecentAnnouncements(Array.isArray(announcements) ? announcements.slice(0, 3) : []);
-      
+      setTodayClasses(schedule);
+
       // Trigger animations after data loads
       Animated.parallel([
         Animated.timing(fadeAnim, {
@@ -142,7 +147,7 @@ const StudentDashboardScreen = ({ navigation }) => {
       </LinearGradient>
 
       {/* Stats Grid */}
-      <Animated.View 
+      <Animated.View
         style={[
           styles.statsContainer,
           {
@@ -184,6 +189,64 @@ const StudentDashboardScreen = ({ navigation }) => {
           />
         </View>
       </Animated.View>
+
+      {/* Today's Schedule */}
+      {todayClasses.length > 0 && (
+        <Animated.View
+          style={[
+            styles.section,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            },
+          ]}
+        >
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Today's Schedule</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Timetable')}>
+              <Text style={styles.viewAllText}>View Full →</Text>
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 20 }}>
+            {todayClasses.map((item, index) => (
+              <View
+                key={index}
+                style={{
+                  backgroundColor: colors.white,
+                  padding: 15,
+                  borderRadius: 12,
+                  marginRight: 10,
+                  width: 140,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 1 },
+                  shadowOpacity: 0.05,
+                  shadowRadius: 2,
+                  elevation: 2,
+                  borderLeftWidth: 4,
+                  borderLeftColor: colors.primary
+                }}
+              >
+                <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.textPrimary, marginBottom: 4 }} numberOfLines={1}>
+                  {item.subject?.name || item.subject}
+                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 2 }}>
+                  <Ionicons name="time-outline" size={12} color={colors.textSecondary} style={{ marginRight: 4 }} />
+                  <Text style={{ fontSize: 12, color: colors.textSecondary }}>
+                    {item.startTime} - {item.endTime}
+                  </Text>
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Ionicons name="location-outline" size={12} color={colors.textSecondary} style={{ marginRight: 4 }} />
+                  <Text style={{ fontSize: 12, color: colors.textSecondary }}>
+                    {item.room || 'Room A'}
+                  </Text>
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+        </Animated.View>
+      )}
 
       {/* Quick Actions */}
       <View style={styles.section}>
@@ -234,7 +297,7 @@ const StudentDashboardScreen = ({ navigation }) => {
       {/* Recent Announcements */}
       {/* Recent Announcements */}
       {recentAnnouncements.length > 0 && (
-        <Animated.View 
+        <Animated.View
           style={[
             styles.section,
             {
@@ -272,10 +335,10 @@ const styles = StyleSheet.create({
     paddingTop: spacing.xl,
     paddingBottom: spacing.xxxl,
   },
-  headerContent: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'flex-start' 
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start'
   },
   headerInfo: { flex: 1 },
   greeting: {

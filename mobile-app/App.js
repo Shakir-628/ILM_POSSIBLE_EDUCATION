@@ -12,6 +12,8 @@ import { theme } from './src/utils/theme';
 // Configure react-native-paper to use Expo icons (suppress warning)
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
+import linking from './src/navigation/linking';
+
 // Override the default icon component
 const customTheme = {
   ...theme,
@@ -35,7 +37,7 @@ export default function App() {
       <AuthProvider>
         <SocketProvider>
           <ToastProvider>
-            <NavigationContainer>
+            <NavigationContainer linking={linking}>
               <AppNavigator />
               <StatusBar style="auto" />
             </NavigationContainer>

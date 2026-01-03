@@ -6,16 +6,28 @@ import { colors, spacing, fontSize, fontWeight, borderRadius, shadows } from '..
 
 const StatCard = ({ title, value, icon, color = 'blue', onPress, subtitle }) => {
   const getGradientColors = () => {
+    // Amader School Aesthetic: Blue & Green Harmony
+    const amaderBlue = ['#2563EB', '#1E40AF']; // Royal Blue -> Navy
+    const amaderGreen = ['#10B981', '#059669']; // Emerald -> Dark Emerald
+    const amaderRed = ['#EF4444', '#DC2626'];   // Red
+    const amaderOrange = ['#F59E0B', '#D97706']; // Amber
+
     const gradients = {
-      blue: ['#3b82f6', '#2563eb'],
-      green: ['#22c55e', '#16a34a'],
-      purple: ['#a855f7', '#9333ea'],
-      red: ['#ef4444', '#dc2626'],
-      orange: ['#f97316', '#ea580c'],
-      indigo: ['#6366f1', '#4f46e5'],
-      yellow: ['#eab308', '#ca8a04'],
+      // Primary Roles -> Royal Blue
+      blue: amaderBlue,
+      indigo: amaderBlue,
+      purple: amaderBlue,
+      pink: amaderBlue,
+      teal: amaderBlue,
+      cyan: amaderBlue,
+
+      // Status Roles -> Green/Red/Orange
+      green: amaderGreen,
+      red: amaderRed,
+      orange: amaderOrange,
+      yellow: amaderOrange,
     };
-    return gradients[color] || gradients.blue;
+    return gradients[color] || amaderBlue;
   };
 
   const Component = onPress ? TouchableOpacity : View;
@@ -88,4 +100,3 @@ const styles = StyleSheet.create({
 });
 
 export default StatCard;
-

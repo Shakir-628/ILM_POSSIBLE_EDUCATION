@@ -83,7 +83,7 @@ const FeeManagementScreen = ({ navigation }) => {
     try {
       const payments = await feeService.getFeePayments();
       setFeePayments(Array.isArray(payments) ? payments : []);
-      
+
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 400,
@@ -135,8 +135,8 @@ const FeeManagementScreen = ({ navigation }) => {
 
   const filteredPayments = feePayments.filter(payment => {
     const matchesSearch = payment.student?.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         payment.student?.lastName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         payment.invoiceNumber?.toLowerCase().includes(searchQuery.toLowerCase());
+      payment.student?.lastName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      payment.invoiceNumber?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = filterStatus === 'all' || payment.paymentStatus === filterStatus;
     return matchesSearch && matchesStatus;
   });
@@ -324,53 +324,71 @@ const FeeManagementScreen = ({ navigation }) => {
               <View style={styles.statsGrid}>
                 <View style={styles.statItem}>
                   <Ionicons name="cash" size={32} color={colors.success} />
-                  <Text style={styles.statValue}>PKR {statistics.totalRevenue?.toLocaleString()}</Text>
-                  <Text style={styles.statLabel}>Total Revenue</Text>
+                  <Text style={styles.statValue}>PKR {statistics.totalInvoiced?.toLocaleString() || '0'}</Text>
+                  <Text style={styles.statLabel}>Total Invoiced</Text>
                 </View>
                 <View style={styles.statItem}>
                   <Ionicons name="checkmark-circle" size={32} color={colors.info} />
-                  <Text style={styles.statValue}>PKR {statistics.totalPaid?.toLocaleString()}</Text>
-                  <Text style={styles.statLabel}>Paid Amount</Text>
+                  <Text style={styles.statValue}>PKR {statistics.totalCollected?.toLocaleString() || '0'}</Text>
+                  <Text style={styles.statLabel}>Total Collected</Text>
                 </View>
               </View>
               <View style={styles.statsGrid}>
                 <View style={styles.statItem}>
                   <Ionicons name="time" size={32} color={colors.warning} />
-                  <Text style={styles.statValue}>PKR {statistics.totalPending?.toLocaleString()}</Text>
-                  <Text style={styles.statLabel}>Pending Amount</Text>
+                  <Text style={styles.statValue}>PKR {statistics.totalPending?.toLocaleString() || '0'}</Text>
+                  <Text style={styles.statLabel}>Total Pending</Text>
                 </View>
                 <View style={styles.statItem}>
                   <Ionicons name="alert-circle" size={32} color={colors.error} />
-                  <Text style={styles.statValue}>PKR {statistics.totalOverdue?.toLocaleString()}</Text>
-                  <Text style={styles.statLabel}>Overdue Amount</Text>
+                  <Text style={styles.statValue}>{statistics.overdueCount || 0}</Text>
+                  <Text style={styles.statLabel}>Overdue Payments</Text>
                 </View>
               </View>
             </CustomCard>
 
             <CustomCard style={styles.statsCard}>
-              <Text style={styles.statsTitle}>Payment Statistics</Text>
-              <View style={styles.statRow}>
-                <Text style={styles.statRowLabel}>Total Students:</Text>
-                <Text style={styles.statRowValue}>{statistics.totalStudents}</Text>
-              </View>
-              <View style={styles.statRow}>
-                <Text style={styles.statRowLabel}>Students Paid:</Text>
-                <Text style={[styles.statRowValue, { color: colors.success }]}>
-                  {statistics.studentsPaid}
-                </Text>
-              </View>
-              <View style={styles.statRow}>
-                <Text style={styles.statRowLabel}>Students Pending:</Text>
-                <Text style={[styles.statRowValue, { color: colors.warning }]}>
-                  {statistics.studentsPending}
-                </Text>
-              </View>
-              <View style={styles.statRow}>
-                <Text style={styles.statRowLabel}>Students Overdue:</Text>
-                <Text style={[styles.statRowValue, { color: colors.error }]}>
-                  {statistics.studentsOverdue}
-                </Text>
-              </View>
+              <Text style={styles.statsTitle}>Payment Breakdown</Text>
+              {(() => {
+                const getCount = (status) => statistics.paymentsByStatus?.find(p => p._id === status)?.count || 0;
+                const paidCount = getCount('paid');
+                const pendingCount = getCount('pending');
+                const partialCount = getCount('partial');
+                const totalCount = (statistics.paymentsByStatus || []).reduce((acc, curr) => acc + curr.count, 0);
+
+                return (
+                  <>
+                    <View style={styles.statRow}>
+                      <Text style={styles.statRowLabel}>Total Transactions:</Text>
+                      <Text style={styles.statRowValue}>{totalCount}</Text>
+                    </View>
+                    <View style={styles.statRow}>
+                      <Text style={styles.statRowLabel}>Paid:</Text>
+                      <Text style={[styles.statRowValue, { color: colors.success }]}>
+                        {paidCount}
+                      </Text>
+                    </View>
+                    <View style={styles.statRow}>
+                      <Text style={styles.statRowLabel}>Pending:</Text>
+                      <Text style={[styles.statRowValue, { color: colors.warning }]}>
+                        {pendingCount}
+                      </Text>
+                    </View>
+                    <View style={styles.statRow}>
+                      <Text style={styles.statRowLabel}>Partial:</Text>
+                      <Text style={[styles.statRowValue, { color: colors.info }]}>
+                        {partialCount}
+                      </Text>
+                    </View>
+                    <View style={styles.statRow}>
+                      <Text style={styles.statRowLabel}>Overdue:</Text>
+                      <Text style={[styles.statRowValue, { color: colors.error }]}>
+                        {statistics.overdueCount || 0}
+                      </Text>
+                    </View>
+                  </>
+                );
+              })()}
             </CustomCard>
           </View>
         )}

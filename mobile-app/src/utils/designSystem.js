@@ -4,66 +4,69 @@
  */
 
 export const colors = {
-  // Primary Colors
-  primary: '#4F46E5',
-  primaryDark: '#4338CA',
-  primaryLight: '#818CF8',
-  
-  // Secondary Colors
-  secondary: '#8B5CF6',
-  secondaryDark: '#7C3AED',
-  secondaryLight: '#A78BFA',
-  
+  // Brand Colors - Amader School Style (Blue & Green Harmony)
+  primary: '#2563EB',      // Royal Blue - Trust
+  primaryDark: '#1E40AF',  // Navy - Stability
+  primaryLight: '#60A5FA', // Sky - Openness
+
+  // Secondary is now Green to match the aesthetic description
+  secondary: '#10B981',    // Emerald - Growth/Freshness
+  secondaryDark: '#059669',
+  secondaryLight: '#34D399',
+
   // Semantic Colors
-  success: '#10B981',
-  successLight: '#34D399',
-  error: '#EF4444',
-  errorLight: '#F87171',
-  warning: '#F59E0B',
-  warningLight: '#FBBF24',
-  info: '#3B82F6',
-  infoLight: '#60A5FA',
-  
+  success: '#10B981',      // Emerald Green
+  successLight: '#6EE7B7',
+  error: '#EF4444',        // Red
+  errorLight: '#FCA5A5',
+  warning: '#F59E0B',      // Amber/Orange
+  warningLight: '#FCD34D',
+  info: '#3B82F6',         // Blue
+  infoLight: '#93C5FD',
+
   // Status Colors
   active: '#10B981',
   inactive: '#EF4444',
   pending: '#F59E0B',
-  
+  paid: '#10B981',
+  unpaid: '#EF4444',
+  overdue: '#EF4444',
+
   // Neutral Colors
   white: '#FFFFFF',
   black: '#000000',
-  gray50: '#F9FAFB',
-  gray100: '#F3F4F6',
-  gray200: '#E5E7EB',
-  gray300: '#D1D5DB',
-  gray400: '#9CA3AF',
-  gray500: '#6B7280',
-  gray600: '#4B5563',
-  gray700: '#374151',
-  gray800: '#1F2937',
-  gray900: '#111827',
-  
+  gray50: '#F8FAFC',
+  gray100: '#F1F5F9',
+  gray200: '#E2E8F0',
+  gray300: '#CBD5E1',
+  gray400: '#94A3B8',
+  gray500: '#64748B',
+  gray600: '#475569',
+  gray700: '#334155',
+  gray800: '#1E293B',
+  gray900: '#0F172A',
+
   // Background
-  background: '#F5F7FA',
+  background: '#F8FAFC', // Crisp Light Grey
   cardBackground: '#FFFFFF',
-  
+
   // Text
-  textPrimary: '#1F2937',
-  textSecondary: '#6B7280',
-  textTertiary: '#9CA3AF',
+  textPrimary: '#0F172A',   // Slate 900
+  textSecondary: '#475569', // Slate 600
+  textTertiary: '#94A3B8',  // Slate 400
   textLight: '#FFFFFF',
-  
+
   // Priority Colors
   urgent: '#EF4444',
   high: '#F59E0B',
-  medium: '#3B82F6',
+  medium: '#2563EB',
   low: '#10B981',
-  
-  // Role Colors
-  admin: '#4F46E5',
-  teacher: '#10B981',
-  student: '#3B82F6',
-  parent: '#8B5CF6',
+
+  // Role Colors - Unified Blue/Green Theme
+  admin: '#2563EB',    // Blue
+  teacher: '#10B981',  // Green (Growth)
+  student: '#2563EB',  // Blue
+  parent: '#10B981',   // Green
 };
 
 export const spacing = {
@@ -77,24 +80,24 @@ export const spacing = {
 };
 
 export const borderRadius = {
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 20,
+  sm: 6,
+  md: 8,
+  lg: 12,
+  xl: 16,
   full: 9999,
 };
 
 export const fontSize = {
   xs: 11,
-  sm: 12,
-  base: 14,
-  md: 15,
-  lg: 16,
-  xl: 18,
-  xxl: 20,
-  xxxl: 24,
-  display: 28,
-  hero: 32,
+  sm: 13,
+  base: 15,
+  md: 16,
+  lg: 18,
+  xl: 20,
+  xxl: 24,
+  xxxl: 30,
+  display: 36,
+  hero: 40,
 };
 
 export const fontWeight = {
@@ -107,34 +110,43 @@ export const fontWeight = {
 
 export const shadows = {
   small: {
-    shadowColor: '#000',
+    shadowColor: '#0f172a',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
-    elevation: 1,
-  },
-  medium: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
     elevation: 2,
   },
-  large: {
-    shadowColor: '#000',
+  medium: {
+    shadowColor: '#0f172a',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
     elevation: 4,
+  },
+  large: {
+    shadowColor: '#0f172a',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 15,
+    elevation: 10,
   },
 };
 
 export const gradients = {
-  primary: ['#4F46E5', '#8B5CF6'],
-  success: ['#10B981', '#34D399'],
-  warning: ['#F59E0B', '#FBBF24'],
-  error: ['#EF4444', '#F87171'],
-  info: ['#3B82F6', '#60A5FA'],
+  // Amader School Style Gradients (Blue & Green dominant)
+  primary: ['#2563EB', '#1E40AF'], // Royal Blue -> Navy
+  secondary: ['#10B981', '#059669'], // Emerald -> Dark Emerald
+  success: ['#10B981', '#059669'],
+  warning: ['#F59E0B', '#D97706'],
+  error: ['#EF4444', '#DC2626'],
+  info: ['#3B82F6', '#2563EB'],
+  card: ['#FFFFFF', '#F8FAFC'],
+
+  // Role Gradients
+  admin: ['#2563EB', '#1E40AF'],
+  teacher: ['#10B981', '#059669'],
+  student: ['#3B82F6', '#2563EB'],
+  parent: ['#10B981', '#059669'],
 };
 
 // Common component styles
@@ -145,7 +157,7 @@ export const componentStyles = {
     padding: spacing.lg,
     ...shadows.medium,
   },
-  
+
   button: {
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.xl,
@@ -153,7 +165,7 @@ export const componentStyles = {
     alignItems: 'center',
     justifyContent: 'center',
   },
-  
+
   input: {
     backgroundColor: colors.white,
     borderRadius: borderRadius.md,
@@ -162,7 +174,7 @@ export const componentStyles = {
     borderWidth: 1,
     borderColor: colors.gray200,
   },
-  
+
   avatar: {
     width: 48,
     height: 48,
@@ -171,23 +183,23 @@ export const componentStyles = {
     justifyContent: 'center',
     alignItems: 'center',
   },
-  
+
   badge: {
     paddingHorizontal: spacing.sm + 2,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.md,
   },
-  
+
   header: {
     padding: spacing.xxl,
     paddingTop: spacing.xl,
     paddingBottom: spacing.xxxl,
   },
-  
+
   section: {
     padding: spacing.lg,
   },
-  
+
   sectionTitle: {
     fontSize: fontSize.xl,
     fontWeight: fontWeight.semibold,

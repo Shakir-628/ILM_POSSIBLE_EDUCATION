@@ -1,11 +1,25 @@
+import { Platform } from 'react-native';
+
 // API Configuration
-export const API_URL = __DEV__ 
-  ? 'http://192.168.0.103:5001/api' // Android Emulator 172.17.40.238, 192.168.0.104
+const getDevApiUrl = () => {
+  if (Platform.OS === 'web') return 'http://localhost:5001/api';
+  if (Platform.OS === 'android') return 'http://192.168.0.103:5001/api'; // Use 10.0.2.2 for emulator
+  return 'http://localhost:5001/api'; // iOS Simulator
+};
+
+const getDevSocketUrl = () => {
+  if (Platform.OS === 'web') return 'http://localhost:5001';
+  if (Platform.OS === 'android') return 'http://192.168.0.103:5001';
+  return 'http://localhost:5001';
+};
+
+export const API_URL = __DEV__
+  ? getDevApiUrl()
   : 'https://your-production-api.com/api';
 
 // Socket.IO Configuration (without /api suffix)
-export const SOCKET_URL = __DEV__ 
-  ? 'http://192.168.0.103:5001' // Match your API_URL but without /api
+export const SOCKET_URL = __DEV__
+  ? getDevSocketUrl()
   : 'https://your-production-api.com';
 
 // For iOS Simulator, use: http://localhost:5001/api

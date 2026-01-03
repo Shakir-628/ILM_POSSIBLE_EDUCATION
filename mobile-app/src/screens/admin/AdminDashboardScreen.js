@@ -1,16 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, Animated } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import StatCard from '../../components/StatCard';
 import StudentCard from '../../components/StudentCard';
 import Loading from '../../components/Loading';
-import LogoutButton from '../../components/LogoutButton';
+import CurvedHeader from '../../components/CurvedHeader';
+import NoticeBoard from '../../components/NoticeBoard';
+import MenuGrid from '../../components/MenuGrid';
 import { useAuth } from '../../context/AuthContext';
-import { adminService } from '../../services/adminService';
 import { studentService } from '../../services/studentService';
+import { teacherService } from '../../services/teacherService';
+import { classService } from '../../services/classService';
+import { parentService } from '../../services/parentService';
+import { feeService } from '../../services/feeService';
+import { announcementService } from '../../services/announcementService';
 import { useToast } from '../../context/ToastContext';
-import { colors, spacing, fontSize, fontWeight, borderRadius, gradients } from '../../utils/designSystem';
+import { colors, spacing, fontSize, fontWeight, borderRadius } from '../../utils/designSystem';
+import { format } from 'date-fns';
 
 const AdminDashboardScreen = ({ navigation }) => {
   const { user } = useAuth();
@@ -28,6 +33,7 @@ const AdminDashboardScreen = ({ navigation }) => {
     pendingFees: 0,
   });
   const [recentStudents, setRecentStudents] = useState([]);
+  const [notices, setNotices] = useState([]);
 
   // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -39,29 +45,61 @@ const AdminDashboardScreen = ({ navigation }) => {
 
   const fetchDashboardData = async () => {
     try {
-      // Fetch students data
-      const studentsData = await studentService.getAllStudents();
+      const [
+        studentsData,
+        teachersData,
+        classesData,
+        parentsData,
+        feeStatsData,
+        announcementsData
+      ] = await Promise.all([
+        studentService.getAllStudents(),
+        teacherService.getAllTeachers().catch(() => []),
+        classService.getAllClasses().catch(() => []),
+        parentService.getAllParents().catch(() => []),
+        feeService.getFeeStatistics().catch(() => ({ totalPending: 0 })),
+        announcementService.getAllAnnouncements().catch(() => [])
+      ]);
+
       const students = Array.isArray(studentsData) ? studentsData : studentsData.data || [];
-      
+      const teachers = Array.isArray(teachersData) ? teachersData : teachersData.data || [];
+      const classes = Array.isArray(classesData) ? classesData : classesData.data || [];
+      const parents = Array.isArray(parentsData) ? parentsData : parentsData.data || [];
+      const announcements = Array.isArray(announcementsData) ? announcementsData : announcementsData.data || [];
+
       // Calculate stats
       const totalStudents = students.length;
       const activeStudents = students.filter(s => s.status === 'active').length;
-      
+      const activeClasses = classes.filter(c => c.status !== 'inactive').length;
+
       setStats({
         totalStudents: totalStudents,
         activeStudents: activeStudents,
-        totalTeachers: 25, // You can fetch from teachers API
-        totalClasses: 12, // You can fetch from classes API
-        totalParents: Math.floor(totalStudents * 0.8), // Estimate
+        totalTeachers: teachers.length,
+        totalClasses: classes.length,
+        totalParents: parents.length,
         presentToday: 0,
         absentToday: 0,
-        activeClasses: 12,
-        pendingFees: totalStudents * 0.15, // Estimate
+        activeClasses: activeClasses,
+        pendingFees: feeStatsData.totalPending || feeStatsData.pendingAmount || 0,
       });
 
       // Get recent students (last 5)
       setRecentStudents(students.slice(0, 5));
-      
+
+      // Process announcements for NoticeBoard
+      const processedNotices = announcements.slice(0, 5).map((notice, index) => {
+        const colorsList = ['#E0E7FF', '#FCE7F3', '#DCFCE7', '#FEF3C7', '#DBEAFE'];
+        return {
+          id: notice._id,
+          title: notice.title,
+          date: format(new Date(notice.createdAt || new Date()), 'dd MMMM yyyy'),
+          color: colorsList[index % colorsList.length],
+          image: 'https://cdn-icons-png.flaticon.com/512/2583/2583319.png'
+        };
+      });
+      setNotices(processedNotices);
+
       // Trigger animations after data loads
       Animated.parallel([
         Animated.timing(fadeAnim, {
@@ -93,292 +131,121 @@ const AdminDashboardScreen = ({ navigation }) => {
     return <Loading message="Loading dashboard..." />;
   }
 
-  return (
-    <ScrollView 
-      style={styles.container}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <LinearGradient colors={['#4F46E5', '#8B5CF6']} style={styles.header}>
-        <View style={styles.headerContent}>
-          <View style={styles.headerInfo}>
-            <Text style={styles.greeting}>Admin Dashboard</Text>
-            <Text style={styles.userName}>{user?.name}</Text>
-            <Text style={styles.role}>{user?.role?.toUpperCase()}</Text>
-          </View>
-          <LogoutButton />
-        </View>
-      </LinearGradient>
+  const menuItems = [
+    {
+      label: 'Student Directory',
+      onPress: () => navigation.navigate('StudentsList'),
+      image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
+    },
+    {
+      label: 'Fee Management',
+      onPress: () => navigation.navigate('FeeManagement'),
+      image: 'https://cdn-icons-png.flaticon.com/512/2454/2454282.png'
+    },
+    {
+      label: 'Events',
+      onPress: () => navigation.navigate('Announcements'),
+      image: 'https://cdn-icons-png.flaticon.com/512/1458/1458512.png'
+    },
+    {
+      label: 'Teachers',
+      onPress: () => navigation.navigate('TeachersList'),
+      image: 'https://cdn-icons-png.flaticon.com/512/1995/1995539.png'
+    }
+  ];
 
-      <Animated.View 
-        style={[
-          styles.statsContainer,
-          {
+  return (
+    <View style={styles.container}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.white} />
+        }
+      >
+        <CurvedHeader
+          subtitle="Welcome to EduNest!"
+          onNotificationPress={() => toast.info('Notifications clicked')}
+        />
+
+        <Animated.View
+          style={{
             opacity: fadeAnim,
             transform: [{ translateY: slideAnim }],
-          },
-        ]}
-      >
-        <Text style={styles.sectionTitle}>Overview Statistics</Text>
-        
-        <View style={styles.statsRow}>
-          <StatCard 
-            title="Active Students" 
-            value={stats.activeStudents?.toString() || '0'} 
-            icon="checkmark-circle" 
-            color="green"
-            onPress={() => navigation.navigate('StudentsList')}
-          />
-          <StatCard 
-            title="Total Teachers" 
-            value={stats.totalTeachers.toString()} 
-            icon="people" 
-            color="purple"
-            onPress={() => {
-              navigation.navigate('TeachersList');
-              toast.info('Viewing all teachers');
-            }}
-          />
-        </View>
-
-        <View style={styles.statsRow}>
-          <StatCard 
-            title="Total Parents" 
-            value={stats.totalParents.toString()} 
-            icon="person" 
-            color="indigo"
-            onPress={() => {
-              navigation.navigate('ParentsList');
-              toast.info('Viewing all parents');
-            }}
-          />
-          <StatCard 
-            title="Active Classes" 
-            value={stats.activeClasses.toString()} 
-            icon="calendar" 
-            color="pink"
-            onPress={() => {
-              navigation.navigate('ClassesList');
-              toast.info('Viewing active classes');
-            }}
-          />
-        </View>
-      </Animated.View>
-
-        {/* Recent Students Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Recent Students</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('StudentsList')}>
-              <Text style={styles.viewAllText}>View All →</Text>
-            </TouchableOpacity>
-          </View>
-
-          {recentStudents.length > 0 ? (
-            recentStudents.map((student) => (
-              <StudentCard
-                key={student._id}
-                student={student}
-                onPress={(student) => {
-                  toast.info(`Viewing ${student.name}'s details`);
-                  // Could navigate to student details screen
-                }}
-              />
-            ))
-          ) : (
-            <View style={styles.emptyContainer}>
-              <Ionicons name="school-outline" size={48} color={colors.gray300} />
-              <Text style={styles.emptyText}>No students found</Text>
-            </View>
-          )}
-        </View>
-
-        {/* Quick Actions */}
-        <Animated.View 
-          style={[
-            styles.section,
-            {
-              opacity: fadeAnim,
-              transform: [{ translateY: slideAnim }],
-            },
-          ]}
+          }}
         >
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
-          <View style={styles.actionsGrid}>
-            <TouchableOpacity 
-              style={styles.actionCard}
-              onPress={() => {
-                navigation.navigate('StudentsList');
-                toast.info('Opening students management');
-              }}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="school" size={32} color={colors.primary} />
-              <Text style={styles.actionText}>Manage Students</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.actionCard}
-              onPress={() => {
-                navigation.navigate('Announcements');
-                toast.info('Opening announcements');
-              }}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="megaphone" size={32} color={colors.success} />
-              <Text style={styles.actionText}>Announcements</Text>
-            </TouchableOpacity>
-          </View>
+          {/* Notice Board */}
+          <NoticeBoard notices={notices} />
 
-          <View style={[styles.actionsGrid, { marginTop: spacing.md }]}>
-            <TouchableOpacity 
-              style={styles.actionCard}
-              onPress={() => {
-                navigation.navigate('FeeManagement');
-                toast.info('Opening fee management');
-              }}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="cash" size={32} color="#10B981" />
-              <Text style={styles.actionText}>Fee Management</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.actionCard}
-              onPress={() => {
-                navigation.navigate('Accounting');
-                toast.info('Opening accounting');
-              }}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="calculator" size={32} color="#F59E0B" />
-              <Text style={styles.actionText}>Accounting</Text>
-            </TouchableOpacity>
-          </View>
+          {/* Academic Overview / Menu Grid */}
+          <MenuGrid items={menuItems} />
 
-          <View style={[styles.actionsGrid, { marginTop: spacing.md }]}>
-            <TouchableOpacity 
-              style={styles.actionCard}
-              onPress={() => {
-                navigation.navigate('ClassGradeHistory');
-                toast.info('Opening class grade history');
-              }}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="bar-chart" size={32} color="#8B5CF6" />
-              <Text style={styles.actionText}>Grade History</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.actionCard}
-              onPress={() => {
-                navigation.navigate('Announcements');
-                toast.info('Opening announcements');
-              }}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="megaphone" size={32} color="#EC4899" />
-              <Text style={styles.actionText}>Post Announcement</Text>
-            </TouchableOpacity>
+          {/* Recent Students Section */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Recent Students</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('StudentsList')}>
+                <Text style={styles.viewAllText}>View All →</Text>
+              </TouchableOpacity>
+            </View>
+
+            {recentStudents.length > 0 ? (
+              recentStudents.map((student) => (
+                <StudentCard
+                  key={student._id}
+                  student={student}
+                  onPress={(student) => {
+                    navigation.navigate('StudentDetail', { student });
+                  }}
+                />
+              ))
+            ) : (
+              <View style={styles.emptyContainer}>
+                <Ionicons name="school-outline" size={48} color={colors.gray300} />
+                <Text style={styles.emptyText}>No students found</Text>
+              </View>
+            )}
           </View>
         </Animated.View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: colors.background 
+  container: {
+    flex: 1,
+    backgroundColor: colors.background
   },
-  header: { 
-    padding: spacing.xxl, 
-    paddingTop: spacing.xl, 
-    paddingBottom: spacing.xxxl 
-  },
-  headerContent: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'flex-start' 
-  },
-  headerInfo: { flex: 1 },
-  greeting: { 
-    fontSize: fontSize.lg, 
-    color: 'rgba(255, 255, 255, 0.9)',
-    marginBottom: spacing.xs,
-  },
-  userName: { 
-    fontSize: fontSize.display, 
-    fontWeight: fontWeight.bold, 
-    color: colors.white, 
-    marginBottom: spacing.sm,
-  },
-  role: { 
-    fontSize: fontSize.base, 
-    color: 'rgba(255, 255, 255, 0.85)',
-  },
-  statsContainer: { 
-    padding: spacing.lg, 
-    marginTop: -spacing.xl 
-  },
-  statsRow: { 
-    flexDirection: 'row', 
-    marginBottom: spacing.md 
-  },
-  section: { 
+  section: {
     padding: spacing.lg,
+    paddingTop: 0,
   },
-  sectionHeader: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: spacing.lg,
   },
-  sectionTitle: { 
-    fontSize: fontSize.xl, 
-    fontWeight: fontWeight.semibold, 
+  sectionTitle: {
+    fontSize: fontSize.xl,
+    fontWeight: fontWeight.semibold,
     color: colors.textPrimary,
     marginBottom: spacing.md,
   },
-  viewAllText: { 
-    fontSize: fontSize.base, 
-    color: colors.primary, 
-    fontWeight: fontWeight.semibold 
+  viewAllText: {
+    fontSize: fontSize.base,
+    color: colors.primary,
+    fontWeight: fontWeight.semibold
   },
   emptyContainer: {
     alignItems: 'center',
     padding: spacing.xxl,
   },
-  emptyText: { 
-    textAlign: 'center', 
-    color: colors.textSecondary, 
-    fontSize: fontSize.base, 
-    marginTop: spacing.md,
-  },
-  actionsGrid: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between',
-    gap: spacing.md,
-  },
-  actionCard: {
-    flex: 1,
-    backgroundColor: colors.white,
-    padding: spacing.xl,
-    borderRadius: borderRadius.lg,
-    alignItems: 'center',
-    elevation: 2,
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  actionText: { 
-    fontSize: fontSize.sm + 1, 
-    fontWeight: fontWeight.semibold, 
-    color: colors.textPrimary, 
+  emptyText: {
     textAlign: 'center',
-    marginTop: spacing.sm,
+    color: colors.textSecondary,
+    fontSize: fontSize.base,
+    marginTop: spacing.md,
   },
 });
 

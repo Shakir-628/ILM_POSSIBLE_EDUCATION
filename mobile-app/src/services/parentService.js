@@ -28,25 +28,26 @@ export const parentService = {
 
   // Get child's attendance
   getChildAttendance: async (studentId, params = {}) => {
-    const response = await api.get(`/attendance/student/${studentId}`, { params });
+    // Use /stats/:studentId for attendance statistics
+    const response = await api.get(`/attendance/stats/${studentId}`, { params });
     return response.data;
   },
 
   // Get child's grades
   getChildGrades: async (studentId) => {
-    const response = await api.get(`/grades/student/${studentId}`);
+    const response = await api.get('/grades', { params: { studentId } });
     return response.data;
   },
 
   // Get child's assignments
   getChildAssignments: async (studentId) => {
-    const response = await api.get(`/assignments/student/${studentId}`);
+    const response = await api.get('/assignments', { params: { studentId } });
     return response.data;
   },
 
   // Get child's fees
   getChildFees: async (studentId) => {
-    const response = await api.get(`/fees/student/${studentId}`);
+    const response = await api.get('/fees/payments', { params: { studentId } });
     return response.data;
   },
 
