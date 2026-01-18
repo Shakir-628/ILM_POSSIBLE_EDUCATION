@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, RefreshControl, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { StatusBar } from 'expo-status-bar';
 import CustomCard from '../../components/CustomCard';
 import Loading from '../../components/Loading';
 import EmptyState from '../../components/EmptyState';
+import CurvedHeader from '../../components/CurvedHeader';
 import { studentService } from '../../services/studentService';
+import { useDesignSystem } from '../../utils/designSystem';
 import { useToast } from '../../context/ToastContext';
 
 const StudentsListScreen = ({ navigation }) => {
   const toast = useToast();
+  const { colors, isDarkMode } = useDesignSystem();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [students, setStudents] = useState([]);
@@ -64,29 +68,37 @@ const StudentsListScreen = ({ navigation }) => {
   };
 
   const renderStudent = ({ item }) => (
-    <CustomCard style={styles.studentCard}>
-      <View style={styles.studentRow}>
-        <View style={styles.studentAvatar}>
-          <Text style={styles.avatarText}>
-            {item.name?.charAt(0)?.toUpperCase() || 'S'}
-          </Text>
+    <TouchableOpacity
+      onPress={() => navigation.navigate('StudentDetail', {
+        studentId: item._id || item.studentId,
+        ...(Platform.OS !== 'web' && { student: item })
+      })}
+      activeOpacity={0.7}
+    >
+      <CustomCard style={styles.studentCard}>
+        <View style={styles.studentRow}>
+          <View style={styles.studentAvatar}>
+            <Text style={styles.avatarText}>
+              {item.name?.charAt(0)?.toUpperCase() || 'S'}
+            </Text>
+          </View>
+          <View style={styles.studentInfo}>
+            <Text style={styles.studentName}>{item.name}</Text>
+            <Text style={styles.studentDetails}>
+              {item.studentId} • {typeof item.class === 'object' ? item.class?.className : item.class} {item.section}
+            </Text>
+            <Text style={styles.studentEmail}>{item.email}</Text>
+          </View>
+          <View style={[styles.statusBadge, {
+            backgroundColor: item.status === 'active' ? '#10B981' : '#EF4444'
+          }]}>
+            <Text style={styles.statusText}>
+              {item.status === 'active' ? 'Active' : 'Inactive'}
+            </Text>
+          </View>
         </View>
-        <View style={styles.studentInfo}>
-          <Text style={styles.studentName}>{item.name}</Text>
-          <Text style={styles.studentDetails}>
-            {item.studentId} • {typeof item.class === 'object' ? item.class?.className : item.class} {item.section}
-          </Text>
-          <Text style={styles.studentEmail}>{item.email}</Text>
-        </View>
-        <View style={[styles.statusBadge, { 
-          backgroundColor: item.status === 'active' ? '#10B981' : '#EF4444' 
-        }]}>
-          <Text style={styles.statusText}>
-            {item.status === 'active' ? 'Active' : 'Inactive'}
-          </Text>
-        </View>
-      </View>
-    </CustomCard>
+      </CustomCard>
+    </TouchableOpacity>
   );
 
   if (loading) {
@@ -94,16 +106,14 @@ const StudentsListScreen = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
-      <LinearGradient colors={['#4F46E5', '#8B5CF6']} style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-        <View style={styles.headerContent}>
-          <Text style={styles.title}>All Students</Text>
-          <Text style={styles.subtitle}>{students.length} students total</Text>
-        </View>
-      </LinearGradient>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar style="light" translucent backgroundColor="transparent" />
+      <CurvedHeader
+        title="Student Directory"
+        subtitle={`${students.length} students enrolled`}
+        showBack={true}
+        onBack={() => navigation.goBack()}
+      />
 
       <View style={styles.searchContainer}>
         <TextInput
@@ -116,10 +126,10 @@ const StudentsListScreen = ({ navigation }) => {
       </View>
 
       {filteredStudents.length === 0 ? (
-        <EmptyState 
-          icon="people-outline" 
-          title="No Students Found" 
-          message={searchQuery ? "Try a different search term" : "No students in the system yet"} 
+        <EmptyState
+          icon="people-outline"
+          title="No Students Found"
+          message={searchQuery ? "Try a different search term" : "No students in the system yet"}
         />
       ) : (
         <FlatList

@@ -18,6 +18,7 @@ import FeeManagementScreen from '../screens/admin/FeeManagementScreen';
 import ClassGradeHistoryScreen from '../screens/admin/ClassGradeHistoryScreen';
 import AdminProfileScreen from '../screens/admin/AdminProfileScreen';
 import SettingsScreen from '../screens/admin/SettingsScreen';
+import EnableBiometricScreen from '../screens/admin/EnableBiometricScreen';
 import ChangePasswordScreen from '../screens/admin/ChangePasswordScreen';
 import HelpSupportScreen from '../screens/admin/HelpSupportScreen';
 import PrivacyPolicyScreen from '../screens/admin/PrivacyPolicyScreen';
@@ -30,6 +31,7 @@ const AdminTabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
+        headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
@@ -84,6 +86,7 @@ const AdminNavigator = () => {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="AdminTabs" component={AdminTabNavigator} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
+      <Stack.Screen name="EnableBiometric" component={EnableBiometricScreen} />
       <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
       <Stack.Screen name="HelpSupport" component={HelpSupportScreen} />
       <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />

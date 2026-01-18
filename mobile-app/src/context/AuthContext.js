@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   useEffect(() => {
     loadUserFromStorage();
@@ -35,26 +36,26 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authService.login(email, password);
       console.log('API Response:', response);
-      
+
       // Backend returns flat structure: { _id, name, email, role, token, ... }
       const token = response.token;
-      
+
       // Extract user data (everything except token)
       const { token: _, ...userData } = response;
       const user = userData;
-      
+
       console.log('Extracted data:', { token: !!token, user: user?.role });
-      
+
       if (!token || !user || !user.role) {
         throw new Error('Invalid response from server');
       }
-      
+
       await storage.setItem(STORAGE_KEYS.TOKEN, token);
       await storage.setItem(STORAGE_KEYS.USER, user);
-      
+
       setToken(token);
       setUser(user);
-      
+
       return { token, user };
     } catch (error) {
       console.error('Login error in AuthContext:', error);
@@ -65,17 +66,17 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       const response = await authService.register(userData);
-      
+
       // Backend returns flat structure: { _id, name, email, role, token, ... }
       const token = response.token;
       const { token: _, ...user } = response;
-      
+
       await storage.setItem(STORAGE_KEYS.TOKEN, token);
       await storage.setItem(STORAGE_KEYS.USER, user);
-      
+
       setToken(token);
       setUser(user);
-      
+
       return { token, user };
     } catch (error) {
       throw error;
@@ -86,7 +87,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await storage.removeItem(STORAGE_KEYS.TOKEN);
       await storage.removeItem(STORAGE_KEYS.USER);
-      
+
       setToken(null);
       setUser(null);
     } catch (error) {
@@ -114,6 +115,8 @@ export const AuthProvider = ({ children }) => {
     user,
     token,
     loading,
+    isLoggingIn,
+    setIsLoggingIn,
     login,
     register,
     logout,

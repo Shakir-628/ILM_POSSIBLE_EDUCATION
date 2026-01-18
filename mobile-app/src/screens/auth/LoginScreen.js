@@ -15,16 +15,19 @@ import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
+import BiometricService from '../../services/biometricService';
 import { colors, spacing, fontSize, fontWeight, borderRadius, gradients } from '../../utils/designSystem';
 
 const LoginScreen = ({ navigation }) => {
-  const { login, isAuthenticated, user } = useAuth();
+  const { login, isAuthenticated, user, setIsLoggingIn } = useAuth();
   const toast = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+  const [biometricAvailable, setBiometricAvailable] = useState(false);
+  const [biometricTypeName, setBiometricTypeName] = useState('Biometric');
 
   // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -51,6 +54,9 @@ const LoginScreen = ({ navigation }) => {
         useNativeDriver: true,
       }),
     ]).start();
+
+    // Check biometric availability
+    checkBiometricAvailability();
   }, []);
 
   useEffect(() => {
@@ -63,6 +69,42 @@ const LoginScreen = ({ navigation }) => {
   useEffect(() => {
     validateForm();
   }, [email, password]);
+
+  const checkBiometricAvailability = async () => {
+    try {
+      const info = await BiometricService.getDeviceBiometricInfo();
+      setBiometricAvailable(info.enabled && info.supported && info.enrolled);
+      setBiometricTypeName(info.typeName);
+    } catch (error) {
+      console.error('Error checking biometric:', error);
+    }
+  };
+
+  const handleBiometricLogin = async () => {
+    try {
+      setLoading(true);
+      const result = await BiometricService.getStoredCredentials();
+
+      if (result.success && result.credentials) {
+        const { email: storedEmail, password: storedPassword } = result.credentials;
+
+        // Perform login with stored credentials
+        const loginResult = await login(storedEmail, storedPassword);
+        if (loginResult) {
+          console.log('Biometric login successful:', loginResult?.user?.role || 'unknown role');
+          toast.success(`Welcome back! 🎉`);
+          setIsLoggingIn(true);
+        }
+      } else {
+        toast.error(result.error || 'Biometric authentication failed');
+      }
+    } catch (error) {
+      console.error('Biometric login error:', error);
+      toast.error('Authentication failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -103,19 +145,16 @@ const LoginScreen = ({ navigation }) => {
     setLoading(true);
     try {
       const result = await login(email, password);
-      console.log('Login successful:', result?.user?.role || 'unknown role');
-      toast.success('Welcome back! 🎉');
-      
-      if (Platform.OS === 'web') {
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
+      if (result) {
+        console.log('Login successful:', result?.user?.role || 'unknown role');
+        toast.success('Welcome back! 🎉');
+        setIsLoggingIn(true);
       }
     } catch (error) {
       console.error('Login error in screen:', error);
       const errorMessage = error.response?.data?.message || error.message || 'Invalid credentials';
       toast.error(errorMessage);
-      
+
       // Shake animation on error
       Animated.sequence([
         Animated.timing(slideAnim, { toValue: -10, duration: 50, useNativeDriver: true }),
@@ -213,6 +252,19 @@ const LoginScreen = ({ navigation }) => {
               icon="log-in-outline"
               style={styles.loginButton}
             />
+
+            {biometricAvailable && (
+              <TouchableOpacity
+                style={styles.biometricButton}
+                onPress={handleBiometricLogin}
+                disabled={loading}
+              >
+                <Ionicons name="finger-print" size={24} color={colors.primary} />
+                <Text style={styles.biometricText}>
+                  Sign in with {biometricTypeName}
+                </Text>
+              </TouchableOpacity>
+            )}
 
             <CustomButton
               title="Forgot Password?"
@@ -324,6 +376,23 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     marginTop: spacing.sm,
+  },
+  biometricButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.md,
+    marginTop: spacing.md,
+    borderRadius: borderRadius.lg,
+    backgroundColor: `${colors.primary}10`,
+    borderWidth: 1,
+    borderColor: `${colors.primary}30`,
+    gap: spacing.sm,
+  },
+  biometricText: {
+    fontSize: fontSize.md,
+    color: colors.primary,
+    fontWeight: fontWeight.semibold,
   },
   forgotButton: {
     marginTop: spacing.sm,

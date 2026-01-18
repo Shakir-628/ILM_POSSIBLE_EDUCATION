@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, Animated, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import StudentCard from '../../components/StudentCard';
 import Loading from '../../components/Loading';
 import CurvedHeader from '../../components/CurvedHeader';
 import NoticeBoard from '../../components/NoticeBoard';
@@ -14,12 +13,14 @@ import { parentService } from '../../services/parentService';
 import { feeService } from '../../services/feeService';
 import { announcementService } from '../../services/announcementService';
 import { useToast } from '../../context/ToastContext';
-import { colors, spacing, fontSize, fontWeight, borderRadius } from '../../utils/designSystem';
+import { useDesignSystem, spacing, fontSize, fontWeight } from '../../utils/designSystem';
+import StatCard from '../../components/StatCard';
 import { format } from 'date-fns';
 
 const AdminDashboardScreen = ({ navigation }) => {
   const { user } = useAuth();
   const toast = useToast();
+  const { colors, shadows, isDarkMode } = useDesignSystem();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [stats, setStats] = useState({
@@ -32,7 +33,6 @@ const AdminDashboardScreen = ({ navigation }) => {
     activeClasses: 0,
     pendingFees: 0,
   });
-  const [recentStudents, setRecentStudents] = useState([]);
   const [notices, setNotices] = useState([]);
 
   // Animation values
@@ -84,38 +84,36 @@ const AdminDashboardScreen = ({ navigation }) => {
         pendingFees: feeStatsData.totalPending || feeStatsData.pendingAmount || 0,
       });
 
-      // Get recent students (last 5)
-      setRecentStudents(students.slice(0, 5));
-
       // Process announcements for NoticeBoard
-      const processedNotices = announcements.slice(0, 5).map((notice, index) => {
-        const colorsList = ['#E0E7FF', '#FCE7F3', '#DCFCE7', '#FEF3C7', '#DBEAFE'];
-        return {
-          id: notice._id,
-          title: notice.title,
-          date: format(new Date(notice.createdAt || new Date()), 'dd MMMM yyyy'),
-          color: colorsList[index % colorsList.length],
-          image: 'https://cdn-icons-png.flaticon.com/512/2583/2583319.png'
-        };
-      });
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const processedNotices = announcements
+        .filter(notice => {
+          if (notice.status && notice.status !== 'published') return false;
+          if (notice.expiresAt) return new Date(notice.expiresAt) >= today;
+          return true;
+        })
+        .slice(0, 5)
+        .map((notice, index) => {
+          const colorsList = ['#E0E7FF', '#FCE7F3', '#DCFCE7', '#FEF3C7', '#DBEAFE'];
+          return {
+            id: notice._id,
+            title: notice.title,
+            date: format(new Date(notice.createdAt || new Date()), 'dd MMMM yyyy'),
+            color: colorsList[index % colorsList.length],
+            image: 'https://cdn-icons-png.flaticon.com/512/2583/2583319.png'
+          };
+        });
       setNotices(processedNotices);
 
-      // Trigger animations after data loads
       Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 600,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 500,
-          useNativeDriver: true,
-        }),
+        Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
+        Animated.timing(slideAnim, { toValue: 0, duration: 500, useNativeDriver: true }),
       ]).start();
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      toast.error('Failed to load dashboard data');
+      console.error('Dashboard error:', error);
+      toast.error('Failed to load dashboard');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -132,122 +130,90 @@ const AdminDashboardScreen = ({ navigation }) => {
   }
 
   const menuItems = [
-    {
-      label: 'Student Directory',
-      onPress: () => navigation.navigate('StudentsList'),
-      image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
-    },
-    {
-      label: 'Fee Management',
-      onPress: () => navigation.navigate('FeeManagement'),
-      image: 'https://cdn-icons-png.flaticon.com/512/2454/2454282.png'
-    },
-    {
-      label: 'Events',
-      onPress: () => navigation.navigate('Announcements'),
-      image: 'https://cdn-icons-png.flaticon.com/512/1458/1458512.png'
-    },
-    {
-      label: 'Teachers',
-      onPress: () => navigation.navigate('TeachersList'),
-      image: 'https://cdn-icons-png.flaticon.com/512/1995/1995539.png'
-    }
+    { label: 'Students', onPress: () => navigation.navigate('StudentsList'), image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' },
+    { label: 'Finances', onPress: () => navigation.navigate('FeeManagement'), image: 'https://cdn-icons-png.flaticon.com/512/2454/2454282.png' },
+    { label: 'Notices', onPress: () => navigation.navigate('Announcements'), image: 'https://cdn-icons-png.flaticon.com/512/1458/1458512.png' },
+    { label: 'Faculty', onPress: () => navigation.navigate('TeachersList'), image: 'https://cdn-icons-png.flaticon.com/512/1995/1995539.png' }
   ];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         showsVerticalScrollIndicator={false}
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.white} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
         }
       >
         <CurvedHeader
-          subtitle="Welcome to EduNest!"
-          onNotificationPress={() => toast.info('Notifications clicked')}
+          subtitle="Manage your institution."
+          onNotificationPress={() => navigation.navigate('Notifications')}
         />
 
-        <Animated.View
-          style={{
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }],
-          }}
-        >
-          {/* Notice Board */}
-          <NoticeBoard notices={notices} />
-
-          {/* Academic Overview / Menu Grid */}
-          <MenuGrid items={menuItems} />
-
-          {/* Recent Students Section */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Recent Students</Text>
-              <TouchableOpacity onPress={() => navigation.navigate('StudentsList')}>
-                <Text style={styles.viewAllText}>View All →</Text>
-              </TouchableOpacity>
+        <View style={styles.overlapContent}>
+          <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+            {/* Academic Overview */}
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Academic Overview</Text>
+              <View style={styles.statsRow}>
+                <StatCard title="Students" value={stats.totalStudents} icon="people-outline" color="blue" />
+                <StatCard title="Teachers" value={stats.totalTeachers} icon="school-outline" color="green" />
+              </View>
+              <View style={styles.statsRow}>
+                <StatCard title="Classes" value={stats.totalClasses} icon="business-outline" color="indigo" />
+                <StatCard title="Pending Fees" value={`₨ ${stats.pendingFees?.toLocaleString()}`} icon="wallet-outline" color="orange" />
+              </View>
             </View>
 
-            {recentStudents.length > 0 ? (
-              recentStudents.map((student) => (
-                <StudentCard
-                  key={student._id}
-                  student={student}
-                  onPress={(student) => {
-                    navigation.navigate('StudentDetail', { student });
-                  }}
-                />
-              ))
-            ) : (
-              <View style={styles.emptyContainer}>
-                <Ionicons name="school-outline" size={48} color={colors.gray300} />
-                <Text style={styles.emptyText}>No students found</Text>
+            {/* Notice Board */}
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={[styles.sectionTitle, { color: colors.textPrimary, marginBottom: 0 }]}>Bulletin Board</Text>
+                <TouchableOpacity onPress={() => navigation.navigate('Announcements')}>
+                  <Text style={[styles.viewAllText, { color: colors.primary }]}>View All →</Text>
+                </TouchableOpacity>
               </View>
-            )}
-          </View>
-        </Animated.View>
+              {notices.length > 0 ? (
+                <NoticeBoard notices={notices} />
+              ) : (
+                <TouchableOpacity style={[styles.emptyBox, { borderColor: colors.gray200 }]} onPress={() => navigation.navigate('Announcements')}>
+                  <Ionicons name="megaphone-outline" size={32} color={colors.gray300} />
+                  <Text style={{ color: colors.textSecondary, marginTop: 8 }}>Post first announcement</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {/* Actions */}
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Management Hub</Text>
+              <MenuGrid items={menuItems} />
+            </View>
+          </Animated.View>
+        </View>
       </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background
-  },
-  section: {
-    padding: spacing.lg,
-    paddingTop: 0,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  container: { flex: 1 },
+  scrollView: { flex: 1 },
+  scrollContent: { paddingBottom: 40 },
+  overlapContent: { marginTop: -45, zIndex: 10 },
+  section: { paddingHorizontal: 20, marginBottom: 24 },
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+  sectionTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 16 },
+  statsRow: { flexDirection: 'row', gap: 12, marginBottom: 12 },
+  viewAllText: { fontSize: 14, fontWeight: '600' },
+  emptyBox: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 30,
     alignItems: 'center',
-    marginBottom: spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: fontSize.xl,
-    fontWeight: fontWeight.semibold,
-    color: colors.textPrimary,
-    marginBottom: spacing.md,
-  },
-  viewAllText: {
-    fontSize: fontSize.base,
-    color: colors.primary,
-    fontWeight: fontWeight.semibold
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    padding: spacing.xxl,
-  },
-  emptyText: {
-    textAlign: 'center',
-    color: colors.textSecondary,
-    fontSize: fontSize.base,
-    marginTop: spacing.md,
+    borderWidth: 1.5,
+    borderStyle: 'dashed'
   },
 });
 
 export default AdminDashboardScreen;
-

@@ -17,6 +17,7 @@ const StudentNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
+        headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
@@ -65,8 +66,8 @@ const StudentNavigator = () => {
         },
       })}
     >
-      <Tab.Screen 
-        name="Dashboard" 
+      <Tab.Screen
+        name="Dashboard"
         component={StudentDashboardScreen}
         options={{ title: 'Home' }}
       />

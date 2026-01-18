@@ -2,6 +2,7 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useAuth } from '../context/AuthContext';
 import Loading from '../components/Loading';
+import SplashScreen from '../screens/SplashScreen';
 
 // Navigators
 import AuthNavigator from './AuthNavigator';
@@ -13,13 +14,13 @@ import AdminNavigator from './AdminNavigator';
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
-  const { isAuthenticated, user, loading } = useAuth();
+  const { isAuthenticated, user, loading, isLoggingIn, setIsLoggingIn } = useAuth();
 
   // Debug logging
-  console.log('AppNavigator render:', { isAuthenticated, user: user?.role, loading });
+  console.log('AppNavigator render:', { isAuthenticated, user: user?.role, loading, isLoggingIn });
 
-  if (loading) {
-    return <Loading message="Loading ILM Possible..." />;
+  if (loading || isLoggingIn) {
+    return <SplashScreen onFinish={() => setIsLoggingIn(false)} />;
   }
 
   // Get role-specific navigator
@@ -30,7 +31,7 @@ const AppNavigator = () => {
     }
 
     console.log('Getting navigator for role:', user.role);
-    
+
     switch (user.role) {
       case 'student':
         return <Stack.Screen name="StudentMain" component={StudentNavigator} options={{ headerShown: false }} />;

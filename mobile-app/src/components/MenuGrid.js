@@ -1,17 +1,25 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { colors, spacing, borderRadius, fontSize, fontWeight, shadows } from '../utils/designSystem';
+import { useDesignSystem, colors, spacing, borderRadius, fontSize, fontWeight, shadows } from '../utils/designSystem';
 
 const MenuGrid = ({ items = [] }) => {
+    const { colors, spacing, borderRadius, fontSize, fontWeight, shadows, isDarkMode } = useDesignSystem();
+
     return (
         <View style={styles.container}>
-            <Text style={styles.sectionTitle}>Academic Overview</Text>
-
             <View style={styles.grid}>
                 {items.map((item, index) => (
                     <TouchableOpacity
                         key={index}
-                        style={styles.card}
+                        style={[
+                            styles.card,
+                            {
+                                backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : '#F3F4F6',
+                                borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+                                borderWidth: isDarkMode ? 1 : 0,
+                                borderRadius: borderRadius.lg
+                            }
+                        ]}
                         onPress={item.onPress}
                         activeOpacity={0.8}
                     >
@@ -23,7 +31,7 @@ const MenuGrid = ({ items = [] }) => {
                                 item.icon
                             )}
                         </View>
-                        <Text style={styles.label}>{item.label}</Text>
+                        <Text style={[styles.label, { color: colors.textPrimary, fontSize: fontSize.md }]}>{item.label}</Text>
                     </TouchableOpacity>
                 ))}
             </View>

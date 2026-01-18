@@ -36,32 +36,38 @@ export const sendEmail = async ({ to, subject, html, text, attachments = [] }) =
   }
 };
 
-// Send password reset email
-export const sendPasswordResetEmail = async (email, resetToken, userName) => {
-  const resetUrl = `${process.env.CLIENT_URL || "http://localhost:3000"}/reset-password/${resetToken}`;
-
+// Send password reset OTP email
+export const sendPasswordResetEmail = async (email, otp, userName) => {
   const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #333;">Password Reset Request</h2>
-      <p>Hello ${userName},</p>
-      <p>You requested to reset your password. Click the button below to reset it:</p>
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="${resetUrl}" style="background-color: #4F46E5; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">Reset Password</a>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden;">
+      <div style="background-color: #4F46E5; padding: 20px; text-align: center;">
+        <h2 style="color: white; margin: 0;">Password Reset OTP</h2>
       </div>
-      <p>Or copy and paste this link in your browser:</p>
-      <p style="color: #666; word-break: break-all;">${resetUrl}</p>
-      <p>This link will expire in 1 hour.</p>
-      <p>If you didn't request this, please ignore this email.</p>
-      <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-      <p style="color: #999; font-size: 12px;">School Management System</p>
+      <div style="padding: 30px; background-color: white;">
+        <p style="color: #374151; font-size: 16px;">Hello ${userName},</p>
+        <p style="color: #4b5563; font-size: 14px; line-height: 24px;">
+          You requested to reset your password. Use the following 6-digit One-Time Password (OTP) to proceed. This OTP is valid for 10 minutes.
+        </p>
+        <div style="text-align: center; margin: 40px 0;">
+          <div style="background-color: #f3f4f6; color: #111827; font-size: 32px; font-weight: bold; letter-spacing: 8px; padding: 20px; border-radius: 8px; display: inline-block; border: 1px dashed #4F46E5;">
+            ${otp}
+          </div>
+        </div>
+        <p style="color: #6b7280; font-size: 13px; text-align: center;">
+          If you didn't request this, please ignore this email or contact support.
+        </p>
+      </div>
+      <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+        <p style="color: #9ca3af; font-size: 12px; margin: 0;">© 2026 ILM Possible Education. Powered by Innovation.</p>
+      </div>
     </div>
   `;
 
   return await sendEmail({
     to: email,
-    subject: "Password Reset Request",
+    subject: "Your Password Reset OTP",
     html,
-    text: `Reset your password using this link: ${resetUrl}`,
+    text: `Your password reset OTP is: ${otp}. It is valid for 10 minutes.`,
   });
 };
 

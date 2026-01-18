@@ -18,7 +18,6 @@ const ForgotPasswordScreen = ({ navigation }) => {
   const toast = useToast();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
 
   const handleSubmit = async () => {
     if (!email) {
@@ -29,11 +28,11 @@ const ForgotPasswordScreen = ({ navigation }) => {
     setLoading(true);
     try {
       await authService.forgotPassword(email);
-      setEmailSent(true);
-      toast.success('Password reset link sent to your email');
+      toast.success('OTP sent to your email');
+      navigation.navigate('OTP', { email });
     } catch (error) {
       console.error('Forgot password error:', error);
-      toast.error(error.response?.data?.message || 'Failed to send reset link');
+      toast.error(error.response?.data?.message || 'Failed to send OTP');
     } finally {
       setLoading(false);
     }
@@ -55,7 +54,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
         </View>
         <Text style={styles.headerTitle}>Forgot Password?</Text>
         <Text style={styles.headerSubtitle}>
-          No worries, we'll send you reset instructions
+          Enter your email and we'll send you a{'\n'}verification code to reset your password
         </Text>
       </LinearGradient>
 
@@ -64,57 +63,32 @@ const ForgotPasswordScreen = ({ navigation }) => {
         contentContainerStyle={styles.formContent}
         keyboardShouldPersistTaps="handled"
       >
-        {!emailSent ? (
-          <>
-            <CustomInput
-              label="Email Address"
-              value={email}
-              onChangeText={setEmail}
-              placeholder="your.email@example.com"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              icon="mail-outline"
-              required
-            />
+        <CustomInput
+          label="Email Address"
+          value={email}
+          onChangeText={setEmail}
+          placeholder="your.email@example.com"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          icon="mail-outline"
+          required
+        />
 
-            <CustomButton
-              title="Send Reset Link"
-              onPress={handleSubmit}
-              loading={loading}
-              fullWidth
-              style={styles.submitButton}
-            />
+        <CustomButton
+          title="Send OTP Code"
+          onPress={handleSubmit}
+          loading={loading}
+          fullWidth
+          style={styles.submitButton}
+        />
 
-            <CustomButton
-              title="Back to Login"
-              onPress={() => navigation.navigate('Login')}
-              variant="outline"
-              fullWidth
-              style={styles.backButton}
-            />
-          </>
-        ) : (
-          <View style={styles.successContainer}>
-            <View style={styles.successIcon}>
-              <Ionicons name="checkmark-circle" size={64} color="#22c55e" />
-            </View>
-            <Text style={styles.successTitle}>Email Sent!</Text>
-            <Text style={styles.successMessage}>
-              We've sent password reset instructions to{'\n'}
-              <Text style={styles.emailHighlight}>{email}</Text>
-            </Text>
-            <Text style={styles.successNote}>
-              Please check your email and follow the instructions to reset your password.
-            </Text>
-
-            <CustomButton
-              title="Back to Login"
-              onPress={() => navigation.navigate('Login')}
-              fullWidth
-              style={styles.doneButton}
-            />
-          </View>
-        )}
+        <CustomButton
+          title="Back to Login"
+          onPress={() => navigation.navigate('Login')}
+          variant="outline"
+          fullWidth
+          style={styles.backButton}
+        />
       </ScrollView>
     </KeyboardAvoidingView>
   );

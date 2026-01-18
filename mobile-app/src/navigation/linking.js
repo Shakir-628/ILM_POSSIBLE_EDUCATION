@@ -64,6 +64,7 @@ const linking = {
                     PrivacyPolicy: 'admin/privacy',
                     AboutApp: 'admin/about',
                     StudentsList: 'admin/students-list',
+                    StudentDetail: 'admin/student/:studentId',
                     TeachersList: 'admin/teachers-list',
                     ClassesList: 'admin/classes-list',
                     ParentsList: 'admin/parents-list',

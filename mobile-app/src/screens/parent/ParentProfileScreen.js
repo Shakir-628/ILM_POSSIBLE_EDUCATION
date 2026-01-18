@@ -1,57 +1,159 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import CustomButton from '../../components/CustomButton';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import CustomCard from '../../components/CustomCard';
+import CurvedHeader from '../../components/CurvedHeader';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
+import { Ionicons } from '@expo/vector-icons';
+import { useDesignSystem, spacing, borderRadius, fontSize, fontWeight, shadows } from '../../utils/designSystem';
 
-const ParentProfileScreen = () => {
+const ParentProfileScreen = ({ navigation }) => {
   const { user, logout } = useAuth();
   const toast = useToast();
+  const { colors, isDarkMode } = useDesignSystem();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success('Logged out successfully');
+    } catch (error) {
+      toast.error('Failed to logout');
+    }
+  };
+
+  const InfoRow = ({ icon, label, value, isLast }) => (
+    <View style={[styles.infoRow, !isLast && { borderBottomColor: colors.gray100, borderBottomWidth: 1 }]}>
+      <View style={styles.infoLabelGroup}>
+        <Ionicons name={icon} size={18} color={colors.primary} style={styles.rowIcon} />
+        <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>{label}</Text>
+      </View>
+      <Text style={[styles.infoValue, { color: colors.textPrimary }]}>{value || 'N/A'}</Text>
+    </View>
+  );
 
   return (
-    <ScrollView style={styles.container}>
-      <LinearGradient colors={['#4F46E5', '#8B5CF6']} style={styles.header}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{user?.name?.charAt(0)}</Text>
-        </View>
-        <Text style={styles.name}>{user?.name}</Text>
-        <Text style={styles.role}>PARENT</Text>
-      </LinearGradient>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar style="light" translucent backgroundColor="transparent" />
 
-      <View style={styles.section}>
-        <CustomButton
-          title="Logout"
-          onPress={async () => {
-            await logout();
-            toast.success('Logged out');
-          }}
-          variant="outline"
-          icon="log-out-outline"
-          fullWidth
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+        style={styles.scrollView}
+      >
+        <CurvedHeader
+          title="Parent Profile"
+          subtitle="Manage your family's account"
+          showProfile={false}
         />
-      </View>
-    </ScrollView>
+
+        <View style={styles.overlapContent}>
+          {/* Profile Card Overlay */}
+          <View style={styles.profileHeaderOverlay}>
+            <View style={[styles.avatarWrapper, { borderColor: colors.cardBackground, ...shadows.medium }]}>
+              <Image
+                source={{ uri: user?.photo || 'https://ui-avatars.com/api/?name=' + (user?.name || 'Parent') + '&background=ec4899&color=fff&size=128' }}
+                style={styles.avatarImage}
+              />
+            </View>
+            <View style={styles.headerInfoText}>
+              <Text style={[styles.headerName, { color: colors.textPrimary }]}>{user?.name}</Text>
+              <View style={styles.statusRow}>
+                <View style={[styles.statusDot, { backgroundColor: colors.success }]} />
+                <Text style={[styles.headerStatus, { color: colors.textSecondary }]}>VERIFIED GUARDIAN</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.content}>
+            <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Guardian Information</Text>
+            <CustomCard style={{ padding: 4, marginBottom: 24 }}>
+              <InfoRow icon="person-outline" label="Full Name" value={user?.name} />
+              <InfoRow icon="mail-outline" label="Primary Email" value={user?.email} />
+              <InfoRow icon="call-outline" label="Emergency Phone" value={user?.phone || 'Not set'} />
+              <InfoRow icon="home-outline" label="Registered Address" value={user?.address || 'Not set'} isLast />
+            </CustomCard>
+
+            <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Family Actions</Text>
+            <View style={styles.actionsList}>
+              <TouchableOpacity
+                style={[styles.actionBtn, { backgroundColor: colors.cardBackground, ...shadows.small }]}
+                onPress={() => navigation.navigate('Children')}
+              >
+                <View style={[styles.actionIcon, { backgroundColor: '#db277715' }]}>
+                  <Ionicons name="people-outline" size={22} color="#db2777" />
+                </View>
+                <Text style={[styles.actionBtnText, { color: colors.textPrimary }]}>My Children</Text>
+                <Ionicons name="chevron-forward" size={18} color={colors.gray400} />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.actionBtn, { backgroundColor: colors.cardBackground, ...shadows.small }]}
+                onPress={() => navigation.navigate('Fees')}
+              >
+                <View style={[styles.actionIcon, { backgroundColor: '#05966915' }]}>
+                  <Ionicons name="card-outline" size={22} color="#059669" />
+                </View>
+                <Text style={[styles.actionBtnText, { color: colors.textPrimary }]}>Fee Management</Text>
+                <Ionicons name="chevron-forward" size={18} color={colors.gray400} />
+              </TouchableOpacity>
+            </View>
+
+            {/* Logout Button */}
+            <TouchableOpacity
+              style={[styles.logoutBtn, { backgroundColor: isDarkMode ? colors.error + '20' : colors.error + '10' }]}
+              onPress={handleLogout}
+            >
+              <Ionicons name="log-out-outline" size={22} color={colors.error} />
+              <Text style={[styles.logoutBtnText, { color: colors.error }]}>Sign Out Parent Portal</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f7fa' },
-  header: { paddingTop: 20, paddingBottom: 30, alignItems: 'center' },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    justifyContent: 'center',
+  container: { flex: 1 },
+  scrollView: { flex: 1 },
+  scrollContent: { paddingBottom: 40 },
+  overlapContent: { marginTop: -45, zIndex: 10 },
+  profileHeaderOverlay: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    paddingHorizontal: 24,
+    marginTop: 5,
+    marginBottom: 20,
+    zIndex: 10,
   },
-  avatarText: { fontSize: 40, fontWeight: 'bold', color: '#fff' },
-  name: { fontSize: 24, fontWeight: 'bold', color: '#fff', marginBottom: 4 },
-  role: { fontSize: 13, color: 'rgba(255, 255, 255, 0.9)', fontWeight: '600' },
-  section: { padding: 16 },
+  avatarWrapper: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    borderWidth: 4,
+    overflow: 'hidden',
+    backgroundColor: '#fff',
+  },
+  avatarImage: { width: '100%', height: '100%' },
+  headerInfoText: { marginLeft: 16, marginTop: 40, flex: 1 },
+  headerName: { fontSize: 22, fontWeight: 'bold' },
+  statusRow: { flexDirection: 'row', alignItems: 'center', marginTop: 2 },
+  statusDot: { width: 8, height: 8, borderRadius: 4, marginRight: 6 },
+  headerStatus: { fontSize: 11, fontWeight: '700', letterSpacing: 1 },
+  content: { padding: 20 },
+  sectionTitle: { fontSize: 16, fontWeight: '700', marginBottom: 12 },
+  infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 12 },
+  infoLabelGroup: { flexDirection: 'row', alignItems: 'center' },
+  rowIcon: { marginRight: 12 },
+  infoLabel: { fontSize: 13, fontWeight: '500' },
+  infoValue: { fontSize: 14, fontWeight: '600' },
+  actionsList: { marginBottom: 24 },
+  actionBtn: { flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 16, marginBottom: 12 },
+  actionIcon: { width: 44, height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginRight: 16 },
+  actionBtnText: { flex: 1, fontSize: 15, fontWeight: '600' },
+  logoutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 16, borderRadius: 16, gap: 12 },
+  logoutBtnText: { fontSize: 16, fontWeight: 'bold' },
 });
 
 export default ParentProfileScreen;
-

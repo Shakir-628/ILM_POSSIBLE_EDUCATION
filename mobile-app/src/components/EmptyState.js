@@ -14,7 +14,7 @@ const EmptyState = ({
   return (
     <View style={styles.container}>
       <View style={styles.iconContainer}>
-        <Ionicons name={icon} size={64} color="#d1d5db" />
+        <Ionicons name={icon} size={64} color={colors.primary} />
       </View>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.message}>{message}</Text>
@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: colors.gray100,
+    backgroundColor: `${colors.primary}15`, // Soft alpha version of primary
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.xxl,

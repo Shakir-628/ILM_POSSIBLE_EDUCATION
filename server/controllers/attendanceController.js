@@ -7,9 +7,9 @@ import mongoose from "mongoose";
 export const getAttendance = async (req, res) => {
   try {
     const { studentId, classId, startDate, endDate } = req.query;
-    
+
     let query = {};
-    
+
     if (studentId) query.student = studentId;
     if (classId) query.class = classId;
     if (startDate || endDate) {
@@ -100,7 +100,7 @@ export const bulkMarkAttendance = async (req, res) => {
     res.status(201).json(attendance);
   } catch (error) {
     if (error.code === 11000) {
-      res.status(400).json({ 
+      res.status(400).json({
         message: "Some attendance records already exist",
         insertedCount: error.insertedDocs?.length || 0
       });
@@ -167,7 +167,7 @@ export const getAttendanceStats = async (req, res) => {
     const stats = await Attendance.aggregate([
       {
         $match: {
-          student: mongoose.Types.ObjectId(studentId),
+          student: new mongoose.Types.ObjectId(studentId),
           ...dateFilter,
         },
       },

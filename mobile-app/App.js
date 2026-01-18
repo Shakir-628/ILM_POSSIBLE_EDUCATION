@@ -5,6 +5,7 @@ import { Provider as PaperProvider, configureFonts } from 'react-native-paper';
 import { AuthProvider } from './src/context/AuthContext';
 import { ToastProvider } from './src/context/ToastContext';
 import { SocketProvider } from './src/context/SocketContext';
+import { ThemeProvider } from './src/context/ThemeContext';
 import AppNavigator from './src/navigation/AppNavigator';
 import SplashScreen from './src/screens/SplashScreen';
 import { theme } from './src/utils/theme';
@@ -33,18 +34,20 @@ export default function App() {
   }
 
   return (
-    <PaperProvider theme={customTheme}>
-      <AuthProvider>
-        <SocketProvider>
-          <ToastProvider>
-            <NavigationContainer linking={linking}>
-              <AppNavigator />
-              <StatusBar style="auto" />
-            </NavigationContainer>
-          </ToastProvider>
-        </SocketProvider>
-      </AuthProvider>
-    </PaperProvider>
+    <ThemeProvider>
+      <PaperProvider theme={customTheme}>
+        <AuthProvider>
+          <SocketProvider>
+            <ToastProvider>
+              <NavigationContainer linking={linking}>
+                <AppNavigator />
+                <StatusBar style="auto" />
+              </NavigationContainer>
+            </ToastProvider>
+          </SocketProvider>
+        </AuthProvider>
+      </PaperProvider>
+    </ThemeProvider>
   );
 }
 

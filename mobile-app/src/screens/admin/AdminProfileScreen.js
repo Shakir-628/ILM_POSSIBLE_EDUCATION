@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
-import CustomButton from '../../components/CustomButton';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, Image } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import CustomCard from '../../components/CustomCard';
+import CurvedHeader from '../../components/CurvedHeader';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { Ionicons } from '@expo/vector-icons';
+import { useDesignSystem, spacing, borderRadius, fontSize, fontWeight, shadows } from '../../utils/designSystem';
 
 const AdminProfileScreen = ({ navigation }) => {
   const { user, logout } = useAuth();
   const toast = useToast();
+  const { colors, isDarkMode } = useDesignSystem();
   const [loggingOut, setLoggingOut] = useState(false);
 
   const handleLogout = async () => {
@@ -16,12 +19,8 @@ const AdminProfileScreen = ({ navigation }) => {
     try {
       await logout();
       toast.success('Logged out successfully');
-      
-      // On web, reload the page to clear state
       if (Platform.OS === 'web') {
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
+        setTimeout(() => window.location.reload(), 500);
       }
     } catch (error) {
       toast.error('Failed to logout');
@@ -30,222 +29,195 @@ const AdminProfileScreen = ({ navigation }) => {
   };
 
   const InfoItem = ({ icon, label, value }) => (
-    <View style={styles.infoItem}>
-      <View style={styles.infoIcon}>
-        <Ionicons name={icon} size={20} color="#4F46E5" />
+    <View style={[styles.infoItem, { borderBottomColor: colors.gray100 }]}>
+      <View style={[styles.infoIcon, { backgroundColor: colors.primary + '10' }]}>
+        <Ionicons name={icon} size={20} color={colors.primary} />
       </View>
-      <View style={styles.infoContent}>
-        <Text style={styles.infoLabel}>{label}</Text>
-        <Text style={styles.infoValue}>{value || 'Not provided'}</Text>
-      </View>
+      <div style={styles.infoContent}>
+        <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>{label}</Text>
+        <Text style={[styles.infoValue, { color: colors.textPrimary }]}>{value || 'Not provided'}</Text>
+      </div>
     </View>
   );
 
+  const ActionCard = ({ icon, label, color, onPress }) => (
+    <TouchableOpacity
+      style={[styles.actionButton, { backgroundColor: colors.cardBackground, ...shadows.small }]}
+      onPress={onPress}
+      activeOpacity={0.7}
+    >
+      <View style={[styles.actionIcon, { backgroundColor: color + '15' }]}>
+        <Ionicons name={icon} size={24} color={color} />
+      </View>
+      <Text style={[styles.actionText, { color: colors.textPrimary }]}>{label}</Text>
+      <Ionicons name="chevron-forward" size={16} color={colors.gray400} />
+    </TouchableOpacity>
+  );
+
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        {/* Personal Information */}
-        <Text style={styles.sectionTitle}>Personal Information</Text>
-        <CustomCard style={styles.card}>
-          <InfoItem 
-            icon="person-outline" 
-            label="Full Name" 
-            value={user?.name} 
-          />
-          <InfoItem 
-            icon="mail-outline" 
-            label="Email Address" 
-            value={user?.email} 
-          />
-          <InfoItem 
-            icon="call-outline" 
-            label="Phone Number" 
-            value={user?.phone} 
-          />
-          <InfoItem 
-            icon="location-outline" 
-            label="Address" 
-            value={user?.address} 
-          />
-        </CustomCard>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar style="light" translucent backgroundColor="transparent" />
 
-        {/* System Information */}
-        <Text style={styles.sectionTitle}>System Information</Text>
-        <CustomCard style={styles.card}>
-          <InfoItem 
-            icon="phone-portrait-outline" 
-            label="Platform" 
-            value={Platform.OS === 'web' ? 'Web Browser' : Platform.OS === 'ios' ? 'iOS' : 'Android'} 
-          />
-          <InfoItem 
-            icon="code-outline" 
-            label="App Version" 
-            value="1.0.0" 
-          />
-        </CustomCard>
-
-        {/* Quick Actions */}
-        <Text style={styles.sectionTitle}>Quick Actions</Text>
-        <View style={styles.actionsGrid}>
-          <TouchableOpacity 
-            style={styles.actionButton}
-            onPress={() => navigation.navigate('Finance')}
-          >
-            <Ionicons name="cash-outline" size={28} color="#10B981" />
-            <Text style={styles.actionText}>Finance & Accounts</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={styles.actionButton}
-            onPress={() => navigation.navigate('Settings')}
-          >
-            <Ionicons name="settings-outline" size={28} color="#4F46E5" />
-            <Text style={styles.actionText}>Settings</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={styles.actionButton}
-            onPress={() => navigation.navigate('HelpSupport')}
-          >
-            <Ionicons name="help-circle-outline" size={28} color="#4F46E5" />
-            <Text style={styles.actionText}>Help & Support</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={styles.actionButton}
-            onPress={() => navigation.navigate('PrivacyPolicy')}
-          >
-            <Ionicons name="shield-outline" size={28} color="#4F46E5" />
-            <Text style={styles.actionText}>Privacy Policy</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={styles.actionButton}
-            onPress={() => navigation.navigate('AboutApp')}
-          >
-            <Ionicons name="information-circle-outline" size={28} color="#4F46E5" />
-            <Text style={styles.actionText}>About App</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Logout Button */}
-        <CustomButton
-          title="Logout"
-          onPress={handleLogout}
-          loading={loggingOut}
-          variant="outline"
-          icon="log-out-outline"
-          fullWidth
-          style={styles.logoutButton}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+        style={styles.scrollView}
+      >
+        <CurvedHeader
+          title="My Profile"
+          subtitle="Manage your account & settings"
+          showProfile={false}
         />
 
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>ILM Possible Education</Text>
-          <Text style={styles.footerSubtext}>© 2025 All rights reserved</Text>
-          <Text style={styles.footerSubtext}>Developed by Muhammad Shakir</Text>
+        <View style={styles.overlapContent}>
+          {/* Profile Card Overlay */}
+          <View style={styles.profileHeaderOverlay}>
+            <View style={[styles.avatarWrapper, { borderColor: colors.cardBackground, ...shadows.medium }]}>
+              <Image
+                source={{ uri: user?.photo || 'https://ui-avatars.com/api/?name=' + (user?.name || 'Admin') + '&background=6366f1&color=fff&size=128' }}
+                style={styles.avatarImage}
+              />
+            </View>
+            <View style={styles.headerInfoText}>
+              <Text style={[styles.headerName, { color: colors.textPrimary }]}>{user?.name || 'Admin User'}</Text>
+              <View style={styles.statusRow}>
+                <View style={[styles.statusDot, { backgroundColor: colors.success }]} />
+                <Text style={[styles.headerStatus, { color: colors.textSecondary }]}>ADMINISTRATOR</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.content}>
+            <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Account Settings</Text>
+            <View style={styles.actionsList}>
+              <ActionCard
+                icon="cash-outline"
+                label="Finance & Accounts"
+                color="#10B981"
+                onPress={() => navigation.navigate('Finance')}
+              />
+              <ActionCard
+                icon="settings-outline"
+                label="Application Settings"
+                color="#4F46E5"
+                onPress={() => navigation.navigate('Settings')}
+              />
+              <ActionCard
+                icon="help-circle-outline"
+                label="Help & Support Center"
+                color="#F59E0B"
+                onPress={() => navigation.navigate('HelpSupport')}
+              />
+            </View>
+
+            {/* Personal Information */}
+            <Text style={[styles.sectionTitle, { color: colors.textPrimary, marginTop: spacing.xl }]}>Personal Information</Text>
+            <CustomCard style={styles.card}>
+              <View style={[styles.infoItem, { borderBottomColor: colors.gray100 }]}>
+                <View style={[styles.infoIcon, { backgroundColor: colors.primary + '10' }]}>
+                  <Ionicons name="person-outline" size={20} color={colors.primary} />
+                </View>
+                <View style={styles.infoContent}>
+                  <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Full Name</Text>
+                  <Text style={[styles.infoValue, { color: colors.textPrimary }]}>{user?.name}</Text>
+                </View>
+              </View>
+              <View style={[styles.infoItem, { borderBottomColor: colors.gray100 }]}>
+                <View style={[styles.infoIcon, { backgroundColor: colors.primary + '10' }]}>
+                  <Ionicons name="mail-outline" size={20} color={colors.primary} />
+                </View>
+                <View style={styles.infoContent}>
+                  <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Email Address</Text>
+                  <Text style={[styles.infoValue, { color: colors.textPrimary }]}>{user?.email}</Text>
+                </View>
+              </View>
+              <View style={[styles.infoItem, { borderBottomColor: colors.gray100 }]}>
+                <View style={[styles.infoIcon, { backgroundColor: colors.primary + '10' }]}>
+                  <Ionicons name="call-outline" size={20} color={colors.primary} />
+                </View>
+                <View style={styles.infoContent}>
+                  <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Phone Number</Text>
+                  <Text style={[styles.infoValue, { color: colors.textPrimary }]}>{user?.phone}</Text>
+                </View>
+              </View>
+              <View style={[styles.infoItem, { borderBottomWidth: 0 }]}>
+                <View style={[styles.infoIcon, { backgroundColor: colors.primary + '10' }]}>
+                  <Ionicons name="location-outline" size={20} color={colors.primary} />
+                </View>
+                <View style={styles.infoContent}>
+                  <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Office Location</Text>
+                  <Text style={[styles.infoValue, { color: colors.textPrimary }]}>{user?.address}</Text>
+                </View>
+              </View>
+            </CustomCard>
+
+            {/* Logout Button */}
+            <TouchableOpacity
+              style={[styles.logoutBtn, { backgroundColor: isDarkMode ? colors.error + '20' : colors.error + '10' }]}
+              onPress={handleLogout}
+              disabled={loggingOut}
+            >
+              <Ionicons name="log-out-outline" size={24} color={colors.error} />
+              <Text style={[styles.logoutBtnText, { color: colors.error }]}>
+                {loggingOut ? 'Signing out...' : 'Sign Out Account'}
+              </Text>
+            </TouchableOpacity>
+
+            <View style={styles.footer}>
+              <Text style={[styles.footerText, { color: colors.primary }]}>ILM Possible Education</Text>
+              <Text style={[styles.footerSubtext, { color: colors.textTertiary }]}>v1.0.0 Premium Admin Suite</Text>
+            </View>
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: '#f5f7fa' 
-  },
-  content: { 
-    padding: 16,
-    paddingTop: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1f2937',
-    marginBottom: 12,
-    marginTop: 8,
-  },
-  card: {
-    marginBottom: 20,
-  },
-  infoItem: {
+  container: { flex: 1 },
+  scrollView: { flex: 1 },
+  scrollContent: { paddingBottom: 40 },
+  overlapContent: { marginTop: -45, zIndex: 10 },
+  profileHeaderOverlay: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
-  },
-  infoIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#EEF2FF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  infoContent: {
-    flex: 1,
-  },
-  infoLabel: {
-    fontSize: 13,
-    color: '#6b7280',
-    marginBottom: 2,
-  },
-  infoValue: {
-    fontSize: 15,
-    color: '#1f2937',
-    fontWeight: '500',
-  },
-  actionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    paddingHorizontal: 24,
+    marginTop: 5,
     marginBottom: 20,
+    zIndex: 10,
   },
-  actionButton: {
-    width: '48%',
+  avatarWrapper: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    borderWidth: 4,
+    overflow: 'hidden',
     backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginRight: '2%',
-    marginBottom: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
-  actionText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#1f2937',
-    textAlign: 'center',
-    marginTop: 8,
-  },
-  logoutButton: {
-    marginTop: 8,
-    marginBottom: 32,
-  },
-  footer: {
-    alignItems: 'center',
-    paddingVertical: 24,
-    borderTopWidth: 1,
-    borderTopColor: '#e5e7eb',
-  },
-  footerText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#4F46E5',
-    marginBottom: 4,
-  },
-  footerSubtext: {
-    fontSize: 12,
-    color: '#9ca3af',
-    marginTop: 2,
-  },
+  avatarImage: { width: '100%', height: '100%' },
+  headerInfoText: { marginLeft: 16, marginTop: 40, flex: 1 },
+  headerName: { fontSize: 22, fontWeight: 'bold' },
+  statusRow: { flexDirection: 'row', alignItems: 'center', marginTop: 2 },
+  statusDot: { width: 8, height: 8, borderRadius: 4, marginRight: 6 },
+  headerStatus: { fontSize: 11, fontWeight: '700', letterSpacing: 1 },
+  content: { padding: 20 },
+  sectionTitle: { fontSize: 16, fontWeight: '700', marginBottom: 12, marginTop: 8 },
+  card: { marginBottom: 24, padding: 8 },
+  infoItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 8, borderBottomWidth: 1 },
+  infoIcon: { width: 38, height: 38, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginRight: 14 },
+  infoContent: { flex: 1 },
+  infoLabel: { fontSize: 12, fontWeight: '500', marginBottom: 2 },
+  infoValue: { fontSize: 15, fontWeight: '600' },
+  actionsList: { marginBottom: 8 },
+  actionButton: { flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 16, marginBottom: 12 },
+  actionIcon: { width: 48, height: 48, borderRadius: 14, justifyContent: 'center', alignItems: 'center', marginRight: 16 },
+  actionText: { flex: 1, fontSize: 15, fontWeight: '600' },
+  logoutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 16, borderRadius: 16, marginTop: 12, marginBottom: 20, gap: 12 },
+  logoutBtnText: { fontSize: 16, fontWeight: 'bold' },
+  footer: { alignItems: 'center', marginTop: 20, paddingBottom: 20 },
+  footerText: { fontSize: 15, fontWeight: '700', marginBottom: 6 },
+  footerSubtext: { fontSize: 11, marginTop: 2 },
 });
 
 export default AdminProfileScreen;
-
