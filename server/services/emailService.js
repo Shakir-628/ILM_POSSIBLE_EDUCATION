@@ -2,7 +2,7 @@ import nodemailer from "nodemailer";
 
 // Create reusable transporter
 const createTransporter = () => {
-  return nodemailer.createTransporter({
+  return nodemailer.createTransport({
     host: process.env.EMAIL_HOST || "smtp.gmail.com",
     port: process.env.EMAIL_PORT || 587,
     secure: false, // true for 465, false for other ports
@@ -19,9 +19,8 @@ export const sendEmail = async ({ to, subject, html, text, attachments = [] }) =
     const transporter = createTransporter();
 
     const mailOptions = {
-      from: `"${process.env.APP_NAME || 'School Management System'}" <${
-        process.env.EMAIL_USER
-      }>`,
+      from: `"${process.env.APP_NAME || 'School Management System'}" <${process.env.EMAIL_USER
+        }>`,
       to,
       subject,
       text,

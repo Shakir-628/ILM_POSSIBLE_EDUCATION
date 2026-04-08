@@ -318,8 +318,8 @@ const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
           } fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col`}
       >
         {/* Header */}
-        <div className="flex h-16 items-center justify-between px-4 bg-gray-800 lg:justify-center flex-shrink-0">
-          <span className="text-xl font-bold text-white">ILM Possible</span>
+        <div className="flex h-32 items-center justify-between px-4 bg-gray-800 lg:justify-center flex-shrink-0">
+          <img src="/logos/Logo_IP.png" alt="Logo" style={{ height: '7.5rem' }} className="w-auto" />
           <button
             onClick={toggleSidebar}
             className="text-gray-300 hover:text-white lg:hidden"

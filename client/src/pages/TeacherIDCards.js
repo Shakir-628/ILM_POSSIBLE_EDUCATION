@@ -42,11 +42,11 @@ const TeacherIDCards = () => {
     try {
       const response = await teacherService.getAllTeachers();
       console.log('Teachers response:', response); // Debug log
-      
+
       // Handle different response structures
       const teachersData = response.data || response || [];
       console.log('Teachers data:', teachersData); // Debug log
-      
+
       setTeachers(Array.isArray(teachersData) ? teachersData : []);
       setFilteredTeachers(Array.isArray(teachersData) ? teachersData : []);
     } catch (error) {
@@ -73,10 +73,10 @@ const TeacherIDCards = () => {
         const teacherId = (teacher.teacherId || '').toLowerCase();
         const email = (teacher.email || '').toLowerCase();
         const searchLower = searchTerm.toLowerCase().trim();
-        
-        return fullName.includes(searchLower) || 
-               teacherId.includes(searchLower) || 
-               email.includes(searchLower);
+
+        return fullName.includes(searchLower) ||
+          teacherId.includes(searchLower) ||
+          email.includes(searchLower);
       });
     }
 
@@ -115,10 +115,10 @@ const TeacherIDCards = () => {
 
   const handlePrintAll = () => {
     // Set all filtered teachers as selected for printing
-    const teachersToShow = selectedTeachers.length > 0 
+    const teachersToShow = selectedTeachers.length > 0
       ? filteredTeachers.filter(t => selectedTeachers.includes(t._id))
       : filteredTeachers;
-    
+
     if (teachersToShow.length === 0) {
       toast.warning('No teachers to print');
       return;
@@ -139,8 +139,8 @@ const TeacherIDCards = () => {
   };
 
   const handleDownloadAll = async () => {
-    const teachersToDownload = selectedTeachers.length > 0 
-      ? selectedTeachers 
+    const teachersToDownload = selectedTeachers.length > 0
+      ? selectedTeachers
       : filteredTeachers.map(t => t._id);
 
     if (teachersToDownload.length === 0) {
@@ -174,7 +174,7 @@ const TeacherIDCards = () => {
     }
   };
 
-  const departments = Array.isArray(teachers) 
+  const departments = Array.isArray(teachers)
     ? [...new Set(teachers.map(t => t.department).filter(Boolean))]
     : [];
 
@@ -182,13 +182,12 @@ const TeacherIDCards = () => {
   const IDCardPreview = ({ teacher, isPrint = false }) => {
     return (
       <div className={`${isPrint ? 'print-card' : ''} bg-white rounded-lg shadow-lg overflow-hidden border-2 border-gray-200`}
-           style={{ width: '320px', height: '200px' }}>
+        style={{ width: '320px', height: '200px' }}>
         {/* Card Header */}
         <div className="bg-gradient-to-r from-primary-600 to-secondary-600 text-white px-4 py-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <IdentificationIcon className="h-5 w-5" />
-              <span className="font-bold text-sm">ILM Possible</span>
+              <img src="/logos/Logo_IP.png" alt="Logo" style={{ height: '7.5rem' }} className="w-auto brightness-0 invert" />
             </div>
             <span className="text-xs font-semibold">TEACHER ID</span>
           </div>
@@ -200,8 +199,8 @@ const TeacherIDCards = () => {
           <div className="flex-shrink-0">
             <div className="w-20 h-24 bg-gray-200 rounded border-2 border-gray-300 overflow-hidden">
               {teacher.photo ? (
-                <img 
-                  src={teacher.photo} 
+                <img
+                  src={teacher.photo}
                   alt={teacher.firstName}
                   className="w-full h-full object-cover"
                 />
@@ -220,7 +219,7 @@ const TeacherIDCards = () => {
                 {teacher.firstName} {teacher.lastName}
               </h3>
               <p className="text-xs text-gray-600 mt-1">{teacher.qualification || 'Teacher'}</p>
-              
+
               <div className="mt-2 space-y-1">
                 <div className="flex items-start">
                   <span className="text-xs font-semibold text-gray-500 w-12">ID:</span>
@@ -281,8 +280,8 @@ const TeacherIDCards = () => {
               icon={PrinterIcon}
               variant="outline"
             >
-              {selectedTeachers.length > 0 
-                ? `Print Selected (${selectedTeachers.length})` 
+              {selectedTeachers.length > 0
+                ? `Print Selected (${selectedTeachers.length})`
                 : `Print All (${filteredTeachers.length})`}
             </Button>
             <Button
@@ -290,8 +289,8 @@ const TeacherIDCards = () => {
               icon={ArrowDownTrayIcon}
               variant="primary"
             >
-              {selectedTeachers.length > 0 
-                ? `Download Selected (${selectedTeachers.length})` 
+              {selectedTeachers.length > 0
+                ? `Download Selected (${selectedTeachers.length})`
                 : `Download All (${filteredTeachers.length})`}
             </Button>
           </div>
@@ -448,13 +447,12 @@ const TeacherIDCards = () => {
               {filteredTeachers.map((teacher) => {
                 const isSelected = selectedTeachers.includes(teacher._id);
                 const shouldPrint = selectedTeachers.length === 0 || isSelected;
-                
+
                 return (
-                  <div 
+                  <div
                     key={teacher._id}
-                    className={`relative print-card-container transition-all duration-200 ${
-                      isSelected ? 'ring-2 ring-primary-500 rounded-lg' : ''
-                    } ${!shouldPrint ? 'print-hide-card' : ''}`}
+                    className={`relative print-card-container transition-all duration-200 ${isSelected ? 'ring-2 ring-primary-500 rounded-lg' : ''
+                      } ${!shouldPrint ? 'print-hide-card' : ''}`}
                   >
                     {/* Selection Checkbox */}
                     <div className="absolute -top-2 -left-2 z-10 print-hide">

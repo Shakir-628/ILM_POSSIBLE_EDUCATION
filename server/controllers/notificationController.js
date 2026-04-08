@@ -1,4 +1,6 @@
 import Notification from "../models/Notification.js";
+import User from "../models/User.js";
+import Parent from "../models/Parent.js";
 import {
   createAdminNotifications,
   refreshAdminNotifications,
@@ -190,10 +192,40 @@ export const createNotification = async (req, res) => {
 // @access  Private (Admin)
 export const createBulkNotifications = async (req, res) => {
   try {
-    const { recipients, title, message, type, link } = req.body;
+    const { recipients, targetAudience, title, message, type, link } = req.body;
+
+    let finalRecipients = recipients || [];
+
+    // If targetAudience is provided, fetch user IDs based on audience
+    if (targetAudience && targetAudience !== 'custom') {
+      let query = { isActive: true };
+
+      if (targetAudience === 'students') query.role = 'student';
+      else if (targetAudience === 'teachers') query.role = 'teacher';
+      else if (targetAudience === 'staff') query.role = { $in: ['admin', 'superadmin', 'teacher'] };
+      else if (targetAudience === 'parents') {
+        const parents = await Parent.find({ isActive: true }).select('user');
+        const parentUserIds = parents.map(p => p.user);
+        query = { _id: { $in: parentUserIds } };
+      }
+      // 'all' includes everyone
+      else if (targetAudience === 'all') {
+        // No additional query param needed
+      }
+
+      const users = await User.find(query).select('_id');
+      finalRecipients = users.map(u => u._id);
+    }
+
+    if (!finalRecipients || finalRecipients.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No recipients found for the selected audience",
+      });
+    }
 
     const notifications = await createAndEmitBulkNotifications(
-      recipients,
+      finalRecipients,
       { title, message, type, link }
     );
 

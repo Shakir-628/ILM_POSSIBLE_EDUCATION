@@ -8,6 +8,18 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 dark:bg-dark-900 dark:text-white transition-colors duration-200;
+  }
+
+  /* Force dark mode for native controls like date pickers */
+  html.dark {
+    color-scheme: dark;
+  }
+}
+
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 10px;

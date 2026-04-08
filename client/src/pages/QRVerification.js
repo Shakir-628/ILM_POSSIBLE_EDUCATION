@@ -29,55 +29,55 @@ const QRVerification = () => {
     // Create a canvas for the ID card
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    
+
     // Set ID card dimensions (standard credit card size ratio)
     canvas.width = 600;
     canvas.height = 380;
-    
+
     // Background
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
+
     // Add border
     ctx.strokeStyle = '#3b82f6';
     ctx.lineWidth = 3;
     ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
-    
+
     // School Header
     ctx.fillStyle = '#1e40af';
     ctx.fillRect(10, 10, canvas.width - 20, 60);
-    
+
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 24px Arial';
     ctx.textAlign = 'center';
     ctx.fillText('ILM POSSIBLE SCHOOL', canvas.width / 2, 35);
     ctx.font = '16px Arial';
     ctx.fillText('Student Identification Card', canvas.width / 2, 55);
-    
+
     // Student Photo placeholder
     ctx.fillStyle = '#f3f4f6';
     ctx.fillRect(30, 90, 120, 150);
     ctx.strokeStyle = '#d1d5db';
     ctx.lineWidth = 1;
     ctx.strokeRect(30, 90, 120, 150);
-    
+
     ctx.fillStyle = '#6b7280';
     ctx.font = '12px Arial';
     ctx.textAlign = 'center';
     ctx.fillText('PHOTO', 90, 165);
-    
+
     // Student Information
     ctx.fillStyle = '#111827';
     ctx.font = 'bold 18px Arial';
     ctx.textAlign = 'left';
     ctx.fillText(`${studentData.firstName} ${studentData.lastName}`, 170, 110);
-    
+
     ctx.font = '14px Arial';
     ctx.fillStyle = '#374151';
     ctx.fillText(`Student ID: ${studentData.studentId}`, 170, 135);
     ctx.fillText(`Class: ${studentData.class?.className || 'N/A'}`, 170, 155);
     ctx.fillText(`Roll No: ${studentData.rollNumber || 'N/A'}`, 170, 175);
-    
+
     // Add more student details
     if (studentData.dateOfBirth) {
       ctx.fillText(`DOB: ${new Date(studentData.dateOfBirth).toLocaleDateString()}`, 170, 195);
@@ -91,13 +91,13 @@ const QRVerification = () => {
     if (studentData.email) {
       ctx.fillText(`Email: ${studentData.email}`, 170, 255);
     }
-    
+
     // QR Code Section
     ctx.fillStyle = '#111827';
     ctx.font = 'bold 14px Arial';
     ctx.textAlign = 'center';
     ctx.fillText('SCAN FOR VERIFICATION', 450, 280);
-    
+
     // Create QR code for the ID card
     const qrContainer = document.createElement('div');
     qrContainer.innerHTML = `
@@ -107,17 +107,17 @@ const QRVerification = () => {
         <text x="128" y="145" text-anchor="middle" font-size="8" fill="black">${studentData.studentId}</text>
       </svg>
     `;
-    
+
     const svgElement = qrContainer.querySelector('svg');
     const svgData = new XMLSerializer().serializeToString(svgElement);
     const img = new Image();
     const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
     const url = URL.createObjectURL(blob);
-    
-    img.onload = function() {
+
+    img.onload = function () {
       // Draw QR code placeholder
       ctx.drawImage(img, 380, 300, 140, 140);
-      
+
       // Valid Until date
       ctx.fillStyle = '#6b7280';
       ctx.font = '12px Arial';
@@ -125,7 +125,7 @@ const QRVerification = () => {
       const validDate = new Date();
       validDate.setFullYear(validDate.getFullYear() + 1);
       ctx.fillText(`Valid Until: ${validDate.toLocaleDateString()}`, 30, 350);
-      
+
       // Signature line
       ctx.strokeStyle = '#9ca3af';
       ctx.lineWidth = 1;
@@ -133,14 +133,14 @@ const QRVerification = () => {
       ctx.moveTo(400, 350);
       ctx.lineTo(570, 350);
       ctx.stroke();
-      
+
       ctx.fillStyle = '#6b7280';
       ctx.font = '10px Arial';
       ctx.textAlign = 'center';
       ctx.fillText('Principal Signature', 485, 365);
-      
+
       // Convert canvas to blob and download
-      canvas.toBlob(function(blob) {
+      canvas.toBlob(function (blob) {
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = `${studentData.studentId}_ID_Card.png`;
@@ -152,7 +152,7 @@ const QRVerification = () => {
         setIdCardGenerated(true);
       }, 'image/png');
     };
-    
+
     img.src = url;
   };
 
@@ -161,7 +161,7 @@ const QRVerification = () => {
       try {
         // Get QR data from URL parameters
         const qrData = searchParams.get('data');
-        
+
         if (!qrData) {
           setError('No QR data found');
           setVerificationStatus('error');
@@ -182,13 +182,13 @@ const QRVerification = () => {
 
         // Get student by ID
         const studentData = await studentService.getStudentById(parsedData.studentId);
-        
+
         // Verify the data matches
-        if (studentData.firstName === parsedData.name.split(' ')[0] && 
-            studentData.studentId === parsedData.studentId) {
+        if (studentData.firstName === parsedData.name.split(' ')[0] &&
+          studentData.studentId === parsedData.studentId) {
           setStudent(studentData);
           setVerificationStatus('verified');
-          
+
           // Automatically generate and download ID card
           setTimeout(() => {
             generateAndDownloadIDCard(studentData);
@@ -262,16 +262,16 @@ const QRVerification = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="min-h-screen bg-gray-50 dark:bg-dark-900 py-12 px-4 transition-colors">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">QR Code Verification</h1>
-            <p className="text-gray-600">ILM Possible School - Student Identity Verification</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">QR Code Verification</h1>
+            <p className="text-gray-600 dark:text-gray-400">ILM Possible School - Student Identity Verification</p>
           </div>
 
           {/* Verification Status */}
-          <div className="bg-white rounded-lg shadow-lg p-8 mb-6">
+          <div className="bg-white dark:bg-dark-800 rounded-lg shadow-lg p-8 mb-6 border dark:border-dark-700">
             <div className="text-center mb-6">
               {getStatusIcon()}
               <h2 className={`text-2xl font-semibold mt-4 ${getStatusColor()}`}>
@@ -280,17 +280,17 @@ const QRVerification = () => {
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
-                <p className="text-red-800">{error}</p>
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4 mb-6">
+                <p className="text-red-800 dark:text-red-200">{error}</p>
               </div>
             )}
 
             {/* ID Card Download Notification */}
             {verificationStatus === 'verified' && idCardGenerated && (
-              <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-6">
+              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md p-4 mb-6">
                 <div className="flex items-center">
-                  <DocumentArrowDownIcon className="w-5 h-5 text-green-600 mr-2" />
-                  <p className="text-green-800">ID Card has been downloaded automatically!</p>
+                  <DocumentArrowDownIcon className="w-5 h-5 text-green-600 dark:text-green-400 mr-2" />
+                  <p className="text-green-800 dark:text-green-200">ID Card has been downloaded automatically!</p>
                 </div>
               </div>
             )}
@@ -299,69 +299,69 @@ const QRVerification = () => {
             {verificationStatus === 'verified' && student && (
               <div className="space-y-6">
                 {/* Student Card */}
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-dark-700 dark:to-dark-800 rounded-lg p-6 border border-blue-200 dark:border-dark-600">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center mb-4">
-                        <IdentificationIcon className="w-8 h-8 text-blue-600 mr-3" />
-                        <h3 className="text-xl font-semibold text-gray-900">Student Information</h3>
+                        <IdentificationIcon className="w-8 h-8 text-blue-600 dark:text-blue-400 mr-3" />
+                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Student Information</h3>
                       </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-900 dark:text-gray-100">
                         <div className="flex items-center">
-                          <UserIcon className="w-5 h-5 text-gray-400 mr-2" />
-                          <span className="text-sm text-gray-600">Name:</span>
+                          <UserIcon className="w-5 h-5 text-gray-400 dark:text-gray-500 mr-2" />
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Name:</span>
                           <span className="ml-2 font-medium">{student.firstName} {student.lastName}</span>
                         </div>
-                        
+
                         <div className="flex items-center">
-                          <AcademicCapIcon className="w-5 h-5 text-gray-400 mr-2" />
-                          <span className="text-sm text-gray-600">Student ID:</span>
+                          <AcademicCapIcon className="w-5 h-5 text-gray-400 dark:text-gray-500 mr-2" />
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Student ID:</span>
                           <span className="ml-2 font-medium">{student.studentId}</span>
                         </div>
-                        
+
                         <div className="flex items-center">
-                          <AcademicCapIcon className="w-5 h-5 text-gray-400 mr-2" />
-                          <span className="text-sm text-gray-600">Class:</span>
+                          <AcademicCapIcon className="w-5 h-5 text-gray-400 dark:text-gray-500 mr-2" />
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Class:</span>
                           <span className="ml-2 font-medium">{student.class?.className || 'N/A'}</span>
                         </div>
-                        
+
                         <div className="flex items-center">
-                          <CalendarIcon className="w-5 h-5 text-gray-400 mr-2" />
-                          <span className="text-sm text-gray-600">Roll No:</span>
+                          <CalendarIcon className="w-5 h-5 text-gray-400 dark:text-gray-500 mr-2" />
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Roll No:</span>
                           <span className="ml-2 font-medium">{student.rollNumber || 'N/A'}</span>
                         </div>
-                        
+
                         {student.dateOfBirth && (
                           <div className="flex items-center">
-                            <CalendarIcon className="w-5 h-5 text-gray-400 mr-2" />
-                            <span className="text-sm text-gray-600">DOB:</span>
+                            <CalendarIcon className="w-5 h-5 text-gray-400 dark:text-gray-500 mr-2" />
+                            <span className="text-sm text-gray-600 dark:text-gray-400">DOB:</span>
                             <span className="ml-2 font-medium">
                               {new Date(student.dateOfBirth).toLocaleDateString()}
                             </span>
                           </div>
                         )}
-                        
+
                         {student.gender && (
                           <div className="flex items-center">
-                            <UserIcon className="w-5 h-5 text-gray-400 mr-2" />
-                            <span className="text-sm text-gray-600">Gender:</span>
+                            <UserIcon className="w-5 h-5 text-gray-400 dark:text-gray-500 mr-2" />
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Gender:</span>
                             <span className="ml-2 font-medium">{student.gender}</span>
                           </div>
                         )}
-                        
+
                         {student.phone && (
                           <div className="flex items-center">
-                            <PhoneIcon className="w-5 h-5 text-gray-400 mr-2" />
-                            <span className="text-sm text-gray-600">Phone:</span>
+                            <PhoneIcon className="w-5 h-5 text-gray-400 dark:text-gray-500 mr-2" />
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Phone:</span>
                             <span className="ml-2 font-medium">{student.phone}</span>
                           </div>
                         )}
-                        
+
                         {student.email && (
                           <div className="flex items-center">
-                            <EnvelopeIcon className="w-5 h-5 text-gray-400 mr-2" />
-                            <span className="text-sm text-gray-600">Email:</span>
+                            <EnvelopeIcon className="w-5 h-5 text-gray-400 dark:text-gray-500 mr-2" />
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Email:</span>
                             <span className="ml-2 font-medium">{student.email}</span>
                           </div>
                         )}
@@ -382,11 +382,11 @@ const QRVerification = () => {
                 </div>
 
                 {/* Verification Timestamp */}
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-600">
+                <div className="bg-gray-50 dark:bg-dark-900 rounded-lg p-4 text-center">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     Verified on: {new Date().toLocaleString()}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
                     This verification is valid for identity confirmation purposes only
                   </p>
                 </div>
@@ -413,7 +413,7 @@ const QRVerification = () => {
           </div>
 
           {/* Footer */}
-          <div className="text-center text-sm text-gray-500">
+          <div className="text-center text-sm text-gray-500 dark:text-gray-500">
             <p>© 2024 ILM Possible School - Student Verification System</p>
             <p className="mt-1">For official use only | Unauthorized access prohibited</p>
           </div>

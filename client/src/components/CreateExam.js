@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
+import { aiExamService } from "../services/aiExamService";
 import { subjectService } from "../services/subjectService";
 import { classService } from "../services/classService";
 import { useAuth } from "../context/AuthContext";
@@ -223,6 +224,40 @@ const CreateExam = ({ onExamCreated }) => {
     showToast("Question removed", "success");
   };
 
+  const [generatingAI, setGeneratingAI] = useState(false);
+
+  const generateAIQuestions = async () => {
+    if (!formData.title && !formData.description) {
+      showToast("Please provide an exam title or description to guide the AI", "error");
+      return;
+    }
+
+    try {
+      setGeneratingAI(true);
+      const response = await aiExamService.generateQuestions(examId || "new", {
+        topic: formData.title + " " + formData.description,
+        difficulty: "medium",
+        numberOfQuestions: 5,
+        questionType: "mcq"
+      });
+
+      if (response.success && response.data.generatedQuestions) {
+        const newQuestions = response.data.generatedQuestions.map(q => ({
+          ...q,
+          id: Math.random().toString(36).substr(2, 9),
+          options: q.options.map(opt => typeof opt === 'string' ? { optionText: opt, isCorrect: opt === q.correctAnswer } : opt)
+        }));
+        setQuestions([...questions, ...newQuestions]);
+        showToast(`AI generated ${newQuestions.length} questions!`, "success");
+      }
+    } catch (error) {
+      console.error("AI Generation Error:", error);
+      showToast("Failed to generate AI questions", "error");
+    } finally {
+      setGeneratingAI(false);
+    }
+  };
+
   const handleCreateExam = async () => {
     try {
       if (!formData.title || !formData.subject || !formData.class) {
@@ -318,8 +353,8 @@ const CreateExam = ({ onExamCreated }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded shadow-lg p-8">
-      <h1 className="text-3xl font-bold mb-8">Create AI Exam</h1>
+    <div className="max-w-4xl mx-auto bg-white dark:bg-dark-800 rounded shadow-lg p-8 border border-gray-200 dark:border-dark-700 transition-colors duration-200">
+      <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100">Create AI Exam</h1>
 
       {/* Step Indicator */}
       <div className="flex gap-4 mb-8">
@@ -344,23 +379,23 @@ const CreateExam = ({ onExamCreated }) => {
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block font-semibold mb-2">Exam Title *</label>
+              <label className="block font-semibold mb-2 text-gray-700 dark:text-gray-300">Exam Title *</label>
               <input
                 type="text"
                 name="title"
                 value={formData.title}
                 onChange={handleFormChange}
                 placeholder="e.g., Mathematics Final Exam"
-                className="w-full p-3 border rounded"
+                className="w-full p-3 border rounded bg-white dark:bg-dark-700 text-gray-900 dark:text-white border-gray-300 dark:border-dark-600 focus:ring-2 focus:ring-primary-500"
               />
             </div>
             <div>
-              <label className="block font-semibold mb-2">Exam Type *</label>
+              <label className="block font-semibold mb-2 text-gray-700 dark:text-gray-300">Exam Type *</label>
               <select
                 name="examType"
                 value={formData.examType}
                 onChange={handleFormChange}
-                className="w-full p-3 border rounded"
+                className="w-full p-3 border rounded bg-white dark:bg-dark-700 text-gray-900 dark:text-white border-gray-300 dark:border-dark-600"
               >
                 <option value="quiz">Quiz</option>
                 <option value="test">Test</option>
@@ -388,13 +423,13 @@ const CreateExam = ({ onExamCreated }) => {
           </div>
 
           <div>
-            <label className="block font-semibold mb-2">Description</label>
+            <label className="block font-semibold mb-2 text-gray-700 dark:text-gray-300">Description</label>
             <textarea
               name="description"
               value={formData.description}
               onChange={handleFormChange}
               placeholder="Exam description..."
-              className="w-full p-3 border rounded"
+              className="w-full p-3 border rounded bg-white dark:bg-dark-700 text-gray-900 dark:text-white border-gray-300 dark:border-dark-600"
               rows="3"
             />
           </div>
@@ -532,8 +567,21 @@ const CreateExam = ({ onExamCreated }) => {
       {step === 2 && (
         <div className="space-y-6">
           {/* Add Question Form */}
-          <div className="border p-6 rounded bg-gray-50">
-            <h3 className="text-lg font-bold mb-4">Add Question</h3>
+          <div className="border p-6 rounded bg-gray-50 dark:bg-dark-750 border-gray-200 dark:border-dark-600">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold">Add Question</h3>
+              <button
+                type="button"
+                onClick={generateAIQuestions}
+                disabled={generatingAI}
+                className="flex items-center text-sm bg-indigo-50 text-indigo-700 px-4 py-2 rounded-lg border border-indigo-200 hover:bg-indigo-100 transition-colors shadow-sm"
+              >
+                <span className={`mr-2 h-4 w-4 ${generatingAI ? 'animate-spin border-2 border-indigo-700 border-t-transparent rounded-full' : '✨'}`}>
+                  {!generatingAI && ''}
+                </span>
+                {generatingAI ? 'AI generating...' : 'Generate Questions with AI'}
+              </button>
+            </div>
 
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>

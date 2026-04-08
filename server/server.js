@@ -15,6 +15,7 @@ import { initializeSocket } from "./config/socket.js";
 import authRoutes from "./routes/authRoutes.js";
 import studentRoutes from "./routes/studentRoutes.js";
 import teacherRoutes from "./routes/teacherRoutes.js";
+import communicationRoutes from "./routes/communicationRoutes.js";
 import classRoutes from "./routes/classRoutes.js";
 import subjectRoutes from "./routes/subjectRoutes.js";
 import attendanceRoutes from "./routes/attendanceRoutes.js";
@@ -50,6 +51,7 @@ import transportRoutes from "./routes/transport.js";
 import hostelRoutes from "./routes/hostel.js";
 import superadminRoutes from "./routes/superadminRoutes.js";
 import aiExamRoutes from "./routes/aiExamRoutes.js";
+import aiRoutes from "./routes/aiRoutes.js";
 import ePortfolioRoutes from "./routes/ePortfolioRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -99,6 +101,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/superadmins", superadminRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/teachers", teacherRoutes);
+app.use("/api/communication", communicationRoutes);
 app.use("/api/classes", classRoutes);
 app.use("/api/subjects", subjectRoutes);
 app.use("/api/attendance", attendanceRoutes);
@@ -133,6 +136,7 @@ app.use("/api/library", libraryRoutes);
 app.use("/api/transport", transportRoutes);
 app.use("/api/hostel", hostelRoutes);
 app.use("/api/ai-exams", aiExamRoutes);
+app.use("/api/ai", aiRoutes);
 app.use("/api/e-portfolio", ePortfolioRoutes);
 
 // Error handler middleware (must be last)

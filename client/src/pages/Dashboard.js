@@ -8,6 +8,7 @@ import {
   UserGroupIcon,
   BookOpenIcon,
   ChartBarIcon,
+  SparklesIcon,
 } from '@heroicons/react/24/outline';
 import { studentService } from '../services/studentService';
 import { teacherService } from '../services/teacherService';
@@ -65,11 +66,11 @@ const Dashboard = () => {
       ) : (
         <div className="space-y-6">
           {/* Welcome Section */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h1 className="text-2xl font-bold text-gray-900 ">
+          <div className="bg-white dark:bg-dark-800 shadow rounded-lg p-6">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               Welcome back, {user?.name}! 👋
             </h1>
-            <p className="mt-1 text-sm text-gray-500 animate-fade-in-up">
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 animate-fade-in-up">
               {isAdmin && 'Admin Dashboard - Manage your institution'}
               {isTeacher && 'Teacher Dashboard - Manage your classes and students'}
               {isStudent && 'Student Dashboard - View your academic progress'}
@@ -106,6 +107,14 @@ const Dashboard = () => {
                 icon={ChartBarIcon}
                 color="yellow"
                 subtitle="This month"
+              />
+              <Card
+                title="AI Growth Insight"
+                value="+12%"
+                icon={SparklesIcon}
+                color="indigo"
+                subtitle="Student engagement is up"
+                className="ring-2 ring-primary-500/20"
               />
             </div>
           )}

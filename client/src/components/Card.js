@@ -37,7 +37,7 @@ const Card = ({ title, value, icon: Icon, color = 'blue', subtitle, className = 
   const colorClass = colorClasses[color] || colorClasses.blue;
 
   return (
-    <div className={`bg-white overflow-hidden rounded-2xl border border-gray-100 transition-all duration-300 hover:shadow-large hover:-translate-y-1 hover:scale-[1.02] animate-fade-in-up group ${className}`}>
+    <div className={`bg-white dark:bg-dark-800 overflow-hidden rounded-2xl border border-gray-100 dark:border-dark-700 transition-all duration-300 hover:shadow-large hover:-translate-y-1 hover:scale-[1.02] animate-fade-in-up group ${className}`}>
       <div className="p-6">
         <div className="flex items-center">
           <div className="flex-shrink-0">
@@ -47,12 +47,12 @@ const Card = ({ title, value, icon: Icon, color = 'blue', subtitle, className = 
           </div>
           <div className="ml-6 w-0 flex-1">
             <dl>
-              <dt className="text-sm font-semibold text-gray-500 truncate uppercase tracking-wide">{title}</dt>
+              <dt className="text-sm font-semibold text-gray-500 dark:text-gray-400 truncate uppercase tracking-wide">{title}</dt>
               <dd className="flex items-baseline mt-1">
-                <div className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent transition-all duration-300">{value}</div>
+                <div className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent transition-all duration-300">{value}</div>
               </dd>
               {subtitle && (
-                <dd className="text-sm text-gray-600 mt-1.5 font-medium">{subtitle}</dd>
+                <dd className="text-sm text-gray-600 dark:text-gray-400 mt-1.5 font-medium">{subtitle}</dd>
               )}
             </dl>
           </div>
