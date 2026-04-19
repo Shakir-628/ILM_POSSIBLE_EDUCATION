@@ -97,6 +97,20 @@ const RolePermissions = () => {
     setSelectedRole(updatedRole);
   };
 
+  const handlePermissionToggle = (moduleIndex, permissionType, enabled) => {
+    const updatedRole = { ...selectedRole };
+    if (!updatedRole.modules[moduleIndex].permissions) {
+      updatedRole.modules[moduleIndex].permissions = {
+        create: false,
+        read: true,
+        update: false,
+        delete: false
+      };
+    }
+    updatedRole.modules[moduleIndex].permissions[permissionType] = enabled;
+    setSelectedRole(updatedRole);
+  };
+
   const handleMatrixModuleToggle = (roleIndex, moduleName, enabled) => {
     const updatedPermissions = [...rolePermissions];
     const role = updatedPermissions[roleIndex];
@@ -335,7 +349,7 @@ const RolePermissions = () => {
                           }`}
                       >
                         {/* Module Header */}
-                        <div className="flex items-center justify-between mb-3">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
                           <div className="flex items-center space-x-3">
                             <button
                               onClick={() => handleModuleToggle(moduleIndex, !module.enabled)}
@@ -358,6 +372,28 @@ const RolePermissions = () => {
                                 <span className="text-xs text-gray-500 font-medium">Disabled</span>
                               )}
                             </div>
+                          </div>
+                          
+                          {/* CRUD Permissions */}
+                          <div className="flex items-center gap-6 bg-white px-4 py-2 rounded-lg border border-gray-100 shadow-sm">
+                            {(['create', 'read', 'update', 'delete']).map((perm) => (
+                              <label key={perm} className="flex items-center space-x-2 cursor-pointer group">
+                                <input
+                                  type="checkbox"
+                                  checked={module.permissions ? !!module.permissions[perm] : perm === 'read'}
+                                  disabled={selectedRole.role === 'superadmin'}
+                                  onChange={(e) => handlePermissionToggle(moduleIndex, perm, e.target.checked)}
+                                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded cursor-pointer group-hover:scale-110 transition-transform disabled:opacity-50"
+                                />
+                                <span className={`text-xs font-bold uppercase tracking-wider ${
+                                  (module.permissions ? !!module.permissions[perm] : perm === 'read') 
+                                    ? 'text-primary-700' 
+                                    : 'text-gray-400'
+                                }`}>
+                                  {perm}
+                                </span>
+                              </label>
+                            ))}
                           </div>
                         </div>
 

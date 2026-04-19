@@ -9,6 +9,7 @@ import {
   BookOpenIcon,
   ChartBarIcon,
   SparklesIcon,
+  CalendarIcon,
 } from '@heroicons/react/24/outline';
 import { studentService } from '../services/studentService';
 import { teacherService } from '../services/teacherService';
@@ -202,10 +203,11 @@ const Dashboard = () => {
                     Enter Grades
                   </button>
                   <button
-                    onClick={() => navigate('/reports')}
-                    className="flex items-center justify-center px-4 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 hover:shadow-md hover:scale-105 hover:border-red-300"
+                    onClick={() => navigate('/teacher-schedule')}
+                    className="flex items-center justify-center px-4 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 hover:shadow-md hover:scale-105 hover:border-blue-300"
                   >
-                    View Reports
+                    <CalendarIcon className="h-5 w-5 mr-2 transition-transform duration-200 hover:rotate-12" />
+                    View Class Schedule
                   </button>
                 </>
               )}

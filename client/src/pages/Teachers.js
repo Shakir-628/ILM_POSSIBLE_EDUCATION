@@ -10,11 +10,13 @@ import Pagination from '../components/Pagination';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { teacherService } from '../services/teacherService';
 import { useToast } from '../context/ToastContext';
+import { usePermissions } from '../context/PermissionContext';
 import { useTableData } from '../hooks/useTableData';
 import { validationPatterns, validationMessages } from '../utils/validation';
 
 const Teachers = () => {
   const toast = useToast();
+  const { canCreate, canUpdate, canDelete } = usePermissions();
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -218,9 +220,11 @@ const Teachers = () => {
               Manage teacher records and assignments
             </p>
           </div>
-          <Button icon={PlusIcon} onClick={openModal}>
-            Add Teacher
-          </Button>
+          {canCreate('Teachers') && (
+            <Button icon={PlusIcon} onClick={openModal}>
+              Add Teacher
+            </Button>
+          )}
         </div>
 
         {/* Search and Filter */}
@@ -266,8 +270,8 @@ const Teachers = () => {
           <Table
             columns={columns}
             data={paginatedData}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
+            onEdit={canUpdate('Teachers') ? handleEdit : null}
+            onDelete={canDelete('Teachers') ? handleDelete : null}
             loading={loading}
           />
           

@@ -16,6 +16,12 @@ const modulePermissionSchema = new mongoose.Schema({
       default: true,
     },
   }],
+  permissions: {
+    create: { type: Boolean, default: false },
+    read: { type: Boolean, default: true },
+    update: { type: Boolean, default: false },
+    delete: { type: Boolean, default: false },
+  },
 });
 
 const rolePermissionSchema = new mongoose.Schema(
@@ -24,7 +30,7 @@ const rolePermissionSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true, // This already creates an index
-      enum: ['superadmin', 'admin', 'teacher', 'student', 'parent'],
+      enum: ['superadmin', 'admin', 'subadmin', 'teacher', 'student', 'parent'],
     },
     displayName: {
       type: String,

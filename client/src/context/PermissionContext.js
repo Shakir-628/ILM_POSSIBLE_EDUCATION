@@ -42,7 +42,8 @@ export const PermissionProvider = ({ children }) => {
   };
 
   const hasSubmodulePermission = (moduleName, submoduleName) => {
-    if (!permissions || !permissions.modules) return true; // Default to true if no permissions set
+    if (user?.role === 'superadmin') return true;
+    if (!permissions || !permissions.modules) return true;
     const module = permissions.modules.find(m => m.moduleName === moduleName);
     if (!module || !module.enabled) return false;
 
@@ -52,11 +53,30 @@ export const PermissionProvider = ({ children }) => {
     return submodule ? submodule.enabled : false;
   };
 
+  const checkCRUD = (moduleName, operation) => {
+    if (user?.role === 'superadmin') return true;
+    if (!permissions || !permissions.modules) return true;
+
+    const module = permissions.modules.find(m => m.moduleName === moduleName);
+    if (!module || !module.enabled) return false;
+
+    return module.permissions ? !!module.permissions[operation] : true;
+  };
+
+  const canCreate = (moduleName) => checkCRUD(moduleName, 'create');
+  const canRead = (moduleName) => checkCRUD(moduleName, 'read');
+  const canUpdate = (moduleName) => checkCRUD(moduleName, 'update');
+  const canDelete = (moduleName) => checkCRUD(moduleName, 'delete');
+
   const value = {
     permissions,
     loading,
     hasModulePermission,
     hasSubmodulePermission,
+    canCreate,
+    canRead,
+    canUpdate,
+    canDelete,
     refreshPermissions: fetchPermissions,
   };
 

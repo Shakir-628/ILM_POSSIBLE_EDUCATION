@@ -10,6 +10,7 @@ import {
   getBackups,
   getSystemSettings,
   updateSystemSettings,
+  createUser,
 } from "../controllers/settingsController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { authorize } from "../middleware/roleMiddleware.js";
@@ -29,6 +30,7 @@ router.put(
 
 // User Roles
 router.get("/user-roles", protect, authorize("admin"), getUserRoles);
+router.post("/user-roles", protect, authorize("admin"), auditLog("Settings"), createUser);
 router.put(
   "/user-roles/:userId",
   protect,

@@ -28,6 +28,11 @@ export const settingsService = {
     return response.data;
   },
 
+  createUser: async (userData) => {
+    const response = await api.post('/settings/user-roles', userData);
+    return response.data;
+  },
+
   // System
   getSystemStats: async () => {
     const response = await api.get('/settings/system-stats');

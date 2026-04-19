@@ -12,8 +12,17 @@ const UserRoles = () => {
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [newRole, setNewRole] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'student',
+    phone: '',
+    address: ''
+  });
 
   useEffect(() => {
     fetchRoles();
@@ -62,17 +71,43 @@ const UserRoles = () => {
     }
   };
 
+  const handleSubmitCreateUser = async (e) => {
+    e.preventDefault();
+    try {
+      await settingsService.createUser(formData);
+      toast.success('User created successfully');
+      setIsCreateModalOpen(false);
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        role: 'student',
+        phone: '',
+        address: ''
+      });
+      fetchRoles();
+    } catch (error) {
+      console.error('Error creating user:', error);
+      toast.error(error.response?.data?.message || 'Error creating user');
+    }
+  };
+
   const totalUsers = roles.reduce((sum, role) => sum + role.count, 0);
 
   return (
     <Layout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">User Roles Management</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Manage user roles and permissions
-          </p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">User Roles Management</h1>
+            <p className="mt-1 text-sm text-gray-500">
+              Manage user roles and permissions
+            </p>
+          </div>
+          <Button onClick={() => setIsCreateModalOpen(true)}>
+            Create New User
+          </Button>
         </div>
 
         {/* Statistics */}
@@ -131,11 +166,10 @@ const UserRoles = () => {
                           {user.email}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            user.isActive !== false
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.isActive !== false
                               ? 'bg-green-100 text-green-800'
                               : 'bg-red-100 text-red-800'
-                          }`}>
+                            }`}>
                             {user.isActive !== false ? 'Active' : 'Inactive'}
                           </span>
                         </td>
@@ -203,6 +237,89 @@ const UserRoles = () => {
               </div>
             </form>
           )}
+        </Modal>
+
+        {/* Create User Modal */}
+        <Modal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          title="Create New User"
+        >
+          <form onSubmit={handleSubmitCreateUser} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">Full Name</label>
+                <input
+                  type="text"
+                  required
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Email</label>
+                <input
+                  type="email"
+                  required
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Password</label>
+                <input
+                  type="password"
+                  required
+                  minLength={6}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                />
+              </div>
+              <div>
+                <Select
+                  label="Role"
+                  value={formData.role}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  options={[
+                    { value: 'admin', label: 'Admin' },
+                    { value: 'subadmin', label: 'Sub Admin' },
+                    { value: 'teacher', label: 'Teacher' },
+                    { value: 'student', label: 'Student' },
+                    { value: 'parent', label: 'Parent' },
+                  ]}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Phone</label>
+                <input
+                  type="text"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">Address</label>
+                <textarea
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  rows={2}
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 pt-4">
+              <Button variant="secondary" onClick={() => setIsCreateModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Create User</Button>
+            </div>
+          </form>
         </Modal>
       </div>
     </Layout>
