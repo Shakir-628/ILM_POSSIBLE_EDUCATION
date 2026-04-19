@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import {
   CheckCircleIcon,
   XCircleIcon,
@@ -35,12 +35,13 @@ export const ToastProvider = ({ children }) => {
     }
   }, [removeToast]);
 
-  const toast = {
+  const toast = useMemo(() => ({
     success: (message, duration) => addToast(message, 'success', duration),
     error: (message, duration) => addToast(message, 'error', duration),
     warning: (message, duration) => addToast(message, 'warning', duration),
     info: (message, duration) => addToast(message, 'info', duration),
-  };
+    addToast: addToast,
+  }), [addToast]);
 
   return (
     <ToastContext.Provider value={toast}>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Layout from '../components/Layout';
 import Button from '../components/Button';
 import { BellIcon, CheckIcon } from '@heroicons/react/24/outline';
@@ -11,11 +11,7 @@ const Notifications = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // 'all', 'unread', 'read'
 
-  useEffect(() => {
-    fetchNotifications();
-  }, [filter]);
-
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     setLoading(true);
     try {
       const params = filter !== 'all' ? { read: filter === 'read' } : {};
@@ -27,7 +23,11 @@ const Notifications = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter, toast]);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
 
   const handleMarkAsRead = async (id) => {
     try {
@@ -79,11 +79,10 @@ const Notifications = () => {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-md text-sm font-medium ${
-                filter === f
+              className={`px-4 py-2 rounded-md text-sm font-medium ${filter === f
                   ? 'bg-primary-600 text-white'
                   : 'bg-white text-gray-700 border hover:bg-gray-50'
-              }`}
+                }`}
             >
               {f.charAt(0).toUpperCase() + f.slice(1)}
             </button>

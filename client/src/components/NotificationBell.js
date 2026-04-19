@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, useEffect, useCallback, Fragment } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import { BellIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { useToast } from '../context/ToastContext';
@@ -12,6 +12,27 @@ const NotificationBell = () => {
   const [loading, setLoading] = useState(false);
   const { addToast } = useToast();
   const { user, token } = useAuth();
+
+  const fetchUnreadCount = useCallback(async () => {
+    try {
+      const response = await notificationService.getUnreadCount();
+      setUnreadCount(response.count || 0);
+    } catch (error) {
+      console.error('Error fetching unread count:', error);
+    }
+  }, []);
+
+  const fetchNotifications = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await notificationService.getNotifications({ limit: 10 });
+      setNotifications(response.data || []);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   // Initialize Socket.IO connection
   useEffect(() => {
@@ -57,7 +78,7 @@ const NotificationBell = () => {
     return () => {
       newSocket.disconnect();
     };
-  }, [user, token, addToast, fetchNotifications]); // Added fetchNotifications to deps if customized, otherwise rely on useCallback or omit if stable outside.
+  }, [user, token, addToast, fetchNotifications]);
 
 
 
@@ -67,28 +88,9 @@ const NotificationBell = () => {
       fetchUnreadCount();
       fetchNotifications();
     }
-  }, [user]);
+  }, [user, fetchUnreadCount, fetchNotifications]);
 
-  const fetchUnreadCount = async () => {
-    try {
-      const response = await notificationService.getUnreadCount();
-      setUnreadCount(response.count || 0);
-    } catch (error) {
-      console.error('Error fetching unread count:', error);
-    }
-  };
 
-  const fetchNotifications = async () => {
-    try {
-      setLoading(true);
-      const response = await notificationService.getNotifications({ limit: 10 });
-      setNotifications(response.data || []);
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleMarkAsRead = async (notificationId, event) => {
     event.stopPropagation();
