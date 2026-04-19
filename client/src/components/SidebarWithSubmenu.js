@@ -86,6 +86,7 @@ const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
       roles: ['admin'],
       submenu: [
         { name: 'All Teachers', href: '/teachers', roles: ['admin'] },
+        { name: 'Staff Attendance', href: '/teacher-attendance', roles: ['admin'] },
         { name: 'Performance Review', href: '/teacher-performance', roles: ['admin'] },
         { name: 'Payroll', href: '/teacher-payroll', roles: ['admin'] },
         { name: 'ID Cards', href: '/teacher-id-cards', roles: ['admin'] },

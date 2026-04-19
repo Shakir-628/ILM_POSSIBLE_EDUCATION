@@ -46,6 +46,7 @@ import AuditLogs from './pages/AuditLogs';
 import Announcements from './pages/Announcements';
 import Messages from './pages/Messages';
 import Notifications from './pages/Notifications';
+import TeacherAttendance from './pages/TeacherAttendance';
 
 import BulkCommunication from './pages/BulkCommunication';
 import Assets from './pages/Assets';
@@ -139,6 +140,14 @@ function App() {
                 element={
                   <PrivateRoute roles={['admin']}>
                     <TeacherIDCards />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/teacher-attendance"
+                element={
+                  <PrivateRoute roles={['admin']}>
+                    <TeacherAttendance />
                   </PrivateRoute>
                 }
               />
