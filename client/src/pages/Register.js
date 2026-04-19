@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { 
-  AcademicCapIcon, 
-  EnvelopeIcon, 
+import {
+  AcademicCapIcon,
+  EnvelopeIcon,
   LockClosedIcon,
   EyeIcon,
   EyeSlashIcon,
@@ -63,13 +63,13 @@ const Register = () => {
       hasNumber: /\d/.test(password),
       hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(password),
     };
-    
+
     setPasswordChecks(checks);
-    
+
     // Calculate strength (0-5)
     const strength = Object.values(checks).filter(Boolean).length;
     setPasswordStrength(strength);
-    
+
     return Object.values(checks).every(Boolean);
   };
 
@@ -91,7 +91,7 @@ const Register = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     setFormData({
       ...formData,
       [name]: value,
@@ -158,13 +158,13 @@ const Register = () => {
 
     const { confirmPassword, ...registerData } = formData;
     const result = await register(registerData);
-    
+
     if (result.success) {
       navigate('/dashboard');
     } else {
       setError(result.error || 'Registration failed. Please try again.');
     }
-    
+
     setLoading(false);
   };
 
@@ -194,13 +194,11 @@ const Register = () => {
 
       <div className="relative z-10">
         {/* Header */}
-        <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
           <div className="flex justify-center">
-            <div className="bg-white p-4 rounded-full shadow-lg transform hover:scale-110 transition-all duration-300">
-              <AcademicCapIcon className="h-12 w-12 text-primary-600" />
-            </div>
+            <img src="/logos/Logo_IP.png" alt="Logo" style={{ height: '7.5rem' }} className="w-auto drop-shadow-2xl" />
           </div>
-          <h2 className="mt-6 text-center text-4xl font-extrabold text-white drop-shadow-lg">
+          <h2 className="hidden text-center text-4xl font-extrabold text-white drop-shadow-lg">
             Join ILM Possible
           </h2>
           <p className="mt-2 text-center text-lg text-white drop-shadow-md">
@@ -213,12 +211,12 @@ const Register = () => {
 
         {/* Register Form */}
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-white py-8 px-4 shadow-2xl sm:rounded-2xl sm:px-10 border border-gray-100 animate-fade-in">
+          <div className="bg-white dark:bg-dark-800 py-8 px-4 shadow-2xl sm:rounded-2xl sm:px-10 border border-gray-100 dark:border-dark-700 animate-fade-in text-gray-900 dark:text-white">
             {error && (
-              <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg animate-fade-in">
+              <div className="mb-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded-r-lg animate-fade-in">
                 <div className="flex items-center">
                   <XCircleIcon className="h-5 w-5 text-red-500 mr-2 flex-shrink-0" />
-                  <p className="text-sm text-red-700 font-medium">{error}</p>
+                  <p className="text-sm text-red-700 dark:text-red-200 font-medium">{error}</p>
                 </div>
               </div>
             )}
@@ -226,7 +224,7 @@ const Register = () => {
             <form className="space-y-5" onSubmit={handleSubmit}>
               {/* Full Name */}
               <div>
-                <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="name" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                   Full Name <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -241,7 +239,7 @@ const Register = () => {
                     value={formData.name}
                     onChange={handleChange}
                     onBlur={() => handleBlur('name')}
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 text-sm"
+                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-dark-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 text-sm bg-white dark:bg-dark-700 text-gray-900 dark:text-white"
                     placeholder="John Doe"
                   />
                 </div>
@@ -249,7 +247,7 @@ const Register = () => {
 
               {/* Email */}
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                   Email Address <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -264,13 +262,12 @@ const Register = () => {
                     value={formData.email}
                     onChange={handleChange}
                     onBlur={() => handleBlur('email')}
-                    className={`block w-full pl-10 pr-10 py-3 border ${
-                      touched.email
-                        ? emailValid
-                          ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
-                          : 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                        : 'border-gray-300 focus:ring-primary-500 focus:border-primary-500'
-                    } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none transition-all duration-200 text-sm`}
+                    className={`block w-full pl-10 pr-10 py-3 border ${touched.email
+                      ? emailValid
+                        ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
+                        : 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                      : 'border-gray-300 dark:border-dark-600 focus:ring-primary-500 focus:border-primary-500'
+                      } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none transition-all duration-200 text-sm bg-white dark:bg-dark-700 text-gray-900 dark:text-white`}
                     placeholder="you@example.com"
                   />
                   {touched.email && emailValid !== null && (
@@ -284,7 +281,7 @@ const Register = () => {
                   )}
                 </div>
                 {touched.email && !emailValid && (
-                  <p className="mt-1 text-xs text-red-600 animate-fade-in">
+                  <p className="mt-1 text-xs text-red-600 animate-fade-in dark:text-red-400">
                     Please enter a valid email address
                   </p>
                 )}
@@ -292,7 +289,7 @@ const Register = () => {
 
               {/* Phone */}
               <div>
-                <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                   Phone Number
                 </label>
                 <div className="relative">
@@ -306,7 +303,7 @@ const Register = () => {
                     value={formData.phone}
                     onChange={handleChange}
                     onBlur={() => handleBlur('phone')}
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 text-sm"
+                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-dark-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 text-sm bg-white dark:bg-dark-700 text-gray-900 dark:text-white"
                     placeholder="+92 300 1234567"
                   />
                 </div>
@@ -314,7 +311,7 @@ const Register = () => {
 
               {/* Role */}
               <div>
-                <label htmlFor="role" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="role" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                   Role <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -326,18 +323,18 @@ const Register = () => {
                     name="role"
                     value={formData.role}
                     onChange={handleChange}
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 text-sm bg-white"
+                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-dark-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 text-sm bg-white dark:bg-dark-700 text-gray-900 dark:text-white"
                   >
-                    <option value="student">Student</option>
-                    <option value="teacher">Teacher</option>
-                    <option value="parent">Parent</option>
+                    <option value="student" className="dark:bg-dark-800">Student</option>
+                    <option value="teacher" className="dark:bg-dark-800">Teacher</option>
+                    <option value="parent" className="dark:bg-dark-800">Parent</option>
                   </select>
                 </div>
               </div>
 
               {/* Password */}
               <div>
-                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                   Password <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -352,13 +349,13 @@ const Register = () => {
                     value={formData.password}
                     onChange={handleChange}
                     onBlur={() => handleBlur('password')}
-                    className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 text-sm"
+                    className="block w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-dark-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 text-sm bg-white dark:bg-dark-700 text-gray-900 dark:text-white"
                     placeholder="Create a strong password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
                   >
                     {showPassword ? (
                       <EyeSlashIcon className="h-5 w-5" />
@@ -372,17 +369,16 @@ const Register = () => {
                 {touched.password && formData.password && (
                   <div className="mt-2 animate-fade-in">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-medium text-gray-600">Password Strength:</span>
-                      <span className={`text-xs font-semibold ${
-                        passwordStrength <= 2 ? 'text-red-600' :
+                      <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Password Strength:</span>
+                      <span className={`text-xs font-semibold ${passwordStrength <= 2 ? 'text-red-600' :
                         passwordStrength === 3 ? 'text-yellow-600' :
-                        passwordStrength === 4 ? 'text-blue-600' :
-                        'text-green-600'
-                      }`}>
+                          passwordStrength === 4 ? 'text-blue-600' :
+                            'text-green-600'
+                        }`}>
                         {getStrengthText()}
                       </span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                    <div className="w-full bg-gray-200 dark:bg-dark-600 rounded-full h-2 overflow-hidden">
                       <div
                         className={`h-2 rounded-full transition-all duration-300 ${getStrengthColor()}`}
                         style={{ width: `${(passwordStrength / 5) * 100}%` }}
@@ -394,7 +390,7 @@ const Register = () => {
                 {/* Password Requirements */}
                 {touched.password && formData.password && (
                   <div className="mt-3 space-y-1 animate-fade-in">
-                    <p className="text-xs font-medium text-gray-600 mb-2">Password must contain:</p>
+                    <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Password must contain:</p>
                     <div className="space-y-1">
                       {[
                         { key: 'minLength', label: 'At least 8 characters' },
@@ -407,9 +403,9 @@ const Register = () => {
                           {passwordChecks[key] ? (
                             <CheckCircleIcon className="h-4 w-4 text-green-500 flex-shrink-0" />
                           ) : (
-                            <XCircleIcon className="h-4 w-4 text-gray-300 flex-shrink-0" />
+                            <XCircleIcon className="h-4 w-4 text-gray-300 dark:text-gray-600 flex-shrink-0" />
                           )}
-                          <span className={`text-xs ${passwordChecks[key] ? 'text-green-600' : 'text-gray-500'}`}>
+                          <span className={`text-xs ${passwordChecks[key] ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
                             {label}
                           </span>
                         </div>
@@ -421,7 +417,7 @@ const Register = () => {
 
               {/* Confirm Password */}
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                   Confirm Password <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -436,19 +432,18 @@ const Register = () => {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     onBlur={() => handleBlur('confirmPassword')}
-                    className={`block w-full pl-10 pr-10 py-3 border ${
-                      touched.confirmPassword && passwordsMatch !== null
-                        ? passwordsMatch
-                          ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
-                          : 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                        : 'border-gray-300 focus:ring-primary-500 focus:border-primary-500'
-                    } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none transition-all duration-200 text-sm`}
+                    className={`block w-full pl-10 pr-10 py-3 border ${touched.confirmPassword && passwordsMatch !== null
+                      ? passwordsMatch
+                        ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
+                        : 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                      : 'border-gray-300 dark:border-dark-600 focus:ring-primary-500 focus:border-primary-500'
+                      } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none transition-all duration-200 text-sm bg-white dark:bg-dark-700 text-gray-900 dark:text-white`}
                     placeholder="Re-enter your password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
                   >
                     {showConfirmPassword ? (
                       <EyeSlashIcon className="h-5 w-5" />
@@ -467,7 +462,7 @@ const Register = () => {
                   )}
                 </div>
                 {touched.confirmPassword && !passwordsMatch && formData.confirmPassword && (
-                  <p className="mt-1 text-xs text-red-600 animate-fade-in">
+                  <p className="mt-1 text-xs text-red-600 animate-fade-in dark:text-red-400">
                     Passwords do not match
                   </p>
                 )}

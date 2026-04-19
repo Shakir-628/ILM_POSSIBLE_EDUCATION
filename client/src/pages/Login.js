@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { 
-  AcademicCapIcon, 
-  EnvelopeIcon, 
+import {
+  AcademicCapIcon,
+  EnvelopeIcon,
   LockClosedIcon,
   EyeIcon,
   EyeSlashIcon,
@@ -38,7 +38,7 @@ const Login = () => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     const newValue = type === 'checkbox' ? checked : value;
-    
+
     setFormData({
       ...formData,
       [name]: newValue,
@@ -80,7 +80,7 @@ const Login = () => {
 
     try {
       const result = await login(formData.email, formData.password);
-      
+
       if (result.success) {
         navigate('/dashboard');
       } else {
@@ -104,13 +104,11 @@ const Login = () => {
 
       <div className="relative z-10">
         {/* Header */}
-        <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
           <div className="flex justify-center">
-            <div className="bg-white p-4 rounded-full shadow-lg transform hover:scale-110 transition-all duration-300">
-              <AcademicCapIcon className="h-12 w-12 text-primary-600" />
-            </div>
+            <img src="/logos/Logo_IP.png" alt="Logo" style={{ height: '7.5rem' }} className="w-auto drop-shadow-2xl" />
           </div>
-          <h2 className="mt-6 text-center text-4xl font-extrabold text-white drop-shadow-lg">
+          <h2 className="hidden text-center text-4xl font-extrabold text-white drop-shadow-lg">
             ILM Possible
           </h2>
           <p className="mt-2 text-center text-lg text-white drop-shadow-md">
@@ -123,12 +121,12 @@ const Login = () => {
 
         {/* Login Form */}
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-white py-8 px-4 shadow-2xl sm:rounded-2xl sm:px-10 border border-gray-100 animate-fade-in">
+          <div className="bg-white dark:bg-dark-800 py-8 px-4 shadow-2xl sm:rounded-2xl sm:px-10 border border-gray-100 dark:border-dark-700 animate-fade-in">
             {error && (
-              <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg animate-fade-in">
+              <div className="mb-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded-r-lg animate-fade-in">
                 <div className="flex items-center">
                   <XCircleIcon className="h-5 w-5 text-red-500 mr-2" />
-                  <p className="text-sm text-red-700 font-medium">{error}</p>
+                  <p className="text-sm text-red-700 dark:text-red-200 font-medium">{error}</p>
                 </div>
               </div>
             )}
@@ -136,7 +134,7 @@ const Login = () => {
             <form className="space-y-6" onSubmit={handleSubmit}>
               {/* Email Field */}
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                   Email Address
                 </label>
                 <div className="relative">
@@ -152,13 +150,12 @@ const Login = () => {
                     value={formData.email}
                     onChange={handleChange}
                     onBlur={() => handleBlur('email')}
-                    className={`block w-full pl-10 pr-10 py-3 border ${
-                      touched.email
-                        ? emailValid
-                          ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
-                          : 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                        : 'border-gray-300 focus:ring-primary-500 focus:border-primary-500'
-                    } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none transition-all duration-200 text-sm`}
+                    className={`block w-full pl-10 pr-10 py-3 border ${touched.email
+                      ? emailValid
+                        ? 'border-green-300 focus:ring-green-500 focus:border-green-500'
+                        : 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                      : 'border-gray-300 focus:ring-primary-500 focus:border-primary-500'
+                      } rounded-lg shadow-sm placeholder-gray-400 focus:outline-none transition-all duration-200 text-sm`}
                     placeholder="you@example.com"
                   />
                   {touched.email && emailValid !== null && (
@@ -180,7 +177,7 @@ const Login = () => {
 
               {/* Password Field */}
               <div>
-                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                   Password
                 </label>
                 <div className="relative">
@@ -196,13 +193,13 @@ const Login = () => {
                     value={formData.password}
                     onChange={handleChange}
                     onBlur={() => handleBlur('password')}
-                    className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 text-sm"
+                    className="block w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-dark-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 text-sm bg-white dark:bg-dark-700 text-gray-900 dark:text-white"
                     placeholder="Enter your password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
                   >
                     {showPassword ? (
                       <EyeSlashIcon className="h-5 w-5" />
@@ -222,15 +219,15 @@ const Login = () => {
                     type="checkbox"
                     checked={formData.rememberMe}
                     onChange={handleChange}
-                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded cursor-pointer"
+                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-dark-600 rounded cursor-pointer dark:bg-dark-700"
                   />
-                  <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-700 cursor-pointer">
+                  <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
                     Remember me
                   </label>
                 </div>
 
                 <div className="text-sm">
-                  <Link to="/forgot-password" className="font-medium text-primary-600 hover:text-primary-700 transition-colors">
+                  <Link to="/forgot-password" className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 transition-colors">
                     Forgot password?
                   </Link>
                 </div>

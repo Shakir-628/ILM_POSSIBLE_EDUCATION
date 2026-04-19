@@ -43,11 +43,11 @@ const StudentIDCards = () => {
     try {
       const response = await studentService.getAllStudents();
       console.log('Students response:', response); // Debug log
-      
+
       // Handle different response structures
       const studentsData = response.data || response || [];
       console.log('Students data:', studentsData); // Debug log
-      
+
       setStudents(Array.isArray(studentsData) ? studentsData : []);
       setFilteredStudents(Array.isArray(studentsData) ? studentsData : []);
     } catch (error) {
@@ -75,11 +75,11 @@ const StudentIDCards = () => {
         const rollNumber = (student.rollNumber || '').toLowerCase();
         const email = (student.email || '').toLowerCase();
         const searchLower = searchTerm.toLowerCase().trim();
-        
-        return fullName.includes(searchLower) || 
-               studentId.includes(searchLower) || 
-               rollNumber.includes(searchLower) ||
-               email.includes(searchLower);
+
+        return fullName.includes(searchLower) ||
+          studentId.includes(searchLower) ||
+          rollNumber.includes(searchLower) ||
+          email.includes(searchLower);
       });
     }
 
@@ -117,10 +117,10 @@ const StudentIDCards = () => {
   };
 
   const handlePrintAll = () => {
-    const studentsToShow = selectedStudents.length > 0 
+    const studentsToShow = selectedStudents.length > 0
       ? filteredStudents.filter(s => selectedStudents.includes(s._id))
       : filteredStudents;
-    
+
     if (studentsToShow.length === 0) {
       toast.warning('No students to print');
       return;
@@ -141,8 +141,8 @@ const StudentIDCards = () => {
   };
 
   const handleDownloadAll = async () => {
-    const studentsToDownload = selectedStudents.length > 0 
-      ? selectedStudents 
+    const studentsToDownload = selectedStudents.length > 0
+      ? selectedStudents
       : filteredStudents.map(s => s._id);
 
     if (studentsToDownload.length === 0) {
@@ -160,11 +160,11 @@ const StudentIDCards = () => {
     }
   };
 
-  const grades = Array.isArray(students) 
+  const grades = Array.isArray(students)
     ? [...new Set(students.map(s => s.grade).filter(Boolean))]
     : [];
 
-  const sections = Array.isArray(students) 
+  const sections = Array.isArray(students)
     ? [...new Set(students.map(s => s.section).filter(Boolean))]
     : [];
 
@@ -172,13 +172,12 @@ const StudentIDCards = () => {
   const IDCardPreview = ({ student }) => {
     return (
       <div className="bg-white rounded-lg shadow-lg overflow-hidden border-2 border-gray-200"
-           style={{ width: '320px', height: '200px' }}>
+        style={{ width: '320px', height: '200px' }}>
         {/* Card Header */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <AcademicCapIcon className="h-5 w-5" />
-              <span className="font-bold text-sm">ILM Possible</span>
+              <img src="/logos/Logo_IP.png" alt="Logo" style={{ height: '7.5rem' }} className="w-auto brightness-0 invert" />
             </div>
             <span className="text-xs font-semibold">STUDENT ID</span>
           </div>
@@ -190,8 +189,8 @@ const StudentIDCards = () => {
           <div className="flex-shrink-0">
             <div className="w-20 h-24 bg-gray-200 rounded border-2 border-gray-300 overflow-hidden">
               {student.photo ? (
-                <img 
-                  src={student.photo} 
+                <img
+                  src={student.photo}
                   alt={student.firstName}
                   className="w-full h-full object-cover"
                 />
@@ -212,7 +211,7 @@ const StudentIDCards = () => {
               <p className="text-xs text-gray-600 mt-1">
                 {student.grade}{student.section ? ` - Section ${student.section}` : ''}
               </p>
-              
+
               <div className="mt-2 space-y-1">
                 <div className="flex items-start">
                   <span className="text-xs font-semibold text-gray-500 w-12">ID:</span>
@@ -279,8 +278,8 @@ const StudentIDCards = () => {
               icon={PrinterIcon}
               variant="outline"
             >
-              {selectedStudents.length > 0 
-                ? `Print Selected (${selectedStudents.length})` 
+              {selectedStudents.length > 0
+                ? `Print Selected (${selectedStudents.length})`
                 : `Print All (${filteredStudents.length})`}
             </Button>
             <Button
@@ -288,8 +287,8 @@ const StudentIDCards = () => {
               icon={ArrowDownTrayIcon}
               variant="primary"
             >
-              {selectedStudents.length > 0 
-                ? `Download Selected (${selectedStudents.length})` 
+              {selectedStudents.length > 0
+                ? `Download Selected (${selectedStudents.length})`
                 : `Download All (${filteredStudents.length})`}
             </Button>
           </div>
@@ -458,13 +457,12 @@ const StudentIDCards = () => {
               {filteredStudents.map((student) => {
                 const isSelected = selectedStudents.includes(student._id);
                 const shouldPrint = selectedStudents.length === 0 || isSelected;
-                
+
                 return (
-                  <div 
+                  <div
                     key={student._id}
-                    className={`relative print-card-container transition-all duration-200 ${
-                      isSelected ? 'ring-2 ring-blue-500 rounded-lg' : ''
-                    } ${!shouldPrint ? 'print-hide-card' : ''}`}
+                    className={`relative print-card-container transition-all duration-200 ${isSelected ? 'ring-2 ring-blue-500 rounded-lg' : ''
+                      } ${!shouldPrint ? 'print-hide-card' : ''}`}
                   >
                     {/* Selection Checkbox */}
                     <div className="absolute -top-2 -left-2 z-10 print-hide">

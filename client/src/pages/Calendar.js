@@ -48,7 +48,7 @@ const Calendar = () => {
     const startingDayOfWeek = firstDay.getDay();
 
     const days = [];
-    
+
     // Previous month padding
     const prevMonthLastDay = new Date(year, month, 0).getDate();
     for (let i = startingDayOfWeek - 1; i >= 0; i--) {
@@ -94,7 +94,7 @@ const Calendar = () => {
 
   const handleDateClick = (day) => {
     if (!day.isCurrentMonth) return;
-    
+
     const dayEvents = getEventsForDate(day.fullDate);
     setSelectedDate(day.fullDate);
     setSelectedEvents(dayEvents);
@@ -165,8 +165,8 @@ const Calendar = () => {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">📅 Academic Calendar</h1>
-            <p className="mt-1 text-sm text-gray-500">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">📅 Academic Calendar</h1>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               View events, exams, and important dates
             </p>
           </div>
@@ -184,7 +184,7 @@ const Calendar = () => {
             >
               <ChevronLeftIcon className="h-6 w-6 text-white" />
             </button>
-            
+
             <div className="text-center">
               <h2 className="text-3xl font-bold text-white">
                 {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
@@ -196,7 +196,7 @@ const Calendar = () => {
                 }).length} events this month
               </p>
             </div>
-            
+
             <button
               onClick={handleNextMonth}
               className="p-2 hover:bg-white/20 rounded-full transition-colors"
@@ -207,13 +207,13 @@ const Calendar = () => {
         </div>
 
         {/* Calendar Grid */}
-        <div className="bg-white shadow-xl rounded-lg overflow-hidden">
+        <div className="bg-white dark:bg-dark-800 shadow-xl rounded-lg overflow-hidden">
           {/* Day Headers */}
-          <div className="grid grid-cols-7 bg-gray-100 border-b-2 border-gray-200">
+          <div className="grid grid-cols-7 bg-gray-100 dark:bg-dark-700 border-b-2 border-gray-200 dark:border-dark-600">
             {dayNames.map((day) => (
               <div
                 key={day}
-                className="px-2 py-3 text-center text-sm font-bold text-gray-700 uppercase"
+                className="px-2 py-3 text-center text-sm font-bold text-gray-700 dark:text-gray-200 uppercase"
               >
                 {day}
               </div>
@@ -221,7 +221,7 @@ const Calendar = () => {
           </div>
 
           {/* Calendar Days */}
-          <div className="grid grid-cols-7 divide-x divide-y">
+          <div className="grid grid-cols-7 divide-x divide-y dark:divide-dark-600">
             {days.map((day, index) => {
               const dayEvents = getEventsForDate(day.fullDate);
               const isTodayDate = isToday(day.fullDate);
@@ -230,17 +230,19 @@ const Calendar = () => {
                 <div
                   key={index}
                   onClick={() => handleDateClick(day)}
-                  className={`min-h-[100px] p-2 cursor-pointer transition-all duration-200 hover:bg-gray-50 ${
-                    !day.isCurrentMonth ? 'bg-gray-50 opacity-50' : 'bg-white'
-                  } ${isTodayDate ? 'bg-blue-50 ring-2 ring-blue-500 ring-inset' : ''}`}
+                  className={`min-h-[100px] p-2 cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-dark-700 ${!day.isCurrentMonth
+                    ? 'bg-gray-50 dark:bg-dark-750 opacity-50'
+                    : isTodayDate
+                      ? 'bg-primary-50 dark:bg-primary-900/20 ring-2 ring-primary-500 ring-inset'
+                      : 'bg-white dark:bg-dark-800'
+                    }`}
                 >
                   <div className="flex flex-col h-full">
                     {/* Date Number */}
-                    <div className={`text-sm font-semibold mb-2 ${
-                      isTodayDate 
-                        ? 'bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center' 
-                        : day.isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
-                    }`}>
+                    <div className={`text-sm font-semibold mb-2 ${isTodayDate
+                      ? 'bg-primary-500 text-white w-8 h-8 rounded-full flex items-center justify-center'
+                      : day.isCurrentMonth ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-600'
+                      }`}>
                       {day.date}
                     </div>
 
@@ -256,7 +258,7 @@ const Calendar = () => {
                         </div>
                       ))}
                       {dayEvents.length > 3 && (
-                        <div className="text-xs text-gray-500 font-medium px-2">
+                        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium px-2">
                           +{dayEvents.length - 3} more
                         </div>
                       )}
@@ -269,8 +271,8 @@ const Calendar = () => {
         </div>
 
         {/* Event Legend */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-sm font-semibold text-gray-900 mb-4">Event Types</h3>
+        <div className="bg-white dark:bg-dark-800 shadow rounded-lg p-6">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Event Types</h3>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {[
               { type: 'academic', label: 'Academic', icon: AcademicCapIcon },
@@ -286,7 +288,7 @@ const Calendar = () => {
             ].map(({ type, label, icon: Icon }) => (
               <div key={type} className="flex items-center space-x-2">
                 <div className={`w-4 h-4 rounded ${getEventColor(type)}`}></div>
-                <span className="text-sm text-gray-700">{label}</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">{label}</span>
               </div>
             ))}
           </div>
@@ -306,16 +308,16 @@ const Calendar = () => {
                 return (
                   <div
                     key={idx}
-                    className={`border-l-4 ${getEventColor(event.eventType).replace('bg-', 'border-')} bg-gray-50 p-4 rounded-r-lg hover:shadow-md transition-shadow`}
+                    className={`border-l-4 ${getEventColor(event.eventType).replace('bg-', 'border-')} bg-gray-50 dark:bg-dark-700 p-4 rounded-r-lg hover:shadow-md transition-shadow`}
                   >
                     <div className="flex items-start space-x-3">
                       <div className={`p-2 rounded-full ${getEventColor(event.eventType)} bg-opacity-20`}>
                         <Icon className={`h-6 w-6 ${getEventColor(event.eventType).replace('bg-', 'text-')}`} />
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900">{event.title}</h3>
-                        <p className="text-sm text-gray-600 mt-1">{event.description}</p>
-                        <div className="mt-3 flex flex-wrap gap-3 text-xs text-gray-500">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{event.title}</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{event.description}</p>
+                        <div className="mt-3 flex flex-wrap gap-3 text-xs text-gray-500 dark:text-gray-400">
                           <span className="flex items-center">
                             <CalendarIcon className="h-4 w-4 mr-1" />
                             {new Date(event.date).toLocaleDateString()}

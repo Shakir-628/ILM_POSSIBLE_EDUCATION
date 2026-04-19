@@ -44,15 +44,15 @@ export const authService = {
     return response.data;
   },
 
-  resetPassword: async (token, password) => {
-    const response = await api.post(`/auth/reset-password/${token}`, { password });
+  resetPassword: async (email, otp, password) => {
+    const response = await api.post('/auth/reset-password', { email, otp, password });
     return response.data;
   },
 
   changePassword: async (currentPassword, newPassword) => {
-    const response = await api.put('/auth/change-password', { 
-      currentPassword, 
-      newPassword 
+    const response = await api.put('/auth/change-password', {
+      currentPassword,
+      newPassword
     });
     if (response.data.token) {
       localStorage.setItem('userInfo', JSON.stringify(response.data));

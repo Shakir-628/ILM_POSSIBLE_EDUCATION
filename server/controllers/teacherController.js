@@ -18,6 +18,26 @@ export const getTeachers = async (req, res) => {
   }
 };
 
+// @desc    Get current teacher profile
+// @route   GET /api/teachers/me
+// @access  Private (Teacher)
+export const getMyTeacherProfile = async (req, res) => {
+  try {
+    const teacher = await Teacher.findOne({ user: req.user._id })
+      .populate("user", "name email role")
+      .populate("subjects", "subjectName subjectCode");
+
+    if (!teacher) {
+      return res.status(404).json({ message: "Teacher profile not found" });
+    }
+
+    res.json(teacher);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
 // @desc    Get single teacher
 // @route   GET /api/teachers/:id
 // @access  Private
@@ -180,7 +200,7 @@ export const generateIDCard = async (req, res) => {
     }
 
     // Create PDF document (ID card size: 85.6mm x 54mm)
-    const doc = new PDFDocument({ 
+    const doc = new PDFDocument({
       size: [242.64, 153], // CR80 size in points (85.6mm x 54mm)
       margins: { top: 0, bottom: 0, left: 0, right: 0 }
     });
@@ -205,11 +225,11 @@ export const generateIDCard = async (req, res) => {
 
     // Card Header (Blue gradient background)
     doc.rect(0, 0, 242.64, 35).fillAndStroke('#0070C0', '#0070C0');
-    
+
     // School Name
     doc.fontSize(10).font('Helvetica-Bold').fillColor('white');
     doc.text('ILM Possible', 10, 8, { width: 150 });
-    
+
     // ID Card Label
     doc.fontSize(8).font('Helvetica-Bold');
     doc.text('TEACHER ID', 150, 12, { align: 'right', width: 82 });
@@ -219,9 +239,9 @@ export const generateIDCard = async (req, res) => {
     const photoY = 40;
     const photoWidth = 50;
     const photoHeight = 60;
-    
+
     doc.rect(photoX, photoY, photoWidth, photoHeight).stroke('#CCCCCC');
-    
+
     // If no photo, add placeholder
     doc.fontSize(8).fillColor('#999999');
     doc.text('PHOTO', photoX + 12, photoY + 25);
@@ -257,7 +277,7 @@ export const generateIDCard = async (req, res) => {
       const qrX = 185;
       const qrY = 40;
       const qrSize = 35;
-      
+
       // Add QR code image
       const qrBuffer = Buffer.from(qrCodeImage.split(',')[1], 'base64');
       doc.image(qrBuffer, qrX, qrY, { width: qrSize, height: qrSize });
@@ -266,7 +286,7 @@ export const generateIDCard = async (req, res) => {
     // Footer
     const footerY = 115;
     doc.rect(0, footerY, 242.64, 38).fillAndStroke('#F5F5F5', '#F5F5F5');
-    
+
     doc.fontSize(7).font('Helvetica').fillColor('#666666');
     doc.text(`Valid: ${new Date().getFullYear()}`, 10, footerY + 5);
     doc.text('📞 +92-XXX-XXXXXXX', 10, footerY + 15, { width: 220, align: 'center' });
@@ -301,7 +321,7 @@ export const generateBulkIDCards = async (req, res) => {
     }
 
     // Create PDF document with multiple cards (A4 size for printing)
-    const doc = new PDFDocument({ 
+    const doc = new PDFDocument({
       size: 'A4',
       margins: { top: 20, bottom: 20, left: 20, right: 20 }
     });
@@ -338,7 +358,7 @@ export const generateBulkIDCards = async (req, res) => {
 
       // Save current position
       doc.save();
-      
+
       // Generate QR code
       const qrData = JSON.stringify({
         id: teacher.teacherId,
@@ -353,7 +373,7 @@ export const generateBulkIDCards = async (req, res) => {
 
       // Card Header
       doc.rect(x, y, cardWidth, 35).fillAndStroke('#0070C0', '#0070C0');
-      
+
       doc.fontSize(10).font('Helvetica-Bold').fillColor('white');
       doc.text('ILM Possible', x + 10, y + 8, { width: 150 });
       doc.fontSize(8).text('TEACHER ID', x + 150, y + 12, { align: 'right', width: 82 });
@@ -401,7 +421,7 @@ export const generateBulkIDCards = async (req, res) => {
       // Footer
       const footerY = y + 115;
       doc.rect(x, footerY, cardWidth, 38).fillAndStroke('#F5F5F5', '#F5F5F5');
-      
+
       doc.fontSize(7).font('Helvetica').fillColor('#666666');
       doc.text(`Valid: ${new Date().getFullYear()}`, x + 10, footerY + 5);
       doc.text('📞 +92-XXX-XXXXXXX', x + 10, footerY + 15, { width: 220, align: 'center' });

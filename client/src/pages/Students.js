@@ -4,6 +4,7 @@ import { studentService } from '../services/studentService';
 import { classService } from '../services/classService';
 import { useTableData } from '../hooks/useTableData';
 import { useToast } from '../context/ToastContext';
+import { usePermissions } from '../context/PermissionContext';
 import Layout from '../components/Layout';
 import Button from '../components/Button';
 import Input from '../components/Input';
@@ -33,6 +34,7 @@ import {
 const Students = () => {
   const location = useLocation();
   const toast = useToast();
+  const { canCreate, canUpdate, canDelete, canRead } = usePermissions();
   const [students, setStudents] = useState([]);
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -739,53 +741,63 @@ const Students = () => {
       accessor: 'actions',
       render: (row) => (
         <div className="flex space-x-2">
-          <button
-            onClick={() => handleShowQR(row)}
-            className="text-purple-600 hover:text-purple-900 text-sm"
-            title="Show QR Code"
-          >
-            QR
-          </button>
-          <button
-            onClick={() => handleGenerateIDCard(row)}
-            className="text-green-600 hover:text-green-900 text-sm"
-            title="Generate ID Card"
-          >
-            ID
-          </button>
-          <button
-            onClick={() => handleShowDocuments(row)}
-            className="text-indigo-600 hover:text-indigo-900 text-sm"
-            title="Documents"
-          >
-            Docs
-          </button>
-          <button
-            onClick={() => handleShowPromote(row)}
-            className="text-blue-600 hover:text-blue-900 text-sm"
-            title="Promote"
-          >
-            Promote
-          </button>
-          <button
-            onClick={() => handleShowTransfer(row)}
-            className="text-orange-600 hover:text-orange-900 text-sm"
-            title="Transfer"
-          >
-            Transfer
-          </button>
-          <button
-            onClick={() => handleEdit(row)}
-            className="text-indigo-600 hover:text-indigo-900 text-sm"
-          >
-            Edit
-          </button>
-          <button
-            onClick={() => handleDelete(row)}
-            className="text-red-600 hover:text-red-900 text-sm"
-          >
-            Delete
-          </button>
+          {canRead('Students') && (
+            <>
+              <button
+                onClick={() => handleShowQR(row)}
+                className="text-purple-600 hover:text-purple-900 text-sm"
+                title="Show QR Code"
+              >
+                QR
+              </button>
+              <button
+                onClick={() => handleGenerateIDCard(row)}
+                className="text-green-600 hover:text-green-900 text-sm"
+                title="Generate ID Card"
+              >
+                ID
+              </button>
+            </>
+          )}
+          {canUpdate('Students') && (
+            <>
+              <button
+                onClick={() => handleShowDocuments(row)}
+                className="text-indigo-600 hover:text-indigo-900 text-sm"
+                title="Documents"
+              >
+                Docs
+              </button>
+              <button
+                onClick={() => handleShowPromote(row)}
+                className="text-blue-600 hover:text-blue-900 text-sm"
+                title="Promote"
+              >
+                Promote
+              </button>
+              <button
+                onClick={() => handleShowTransfer(row)}
+                className="text-orange-600 hover:text-orange-900 text-sm"
+                title="Transfer"
+              >
+                Transfer
+              </button>
+              <button
+                onClick={() => handleEdit(row)}
+                className="text-indigo-600 hover:text-indigo-900 text-sm"
+              >
+                Edit
+              </button>
+            </>
+          )}
+          {canDelete('Students') && (
+            <button
+              onClick={() => handleDelete(row)}
+              className="text-red-600 hover:text-red-900 text-sm"
+            >
+              Delete
+            </button>
+          )}
         </div>
       ),
     },
@@ -802,34 +814,42 @@ const Students = () => {
               Digital student registration and profile management
             </p>
           </div>
-          <div className="flex space-x-3">
-            <Button
-              variant="secondary"
-              icon={ArrowUpTrayIcon}
-              onClick={() => setShowBulkImportModal(true)}
-            >
-              Bulk Import
-            </Button>
-            <Button
-              variant="secondary"
-              icon={DocumentArrowDownIcon}
-              onClick={handleExportExcel}
-            >
-              Export Excel
-            </Button>
-            <Button
-              variant="secondary"
-              icon={DocumentArrowDownIcon}
-              onClick={handleExportPDF}
-            >
-              Export PDF
-            </Button>
-            <Button
-              icon={PlusIcon}
-              onClick={openModal}
-            >
-              Add Student
-            </Button>
+          <div className="flex gap-2">
+            {canRead('Students') && (
+              <>
+                <Button
+                  variant="outline"
+                  icon={DocumentArrowDownIcon}
+                  onClick={handleExportExcel}
+                  className="hidden md:flex"
+                >
+                  Excel
+                </Button>
+                <Button
+                  variant="outline"
+                  icon={DocumentTextIcon}
+                  onClick={handleExportPDF}
+                  className="hidden md:flex"
+                >
+                  PDF
+                </Button>
+              </>
+            )}
+            {canCreate('Students') && (
+              <Button
+                variant="outline"
+                icon={ArrowUpTrayIcon}
+                onClick={() => setShowBulkImportModal(true)}
+                className="hidden md:flex"
+              >
+                Import
+              </Button>
+            )}
+            {canCreate('Students') && (
+              <Button icon={PlusIcon} onClick={openModal}>
+                Add Student
+              </Button>
+            )}
           </div>
         </div>
 

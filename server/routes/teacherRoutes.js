@@ -7,6 +7,7 @@ import {
   deleteTeacher,
   generateIDCard,
   generateBulkIDCards,
+  getMyTeacherProfile,
 } from "../controllers/teacherController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { authorize } from "../middleware/roleMiddleware.js";
@@ -15,6 +16,7 @@ import { auditLog } from "../middleware/auditMiddleware.js";
 const router = express.Router();
 
 // ID Card generation routes (must come before /:id route)
+router.get("/me", protect, getMyTeacherProfile);
 router.post("/bulk-id-cards", protect, authorize("admin"), generateBulkIDCards);
 
 router

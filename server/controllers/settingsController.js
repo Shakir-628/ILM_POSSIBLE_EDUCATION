@@ -141,6 +141,61 @@ export const updateUserRole = async (req, res) => {
   }
 };
 
+// @desc    Create a new user
+// @route   POST /api/settings/user-roles
+// @access  Private (Admin)
+export const createUser = async (req, res) => {
+  try {
+    const { name, email, password, role, phone, address } = req.body;
+
+    // Check if user exists
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({
+        success: false,
+        message: "Email already registered",
+      });
+    }
+
+    // Authorization check
+    if (role === 'superadmin' && req.user.role !== 'superadmin') {
+      return res.status(403).json({
+        success: false,
+        message: "Only SuperAdmins can create other SuperAdmin accounts",
+      });
+    }
+
+    const user = await User.create({
+      name,
+      email,
+      password,
+      role,
+      phone,
+      address,
+      isActive: true,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "User created successfully",
+      data: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive,
+      },
+    });
+  } catch (error) {
+    console.error("Create user error:", error);
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
 // @desc    Toggle user active status
 // @route   PUT /api/settings/user-roles/:userId/toggle-active
 // @access  Private (Admin)
@@ -206,7 +261,7 @@ export const getSystemStats = async (req, res) => {
 export const triggerBackup = async (req, res) => {
   try {
     const backupDir = path.join(process.cwd(), "backups");
-    
+
     // Create backups directory if it doesn't exist
     if (!fs.existsSync(backupDir)) {
       fs.mkdirSync(backupDir, { recursive: true });

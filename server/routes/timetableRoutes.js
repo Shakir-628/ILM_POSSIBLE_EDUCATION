@@ -10,6 +10,7 @@ import {
   exportToExcel,
   exportToPDF,
   generateSmartTimetable,
+  getTeacherSchedule,
 } from "../controllers/timetableController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { authorize } from "../middleware/roleMiddleware.js";
@@ -23,6 +24,7 @@ router.post("/smart-generate", protect, authorize("admin"), generateSmartTimetab
 
 // Get timetable by class
 router.get("/class/:classId", protect, getTimetableByClass);
+router.get("/teacher/:teacherId", protect, getTeacherSchedule);
 
 // Export routes (must come before /:id route)
 router.get("/:id/export/excel", protect, exportToExcel);

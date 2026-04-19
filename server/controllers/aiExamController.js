@@ -4,6 +4,8 @@ import {
   QuestionBank,
   ExamPerformanceAnalytics,
 } from "../models/AIExam.js";
+import Notification from "../models/Notification.js";
+import aiService from "../services/aiService.js";
 import Subject from "../models/Subject.js";
 import Class from "../models/Class.js";
 import Student from "../models/Student.js";
@@ -1020,36 +1022,43 @@ export const generateAIQuestions = async (req, res) => {
     }
     const { topic, difficulty, numberOfQuestions, questionType } = req.body;
 
-    const exam = await AIExam.findById(examId);
-    if (!exam) {
-      return res.status(404).json({
-        success: false,
-        message: "AI Exam not found",
-      });
-    }
+    // Handle 'new' exam case where no record exists yet
+    if (examId !== 'new') {
+      const exam = await AIExam.findById(examId);
+      if (!exam) {
+        return res.status(404).json({
+          success: false,
+          message: "AI Exam not found",
+        });
+      }
 
-    // Check authorization
-    if (exam.createdBy.toString() !== req.user._id.toString() && req.user.role !== "admin") {
-      return res.status(403).json({
-        success: false,
-        message: "Not authorized",
-      });
+      // Check authorization only for existing exams
+      if (exam.createdBy.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+        return res.status(403).json({
+          success: false,
+          message: "Not authorized",
+        });
+      }
     }
 
     // Call AI service to generate questions
-    const prompt = `Generate ${numberOfQuestions} ${difficulty} difficulty ${questionType || "multiple choice"} questions about "${topic}" for an exam. Format as JSON array with questionText, options (with isCorrect flag), correctAnswer, and answerExplanation fields.`;
+    const generatedQuestions = await aiService.generateQuestions(topic, difficulty, numberOfQuestions, questionType);
 
-    // Note: Replace with actual AI API call (Google Gemini, OpenAI, etc.)
-    // This is a placeholder
+    if (!generatedQuestions || generatedQuestions.length === 0) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to generate AI questions",
+      });
+    }
+
     res.status(200).json({
       success: true,
       message: "Questions generated successfully",
       data: {
         topic,
         difficulty,
-        numberOfQuestions,
-        generatedQuestions: [],
-        note: "Integrate with Google Gemini or OpenAI API for actual AI question generation",
+        numberOfQuestions: generatedQuestions.length,
+        generatedQuestions: generatedQuestions,
       },
     });
   } catch (error) {

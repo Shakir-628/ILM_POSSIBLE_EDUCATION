@@ -36,10 +36,10 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className={`relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full ${sizeClasses[size]} animate-scale-in`}>
-                <div className="bg-white px-4 pt-5 pb-4 sm:p-6">
+              <Dialog.Panel className={`relative transform overflow-hidden rounded-lg bg-white dark:bg-dark-800 text-left shadow-xl transition-all sm:my-8 sm:w-full ${sizeClasses[size]} animate-scale-in`}>
+                <div className="bg-white dark:bg-dark-800 px-4 pt-5 pb-4 sm:p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
+                    <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">
                       {title}
                     </Dialog.Title>
                     <button

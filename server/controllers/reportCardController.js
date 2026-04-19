@@ -2,6 +2,7 @@ import ReportCard from "../models/ReportCard.js";
 import Student from "../models/Student.js";
 import Grade from "../models/Grade.js";
 import Attendance from "../models/Attendance.js";
+import aiService from "../services/aiService.js";
 import PDFDocument from "pdfkit";
 import fs from "fs";
 import path from "path";
@@ -129,6 +130,15 @@ export const generateReportCard = async (req, res) => {
     const totalWorkingDays = attendanceRecords.length;
     const presentDays = attendanceRecords.filter((a) => a.status === "present").length;
 
+    // Determine top performing subject for AI Congratulatory Note
+    const sortedGrades = [...subjectGrades].sort((a, b) => b.obtainedMarks - a.obtainedMarks);
+    const topSubjectId = sortedGrades[0]?.subject;
+    const topSubjectObj = grades.find(g => g.subject._id.toString() === topSubjectId.toString())?.subject;
+    const topSubjectName = topSubjectObj?.subjectName || "Academic Excellence";
+
+    // Generate AI Note
+    const aiCongratulatoryNote = await aiService.generateCongratulatoryNote(student, topSubjectName);
+
     // Check if report card already exists
     const existing = await ReportCard.findOne({
       student: studentId,
@@ -145,6 +155,11 @@ export const generateReportCard = async (req, res) => {
       existing.obtainedMarks = obtainedMarks;
       existing.totalWorkingDays = totalWorkingDays;
       existing.presentDays = presentDays;
+      // Add AI note to remarks if specifically provided or update current ones
+      existing.remarks = {
+        ...existing.remarks,
+        aiPersonalizedNote: aiCongratulatoryNote
+      };
       await existing.save();
       reportCard = existing;
     } else {
@@ -160,6 +175,9 @@ export const generateReportCard = async (req, res) => {
         totalWorkingDays,
         presentDays,
         generatedBy: req.user._id,
+        remarks: {
+          aiPersonalizedNote: aiCongratulatoryNote
+        }
       });
     }
 
@@ -334,6 +352,10 @@ export const downloadReportCard = async (req, res) => {
       }
       if (reportCard.remarks.principal) {
         doc.text(`Principal: ${reportCard.remarks.principal}`);
+      }
+      if (reportCard.remarks.aiPersonalizedNote) {
+        doc.moveDown();
+        doc.fontSize(10).font("Helvetica-Oblique").text(`AI Generated Note: ${reportCard.remarks.aiPersonalizedNote}`, { oblique: true, color: 'gray' });
       }
     }
 

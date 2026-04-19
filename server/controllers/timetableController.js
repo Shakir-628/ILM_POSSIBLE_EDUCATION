@@ -791,3 +791,69 @@ export const generateSmartTimetable = async (req, res) => {
   }
 };
 
+// @desc    Get schedule for a specific teacher
+// @route   GET /api/timetables/teacher/:teacherId
+// @access  Private
+export const getTeacherSchedule = async (req, res) => {
+  try {
+    const { teacherId } = req.params;
+    const { day } = req.query; // Optional: specific day, defaults to all days
+
+    const timetables = await Timetable.find({
+      "schedule.periods.teacher": teacherId,
+      isActive: true
+    })
+    .populate("class", "className grade section")
+    .populate({
+      path: "schedule.periods.subject",
+      select: "subjectName subjectCode"
+    });
+
+    const teacherSchedule = [];
+
+    timetables.forEach(timetable => {
+      timetable.schedule.forEach(daySched => {
+        // If 'day' filter provided, skip other days
+        if (day && daySched.day.toLowerCase() !== day.toLowerCase()) return;
+
+        daySched.periods.forEach(period => {
+          if (period.teacher && period.teacher.toString() === teacherId.toString()) {
+            teacherSchedule.push({
+              id: `${timetable._id}-${daySched.day}-${period.periodNumber}`,
+              day: daySched.day,
+              startTime: period.startTime,
+              endTime: period.endTime,
+              subject: period.subject,
+              class: timetable.class,
+              roomNumber: period.roomNumber,
+              periodType: period.periodType,
+              periodNumber: period.periodNumber
+            });
+          }
+        });
+      });
+    });
+
+    // Sort by day then by start time
+    const dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    teacherSchedule.sort((a, b) => {
+      if (a.day !== b.day) {
+        return dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day);
+      }
+      return a.startTime.localeCompare(b.startTime);
+    });
+
+    res.status(200).json({
+      success: true,
+      data: teacherSchedule
+    });
+  } catch (error) {
+    console.error("Get teacher schedule error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+

@@ -86,6 +86,11 @@ export const timetableService = {
 
     return response.data;
   },
+  // Get timetable for a teacher
+  getTeacherSchedule: async (teacherId, params = {}) => {
+    const response = await api.get(`/timetables/teacher/${teacherId}`, { params });
+    return response.data;
+  },
 };
 
 export default timetableService;

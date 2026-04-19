@@ -1,24 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.svg" type="image/svg+xml" />
-    <link rel="alternate icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#4F46E5" />
-    <meta
-      name="description"
-      content="ILM Possible Education - Complete School Management System"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <title>ILM Possible Education - School Management System</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!-- GetYourBots Chatbot Widget -->
-  <script src="https://getyourbots.com/widget.js" data-id="7115f331-5345-4c63-8b1d-47e95dfc2cff"></script>
-  </body>
-</html>
 
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" type="image/png" href="%PUBLIC_URL%/logos/Logo_IP.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#4f46e5" />
+  <meta name="description" content="ILM Possible Education - Advanced School Management System" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logos/Logo_IP.png" />
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  <title>ILM Possible Education - School Management System</title>
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
+  <!-- GetYourBots Chatbot Widget -->
+  <script src="https://getyourbots.com/widget.js" data-id="7115f331-5345-4c63-8b1d-47e95dfc2cff"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (registrations) {
+        for (let registration of registrations) {
+          if (registration.active && registration.active.scriptURL.includes('firebase-messaging-sw.js')) {
+            registration.unregister().then(function (boolean) {
+              if (boolean) {
+                console.log('Unregistered lingering Firebase Service Worker');
+              }
+            });
+          }
+        }
+      });
+    }
+  </script>
+</body>
+
+</html>

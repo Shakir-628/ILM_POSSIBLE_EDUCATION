@@ -50,19 +50,19 @@ const ExamResults = () => {
   const { attemptOverview, questionAnalytics, topicAnalytics, aiFeedback } = analytics;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-gray-100 dark:bg-dark-900 p-8 transition-colors duration-200">
       {/* Header */}
       <div className="max-w-6xl mx-auto">
         <button
           onClick={() => navigate("/exams")}
-          className="mb-6 text-blue-600 hover:text-blue-800 font-semibold"
+          className="mb-6 text-blue-600 dark:text-primary-400 hover:text-blue-800 dark:hover:text-primary-300 font-semibold flex items-center"
         >
           ← Back to Exams
         </button>
 
-        <div className="bg-white rounded shadow-lg p-8 mb-6">
-          <h1 className="text-3xl font-bold mb-2">{attempt.exam?.title}</h1>
-          <p className="text-gray-600 mb-6">Exam Results & Performance Analysis</p>
+        <div className="bg-white dark:bg-dark-800 rounded shadow-lg p-8 mb-6 border border-gray-100 dark:border-dark-700">
+          <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">{attempt.exam?.title}</h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">Exam Results & Performance Analysis</p>
 
           {/* Score Display */}
           <div className="grid grid-cols-4 gap-4 mb-8">
@@ -98,15 +98,15 @@ const ExamResults = () => {
         </div>
 
         {/* Tabs */}
-        <div className="bg-white rounded shadow-lg mb-6">
-          <div className="flex border-b">
+        <div className="bg-white dark:bg-dark-800 rounded shadow-lg mb-6 border border-gray-100 dark:border-dark-700">
+          <div className="flex border-b border-gray-200 dark:border-dark-600">
             {["overview", "questions", "topics", "feedback"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`flex-1 py-4 font-semibold capitalize border-b-2 transition ${activeTab === tab
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-gray-600 hover:text-gray-900"
+                  ? "border-blue-600 text-blue-600 dark:text-primary-400 dark:border-primary-400"
+                  : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                   }`}
               >
                 {tab === "topics" ? "Topic-wise" : tab}

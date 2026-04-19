@@ -38,23 +38,29 @@ export const sendEmail = async ({ to, subject, html, text, attachments = [] }) =
 
 // Send password reset OTP email
 export const sendPasswordResetEmail = async (email, otp, userName) => {
+  const clientUrl = process.env.CLIENT_URL || "http://localhost:3000";
+  const resetLink = `${clientUrl}/reset-password?email=${encodeURIComponent(email)}&otp=${otp}`;
+
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden;">
       <div style="background-color: #4F46E5; padding: 20px; text-align: center;">
-        <h2 style="color: white; margin: 0;">Password Reset OTP</h2>
+        <h2 style="color: white; margin: 0;">Password Reset Request</h2>
       </div>
       <div style="padding: 30px; background-color: white;">
         <p style="color: #374151; font-size: 16px;">Hello ${userName},</p>
         <p style="color: #4b5563; font-size: 14px; line-height: 24px;">
-          You requested to reset your password. Use the following 6-digit One-Time Password (OTP) to proceed. This OTP is valid for 10 minutes.
+          You requested to reset your password. Use the following 6-digit One-Time Password (OTP) to proceed, or click the link below.
         </p>
-        <div style="text-align: center; margin: 40px 0;">
+        <div style="text-align: center; margin: 30px 0;">
           <div style="background-color: #f3f4f6; color: #111827; font-size: 32px; font-weight: bold; letter-spacing: 8px; padding: 20px; border-radius: 8px; display: inline-block; border: 1px dashed #4F46E5;">
             ${otp}
           </div>
         </div>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${resetLink}" style="background-color: #4F46E5; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Reset Password Now</a>
+        </div>
         <p style="color: #6b7280; font-size: 13px; text-align: center;">
-          If you didn't request this, please ignore this email or contact support.
+          This OTP and link are valid for 10 minutes. If you didn't request this, please ignore this email.
         </p>
       </div>
       <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
@@ -65,9 +71,9 @@ export const sendPasswordResetEmail = async (email, otp, userName) => {
 
   return await sendEmail({
     to: email,
-    subject: "Your Password Reset OTP",
+    subject: "Reset Your Password - ILM Possible",
     html,
-    text: `Your password reset OTP is: ${otp}. It is valid for 10 minutes.`,
+    text: `Your password reset OTP is: ${otp}. You can also reset it using this link: ${resetLink}. It is valid for 10 minutes.`,
   });
 };
 

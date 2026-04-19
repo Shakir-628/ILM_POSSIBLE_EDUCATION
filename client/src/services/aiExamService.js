@@ -50,4 +50,8 @@ export const aiExamService = {
         const response = await api.get(`/ai-exams/attempts/${attemptId}/analytics`);
         return response.data;
     },
+    generateQuestions: async (examId, params) => {
+        const response = await api.post(`/ai-exams/${examId}/generate-questions`, params);
+        return response.data;
+    },
 };
