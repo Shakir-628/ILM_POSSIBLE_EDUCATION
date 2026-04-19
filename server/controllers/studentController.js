@@ -10,6 +10,7 @@ import PDFDocument from "pdfkit";
 import path from "path";
 import fs from "fs";
 import bcrypt from "bcryptjs";
+import mailService from "../services/mailService.js";
 
 // @desc    Get my profile (for logged-in student)
 // @route   GET /api/students/me
@@ -160,6 +161,14 @@ export const createStudent = async (req, res) => {
       });
 
       userIdToUse = user._id;
+
+      // Send welcome email with credentials
+      try {
+        await mailService.sendWelcomeEmail(email, `${firstName} ${lastName}`, defaultPassword, "student");
+      } catch (mailError) {
+        console.error("Welcome email failed:", mailError);
+        // Don't fail the whole request if email fails
+      }
     }
 
     const student = await Student.create({

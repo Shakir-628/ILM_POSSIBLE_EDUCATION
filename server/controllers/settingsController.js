@@ -3,6 +3,7 @@ import User from "../models/User.js";
 import { exec } from "child_process";
 import path from "path";
 import fs from "fs";
+import mailService from "../services/mailService.js";
 
 // @desc    Get school profile
 // @route   GET /api/settings/school-profile
@@ -174,6 +175,14 @@ export const createUser = async (req, res) => {
       address,
       isActive: true,
     });
+
+    // Send welcome email with credentials
+    try {
+      await mailService.sendWelcomeEmail(email, name, password, role);
+    } catch (mailError) {
+      console.error("Welcome email failed:", mailError);
+      // Don't fail the whole request if email fails
+    }
 
     res.status(201).json({
       success: true,

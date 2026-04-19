@@ -3,6 +3,7 @@ import User from "../models/User.js";
 import { generateUniqueTeacherId } from "../utils/generateId.js";
 import PDFDocument from "pdfkit";
 import QRCode from "qrcode";
+import mailService from "../services/mailService.js";
 
 // @desc    Get all teachers
 // @route   GET /api/teachers
@@ -121,6 +122,14 @@ export const createTeacher = async (req, res) => {
       });
 
       userIdToUse = user._id;
+
+      // Send welcome email with credentials
+      try {
+        await mailService.sendWelcomeEmail(email, `${firstName} ${lastName}`, defaultPassword, "teacher");
+      } catch (mailError) {
+        console.error("Welcome email failed:", mailError);
+        // Don't fail the whole request if email fails
+      }
     }
 
     const teacher = await Teacher.create({
