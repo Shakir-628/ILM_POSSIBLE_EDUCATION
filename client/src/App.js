@@ -65,6 +65,7 @@ import Transport from './pages/Transport';
 import Hostel from './pages/Hostel';
 import AIExams from './pages/AIExams';
 import EPortfolio from './pages/EPortfolio';
+import OnlineClasses from './pages/OnlineClasses';
 // AI Exam Components
 import CreateExam from './components/CreateExam';
 import StudentExamTaking from './components/StudentExamTaking';
@@ -575,6 +576,14 @@ function App() {
                 element={
                   <PrivateRoute>
                     <EPortfolio />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/online-classes"
+                element={
+                  <PrivateRoute>
+                    <OnlineClasses />
                   </PrivateRoute>
                 }
               />

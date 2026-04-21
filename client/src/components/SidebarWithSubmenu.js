@@ -24,6 +24,7 @@ import {
   CubeIcon,
   DocumentChartBarIcon,
   ClipboardDocumentListIcon,
+  VideoCameraIcon,
 } from '@heroicons/react/24/outline';
 import { rolePermissionService } from '../services/rolePermissionService';
 
@@ -108,6 +109,7 @@ const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
         { name: 'Subjects', href: '/subjects', roles: ['admin', 'teacher'] },
         { name: 'Timetable', href: '/timetable', roles: ['admin', 'teacher', 'student'] },
         { name: 'Assignments', href: '/assignments', roles: ['admin', 'teacher', 'student'] },
+        { name: 'Online Classes', href: '/online-classes', roles: ['admin', 'teacher', 'student'] },
       ],
     },
     {
