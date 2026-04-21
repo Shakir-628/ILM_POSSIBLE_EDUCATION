@@ -229,7 +229,13 @@ export const processPayment = async (req, res) => {
       academicYear: payment.academicYear,
     });
 
-    // Send receipt email
+    // Integrated Intelligence: Auto-process receipt delivery
+    import("./services/feeAutomationService.js").then((m) => {
+      m.processAutoReceipt(payment._id);
+    });
+
+    // Send fallback email (optional if auto-receipt handles it, but keeping for legacy compatibility if needed)
+    // Actually, processAutoReceipt is more robust, so we could simplify this, but keeping it as a quick confirmation.
     try {
       await sendEmail({
         to: payment.student.email,
@@ -353,6 +359,11 @@ export const verifyOnlinePayment = async (req, res) => {
         feePayment: payment._id,
         createdBy: payment.student.user,
         academicYear: payment.academicYear,
+      });
+
+      // Integrated Intelligence: Auto-process receipt delivery
+      import("./services/feeAutomationService.js").then((m) => {
+        m.processAutoReceipt(payment._id);
       });
 
       res.json({ success: true, payment });

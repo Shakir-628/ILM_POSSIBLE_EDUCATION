@@ -93,6 +93,17 @@ const feePaymentSchema = new mongoose.Schema(
       type: String,
       enum: ["1st", "2nd", "3rd", "annual"],
     },
+    lastReminderSent: {
+      type: Date,
+    },
+    reminderCount: {
+      type: Number,
+      default: 0,
+    },
+    autoReceiptSent: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

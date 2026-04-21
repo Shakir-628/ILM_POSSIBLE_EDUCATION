@@ -154,6 +154,11 @@ const server = http.createServer(app);
 // Initialize Socket.IO
 initializeSocket(server);
 
+// Initialize Cron Jobs for Automated Intelligence
+import("./utils/cronJobs.js").then((m) => {
+  m.initCronJobs();
+});
+
 server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`🔌 Socket.IO ready for connections`);
