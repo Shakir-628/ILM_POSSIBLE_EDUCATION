@@ -6,6 +6,16 @@ export const studentService = {
     return response.data;
   },
 
+  getMyProfile: async () => {
+    const response = await api.get('/students/me');
+    return response.data;
+  },
+
+  getMyClassInfo: async () => {
+    const response = await api.get('/students/me/class-info');
+    return response.data;
+  },
+
   getStudentById: async (id) => {
     const response = await api.get(`/students/${id}`);
     return response.data;

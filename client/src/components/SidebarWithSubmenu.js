@@ -72,6 +72,12 @@ const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
       roles: ['admin', 'teacher', 'student', 'parent'],
     },
     {
+      name: 'My Class Matrix',
+      href: '/my-class',
+      icon: AcademicCapIcon,
+      roles: ['student'],
+    },
+    {
       name: 'Students',
       icon: AcademicCapIcon,
       roles: ['admin', 'teacher'],

@@ -4,6 +4,7 @@ import {
   getStudentById,
   getMyProfile,
   getDashboardStats,
+  getMyClassInfo,
   createStudent,
   updateStudent,
   deleteStudent,
@@ -29,6 +30,7 @@ const router = express.Router();
 
 // Student's own profile and stats (must be before /:id routes)
 router.get("/me", protect, getMyProfile);
+router.get("/me/class-info", protect, getMyClassInfo);
 router.get("/dashboard/stats", protect, getDashboardStats);
 
 // Export routes (must be before /:id routes)

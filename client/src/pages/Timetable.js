@@ -17,10 +17,11 @@ import { subjectService } from '../services/subjectService';
 import { teacherService } from '../services/teacherService';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { studentService } from '../services/studentService';
 
 const Timetable = () => {
   const toast = useToast();
-  const { isAdmin } = useAuth();
+  const { isAdmin, isStudent, user } = useAuth();
   const [classes, setClasses] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [teachers, setTeachers] = useState([]);
@@ -46,10 +47,25 @@ const Timetable = () => {
   ];
 
   useEffect(() => {
-    fetchClasses();
-    fetchSubjects();
-    fetchTeachers();
-  }, []);
+    const initPage = async () => {
+      if (isStudent) {
+        try {
+          const profile = await studentService.getMyProfile();
+          if (profile && profile.class) {
+            setSelectedClass(profile.class._id || profile.class);
+          }
+        } catch (error) {
+          console.error('Error fetching student profile:', error);
+        }
+      } else {
+        fetchClasses();
+      }
+      fetchSubjects();
+      fetchTeachers();
+    };
+
+    initPage();
+  }, [isStudent, user]);
 
   useEffect(() => {
     if (selectedClass) {
@@ -404,6 +420,7 @@ const Timetable = () => {
                   label: `${cls.className} - ${cls.grade} (${cls.section || ''})`,
                 })),
               ]}
+              disabled={isStudent}
             />
             {isAdmin && selectedClass && !currentTimetable && (
               <div className="flex space-x-2">

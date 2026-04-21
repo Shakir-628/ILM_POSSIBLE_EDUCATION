@@ -16,6 +16,16 @@ export const getAllTimetables = async (req, res) => {
     if (classId) filter.class = classId;
     if (academicYear) filter.academicYear = academicYear;
 
+    // Students only see their own class timetable
+    if (req.user.role === 'student') {
+      const student = await Student.findOne({ user: req.user._id });
+      if (student) {
+        filter.class = student.class;
+      } else {
+        return res.status(404).json({ success: false, message: "Student profile not found" });
+      }
+    }
+
     const timetables = await Timetable.find(filter)
       .populate("class", "className grade section")
       .populate({
@@ -90,6 +100,14 @@ export const getTimetableByClass = async (req, res) => {
 
     if (academicYear) filter.academicYear = academicYear;
     if (term) filter.term = term;
+
+    // Student access control
+    if (req.user.role === 'student') {
+      const student = await Student.findOne({ user: req.user._id });
+      if (!student || student.class.toString() !== req.params.classId) {
+        return res.status(403).json({ success: false, message: "Access denied. You can only view your own class timetable." });
+      }
+    }
 
     const timetable = await Timetable.findOne(filter)
       .populate("class", "className grade section")

@@ -519,6 +519,45 @@ export const sendExamScheduleEmail = async (email, examData) => {
   });
 };
 
+// Send online class notification
+export const sendOnlineClassNotification = async (email, classData) => {
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden;">
+      <div style="background-color: #4F46E5; padding: 20px; text-align: center;">
+        <h2 style="color: white; margin: 0;">New Online Class Scheduled</h2>
+      </div>
+      <div style="padding: 30px; background-color: white;">
+        <p style="color: #374151; font-size: 16px;">Hello,</p>
+        <p style="color: #4b5563; font-size: 14px; line-height: 24px;">
+          An online class has been scheduled for your course. Here are the details:
+        </p>
+        <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #4F46E5;">
+          <h3 style="margin-top: 0; color: #111827;">${classData.title}</h3>
+          <p style="margin: 5px 0;"><strong>Subject:</strong> ${classData.subjectName}</p>
+          <p style="margin: 5px 0;"><strong>Time:</strong> ${new Date(classData.startTime).toLocaleString()}</p>
+          <p style="margin: 5px 0;"><strong>Duration:</strong> ${classData.duration} minutes</p>
+          ${classData.description ? `<p style="margin: 5px 0;"><strong>Description:</strong> ${classData.description}</p>` : ''}
+        </div>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${classData.meetingLink}" style="background-color: #4F46E5; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Join Class Now</a>
+        </div>
+        <p style="color: #6b7280; font-size: 13px; text-align: center;">
+          You can also join via the school portal dashboard.
+        </p>
+      </div>
+      <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+        <p style="color: #9ca3af; font-size: 12px; margin: 0;">© 2026 ILM Possible Education.</p>
+      </div>
+    </div>
+  `;
+
+  return await sendEmail({
+    to: email,
+    subject: `Online Class: ${classData.title}`,
+    html,
+  });
+};
+
 export default {
   sendEmail,
   sendPasswordResetEmail,
@@ -535,5 +574,6 @@ export default {
   sendCertificateWithAttachment,
   sendAssignmentNotification,
   sendGradeNotification,
+  sendOnlineClassNotification,
 };
 

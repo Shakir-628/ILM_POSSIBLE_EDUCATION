@@ -25,6 +25,16 @@ export const getAllExamSchedules = async (req, res) => {
     if (academicYear) filter.academicYear = academicYear;
     if (status) filter.status = status;
 
+    // Students only see exams for their own class
+    if (req.user.role === 'student') {
+      const student = await Student.findOne({ user: req.user._id });
+      if (student) {
+        filter.class = student.class;
+      } else {
+        return res.status(404).json({ success: false, message: "Student profile not found" });
+      }
+    }
+
     const schedules = await ExamSchedule.find(filter)
       .populate("class", "className grade section")
       .populate("schedule.subject", "subjectName subjectCode")
@@ -274,6 +284,14 @@ export const getExamSchedulesByClass = async (req, res) => {
     const filter = { class: req.params.classId };
 
     if (academicYear) filter.academicYear = academicYear;
+
+    // Student access control
+    if (req.user.role === 'student') {
+      const student = await Student.findOne({ user: req.user._id });
+      if (!student || student.class.toString() !== req.params.classId) {
+        return res.status(403).json({ success: false, message: "Access denied. You can only view exams for your own class." });
+      }
+    }
 
     const schedules = await ExamSchedule.find(filter)
       .populate("class", "className grade section")

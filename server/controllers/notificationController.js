@@ -1,6 +1,7 @@
 import Notification from "../models/Notification.js";
 import User from "../models/User.js";
 import Parent from "../models/Parent.js";
+import Student from "../models/Student.js";
 import {
   createAdminNotifications,
   refreshAdminNotifications,
@@ -207,6 +208,11 @@ export const createBulkNotifications = async (req, res) => {
         const parents = await Parent.find({ isActive: true }).select('user');
         const parentUserIds = parents.map(p => p.user);
         query = { _id: { $in: parentUserIds } };
+      }
+      else if (targetAudience === 'class' && req.body.classId) {
+        const studentsInClass = await Student.find({ class: req.body.classId }).select('user');
+        const studentUserIds = studentsInClass.map(s => s.user);
+        query = { _id: { $in: studentUserIds } };
       }
       // 'all' includes everyone
       else if (targetAudience === 'all') {

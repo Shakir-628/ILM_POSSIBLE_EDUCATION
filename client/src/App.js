@@ -66,6 +66,7 @@ import Hostel from './pages/Hostel';
 import AIExams from './pages/AIExams';
 import EPortfolio from './pages/EPortfolio';
 import OnlineClasses from './pages/OnlineClasses';
+import MyClass from './pages/MyClass';
 // AI Exam Components
 import CreateExam from './components/CreateExam';
 import StudentExamTaking from './components/StudentExamTaking';
@@ -584,6 +585,14 @@ function App() {
                 element={
                   <PrivateRoute>
                     <OnlineClasses />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/my-class"
+                element={
+                  <PrivateRoute roles={['student']}>
+                    <MyClass />
                   </PrivateRoute>
                 }
               />

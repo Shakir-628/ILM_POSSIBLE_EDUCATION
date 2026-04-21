@@ -1,5 +1,6 @@
 import Assignment from "../models/Assignment.js";
 import Submission from "../models/Submission.js";
+import Student from "../models/Student.js";
 import { processUploadedFiles } from "../services/fileService.js";
 
 // @desc    Get all assignments
@@ -12,6 +13,16 @@ export const getAssignments = async (req, res) => {
 
     if (classId) query.class = classId;
     if (status) query.status = status;
+
+    // Students only see assignments for their own class
+    if (req.user.role === 'student') {
+      const student = await Student.findOne({ user: req.user._id });
+      if (student) {
+        query.class = student.class;
+      } else {
+        return res.status(404).json({ message: "Student profile not found" });
+      }
+    }
 
     const assignments = await Assignment.find(query)
       .populate("class", "className grade section")

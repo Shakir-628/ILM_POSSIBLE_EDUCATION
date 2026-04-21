@@ -255,10 +255,52 @@ export const deleteStudent = async (req, res) => {
 // @access  Private
 export const getStudentsByClass = async (req, res) => {
   try {
+    // Security: Students can only list students in their own class
+    if (req.user.role === 'student') {
+      const student = await Student.findOne({ user: req.user._id });
+      if (!student || student.class.toString() !== req.params.classId) {
+        return res.status(403).json({ message: "Access denied. You can only view students in your own class." });
+      }
+    }
+
     const students = await Student.find({ class: req.params.classId })
       .populate("user", "name email")
       .populate("class", "className grade section");
     res.json(students);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Get information about the student's own class and teachers
+// @route   GET /api/students/me/class-info
+// @access  Private (Student)
+export const getMyClassInfo = async (req, res) => {
+  try {
+    const student = await Student.findOne({ user: req.user._id });
+    
+    if (!student || !student.class) {
+      return res.status(404).json({ message: "Student class information not found" });
+    }
+
+    const classData = await Class.findById(student.class)
+      .populate("classTeacher", "firstName lastName email phone profileImage")
+      .populate({
+        path: "subjects",
+        populate: {
+          path: "teacher",
+          select: "firstName lastName email phone profileImage specialization"
+        }
+      });
+
+    if (!classData) {
+      return res.status(404).json({ message: "Class details not found" });
+    }
+
+    res.json({
+      success: true,
+      data: classData
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

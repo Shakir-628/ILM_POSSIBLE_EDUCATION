@@ -1,6 +1,9 @@
 import OnlineClass from "../models/OnlineClass.js";
 import Teacher from "../models/Teacher.js";
 import Student from "../models/Student.js";
+import Subject from "../models/Subject.js";
+import Parent from "../models/Parent.js";
+import mailService from "../services/mailService.js";
 import crypto from "crypto";
 
 // @desc    Create a new online class
@@ -40,6 +43,43 @@ export const createOnlineClass = async (req, res) => {
       meetingLink,
       description
     });
+
+    // Send notifications to students and parents
+    try {
+      const subjectDoc = await Subject.findById(subject);
+      const students = await Student.find({ class: classId }).populate('parent');
+
+      const classData = {
+        title,
+        subjectName: subjectDoc ? subjectDoc.subjectName : 'N/A',
+        startTime,
+        duration,
+        description,
+        meetingLink
+      };
+
+      const notificationPromises = [];
+
+      for (const student of students) {
+        const emailRecipients = [];
+        if (student.email) emailRecipients.push(student.email);
+        if (student.guardianEmail) emailRecipients.push(student.guardianEmail);
+        if (student.parent && student.parent.email) emailRecipients.push(student.parent.email);
+
+        const uniqueEmails = [...new Set(emailRecipients)];
+
+        for (const email of uniqueEmails) {
+          notificationPromises.push(mailService.sendOnlineClassNotification(email, classData));
+        }
+      }
+
+      // Send all emails in parallel without blocking the main loop too much
+      // We don't await here because we want to respond to the user quickly
+      Promise.all(notificationPromises).catch(err => console.error("Parallel email send error:", err));
+    } catch (mailError) {
+      console.error("Failed to send online class notifications:", mailError);
+      // Don't fail the whole request if email fails
+    }
 
     res.status(201).json({
       success: true,
