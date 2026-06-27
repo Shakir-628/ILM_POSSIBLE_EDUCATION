@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from './Navbar';
 import SidebarWithSubmenu from './SidebarWithSubmenu';
+import ChatbotWidget from './ChatbotWidget';
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -22,6 +23,7 @@ const Layout = ({ children }) => {
           </div>
         </main>
       </div>
+      <ChatbotWidget />
     </div>
   );
 };

@@ -2,11 +2,11 @@
   "chatbot_training_data": {
     "metadata": {
       "name": "ILM Possible Education - School Management System",
-      "version": "1.0",
+      "version": "1.1",
       "created": "2025-12-31",
       "language": "English",
-      "total_qa_pairs": 100,
-      "categories": 15
+      "total_qa_pairs": 125,
+      "categories": 29
     },
     "qa_pairs": [
       {
@@ -608,6 +608,156 @@
         "category": "General",
         "question": "How often is the system updated?",
         "answer": "The system is updated regularly with new features and improvements. Updates are done during maintenance windows to minimize disruption."
+      },
+      {
+        "category": "Inventory",
+        "question": "How do I add a new asset to the school inventory?",
+        "answer": "Go to the Inventory > Assets section, click 'Add Asset', enter details such as name, category, quantity, and status, then click save.",
+        "id": 101
+      },
+      {
+        "category": "Inventory",
+        "question": "How do I report a maintenance request for school property?",
+        "answer": "Go to Inventory > Maintenance, click 'Log Maintenance Request', select the asset or facility, describe the issue, and assign a priority level.",
+        "id": 102
+      },
+      {
+        "category": "Inventory",
+        "question": "Where can I view reports on school inventory and assets?",
+        "answer": "Go to Inventory > Inventory Reports to view status summaries, maintenance histories, and depreciation logs for all school assets.",
+        "id": 103
+      },
+      {
+        "category": "Analytics",
+        "question": "Where can I view overall academic and attendance performance analytics?",
+        "answer": "Go to the Analytics section to view interactive charts showing school-wide GPA trends, enrollment distributions, and monthly attendance rates.",
+        "id": 104
+      },
+      {
+        "category": "Analytics",
+        "question": "How can teachers view analytics for exam performance?",
+        "answer": "Go to Examinations > Exam Analytics to view grade distributions, pass/fail ratios, and average score benchmarks for specific tests and subjects.",
+        "id": 105
+      },
+      {
+        "category": "Logs",
+        "question": "How can admins view system error and warning logs?",
+        "answer": "Go to Logs > System Logs to view server logs, database exceptions, and real-time backend notifications for troubleshooting.",
+        "id": 106
+      },
+      {
+        "category": "Logs",
+        "question": "Where can I track user actions and activity logs for security auditing?",
+        "answer": "Go to Logs > Audit Logs to view a detailed timestamped history of user logins, data modifications, and setting changes across the system.",
+        "id": 107
+      },
+      {
+        "category": "Settings",
+        "question": "How do I update the school's name, logo, or contact details?",
+        "answer": "Go to Settings > School Profile, update the general school information, upload a new logo, and click 'Save Changes'.",
+        "id": 108
+      },
+      {
+        "category": "Settings",
+        "question": "How do I create and manage different user roles in the portal?",
+        "answer": "Go to Settings > User Roles to view, create, edit, or deactivate custom user roles and assign their base descriptions.",
+        "id": 109
+      },
+      {
+        "category": "Settings",
+        "question": "How do I configure module permissions for specific roles?",
+        "answer": "Go to Settings > Role & Module Permissions, select a role, and check/uncheck the toggles to enable or disable access to specific modules or submodules.",
+        "id": 110
+      },
+      {
+        "category": "Settings",
+        "question": "How do I backup the database or configure auto-backups?",
+        "answer": "Go to Settings > Backup & Security to download database dumps manually or configure the automatic backup frequency and scheduled backup time.",
+        "id": 111
+      },
+      {
+        "category": "Settings",
+        "question": "How can I configure school timings, academic years, and session timeouts?",
+        "answer": "Go to Settings > System Settings to configure start/end times, current academic year, currency, and maximum login attempt limits.",
+        "id": 112
+      },
+      {
+        "category": "Settings",
+        "question": "How do I customize the chatbot settings?",
+        "answer": "Go to Settings > Chatbot Customization to toggle the chatbot, change its name and greeting, and select which modules should be available in its knowledge base.",
+        "id": 113
+      },
+      {
+        "category": "E-Portfolio",
+        "question": "What is the E-Portfolio and how do I use it?",
+        "answer": "The E-Portfolio section allows students to showcase their achievements, certificates, projects, and extra-curricular activities dynamically in their profile.",
+        "id": 114
+      },
+      {
+        "category": "E-Portfolio",
+        "question": "How can teachers view and evaluate student E-Portfolios?",
+        "answer": "Teachers can view student E-Portfolios by navigating to the E-Portfolio page and searching for a specific student's registration ID.",
+        "id": 115
+      },
+      {
+        "category": "Online Classes & Resources",
+        "question": "How do I join or create an online class?",
+        "answer": "Go to Academic > Online Classes. Teachers can click 'Create Meeting' to generate a link, and students can click 'Join Class' to start the live video session.",
+        "id": 116
+      },
+      {
+        "category": "Online Classes & Resources",
+        "question": "Where can I download study materials or lecture notes?",
+        "answer": "Go to Academic > Resource Library to browse, download, or preview syllabus documents, study guides, and lecture slides uploaded by teachers.",
+        "id": 117
+      },
+      {
+        "category": "Online Classes & Resources",
+        "question": "How do teachers upload course resources for students?",
+        "answer": "Go to Academic > Resource Library, click 'Upload Resource', choose a file, select the target class and subject, and click save.",
+        "id": 118
+      },
+      {
+        "category": "Admissions",
+        "question": "How do I submit or process a new student admission?",
+        "answer": "Go to Students > Admissions, fill in the applicant's personal details, parent information, class selection, and documents, then click 'Submit Admission'.",
+        "id": 119
+      },
+      {
+        "category": "Admissions",
+        "question": "How do I track the status of pending admissions?",
+        "answer": "Go to Students > Admissions and check the applicants list. You can filter by status (Pending, Approved, Rejected) and perform actions like 'Approve' or 'Schedule Interview'.",
+        "id": 120
+      },
+      {
+        "category": "ID Cards",
+        "question": "How do I generate student ID cards?",
+        "answer": "Go to Students > ID Cards, select the class/section, choose a design template, and click 'Generate ID Cards' to print or download them as PDFs.",
+        "id": 121
+      },
+      {
+        "category": "ID Cards",
+        "question": "How do I generate teacher ID cards?",
+        "answer": "Go to Teachers > ID Cards, select the departments or teachers, choose a template, and click 'Generate ID Cards' to export them.",
+        "id": 122
+      },
+      {
+        "category": "Reports",
+        "question": "How can I generate monthly attendance reports?",
+        "answer": "Go to Reports > Attendance Reports, select the class, month, and year, and click 'Generate Report' to view or export it to Excel/PDF.",
+        "id": 123
+      },
+      {
+        "category": "Reports",
+        "question": "Where can I view financial and collection reports?",
+        "answer": "Go to Reports > Financial Reports to view monthly fee collections, pending dues, income vs expenses, and payroll summaries.",
+        "id": 124
+      },
+      {
+        "category": "Reports",
+        "question": "How do I generate a custom query report?",
+        "answer": "Go to Reports > Custom Reports, select the fields, filter criteria, and sorting options you need, then click 'Run Custom Report'.",
+        "id": 125
       }
     ]
   }

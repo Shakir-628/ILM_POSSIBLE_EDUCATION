@@ -36,6 +36,7 @@ import UserRoles from './pages/settings/UserRoles';
 import BackupSecurity from './pages/settings/BackupSecurity';
 import SystemSettings from './pages/settings/SystemSettings';
 import RolePermissions from './pages/settings/RolePermissions';
+import ChatbotCustomization from './pages/settings/ChatbotCustomization';
 import TeacherPerformance from './pages/TeacherPerformance';
 import TeacherPayroll from './pages/TeacherPayroll';
 import ExamSchedule from './pages/ExamSchedule';
@@ -440,6 +441,14 @@ function App() {
                 element={
                   <PrivateRoute roles={['superadmin', 'admin']}>
                     <RolePermissions />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/settings/chatbot"
+                element={
+                  <PrivateRoute roles={['superadmin', 'admin']}>
+                    <ChatbotCustomization />
                   </PrivateRoute>
                 }
               />

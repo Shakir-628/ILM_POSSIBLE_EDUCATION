@@ -251,6 +251,7 @@ const SidebarWithSubmenu = ({ isOpen, toggleSidebar }) => {
         { name: 'Role & Module Permissions', href: '/settings/role-permissions', roles: ['admin', 'superadmin'] },
         { name: 'Backup & Security', href: '/settings/backup', roles: ['admin', 'superadmin'] },
         { name: 'System Settings', href: '/settings/system', roles: ['admin', 'superadmin'] },
+        { name: 'Chatbot Customization', href: '/settings/chatbot', roles: ['admin', 'superadmin'] },
       ],
     },
   ];

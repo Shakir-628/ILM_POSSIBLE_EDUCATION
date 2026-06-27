@@ -57,6 +57,8 @@ import ePortfolioRoutes from "./routes/ePortfolioRoutes.js";
 import onlineClassRoutes from "./routes/onlineClassRoutes.js";
 import resourceRoutes from "./routes/resourceRoutes.js";
 import teacherPortalRoutes from "./routes/teacherPortalRoutes.js";
+import chatbotRoutes from "./routes/chatbotRoutes.js";
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -142,6 +144,7 @@ app.use("/api/transport", transportRoutes);
 app.use("/api/hostel", hostelRoutes);
 app.use("/api/ai-exams", aiExamRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/chatbot", chatbotRoutes);
 app.use("/api/e-portfolio", ePortfolioRoutes);
 app.use("/api/online-classes", onlineClassRoutes);
 app.use("/api/resources", resourceRoutes);

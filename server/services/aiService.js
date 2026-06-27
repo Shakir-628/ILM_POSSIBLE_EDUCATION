@@ -110,9 +110,17 @@ export const draftCommunication = async (purpose, details) => {
     return `Dear School Community,\n\nWe would like to inform you regarding ${purpose}. ${details}\n\nThank you for your continued support.\n\nBest regards,\nSchool Administration`;
 };
 
+/**
+ * Get chatbot reply using Gemini AI
+ */
+export const getChatbotReply = async (prompt) => {
+    return await callAIAPI(prompt);
+};
+
 export default {
     generateCongratulatoryNote,
     generateQuestions,
     draftCommunication,
+    getChatbotReply,
 };
 
