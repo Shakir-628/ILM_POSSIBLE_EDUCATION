@@ -216,9 +216,13 @@ const UserRoles = () => {
                 onChange={(e) => setNewRole(e.target.value)}
                 options={[
                   { value: 'admin', label: 'Admin' },
+                  { value: 'subadmin', label: 'Sub Admin' },
                   { value: 'teacher', label: 'Teacher' },
                   { value: 'student', label: 'Student' },
                   { value: 'parent', label: 'Parent' },
+                  { value: 'accountant', label: 'Accountant' },
+                  { value: 'librarian', label: 'Librarian' },
+                  { value: 'receptionist', label: 'Receptionist' },
                 ]}
                 required
               />
@@ -289,6 +293,9 @@ const UserRoles = () => {
                     { value: 'teacher', label: 'Teacher' },
                     { value: 'student', label: 'Student' },
                     { value: 'parent', label: 'Parent' },
+                    { value: 'accountant', label: 'Accountant' },
+                    { value: 'librarian', label: 'Librarian' },
+                    { value: 'receptionist', label: 'Receptionist' },
                   ]}
                   required
                 />

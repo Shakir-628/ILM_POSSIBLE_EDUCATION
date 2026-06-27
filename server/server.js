@@ -55,6 +55,8 @@ import aiExamRoutes from "./routes/aiExamRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import ePortfolioRoutes from "./routes/ePortfolioRoutes.js";
 import onlineClassRoutes from "./routes/onlineClassRoutes.js";
+import resourceRoutes from "./routes/resourceRoutes.js";
+import teacherPortalRoutes from "./routes/teacherPortalRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -142,6 +144,8 @@ app.use("/api/ai-exams", aiExamRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/e-portfolio", ePortfolioRoutes);
 app.use("/api/online-classes", onlineClassRoutes);
+app.use("/api/resources", resourceRoutes);
+app.use("/api/teacher", teacherPortalRoutes);
 
 // Error handler middleware (must be last)
 app.use(errorHandler);

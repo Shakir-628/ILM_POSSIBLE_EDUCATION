@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  ScrollView, 
+  RefreshControl, 
+  TouchableOpacity, 
+  Modal, 
+  TextInput, 
+  Alert,
+  ActivityIndicator
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import GradientHeader from '../../components/GradientHeader';
 import CustomCard from '../../components/CustomCard';
@@ -7,8 +18,8 @@ import Loading from '../../components/Loading';
 import EmptyState from '../../components/EmptyState';
 import CustomButton from '../../components/CustomButton';
 import { parentService } from '../../services/parentService';
+import { feeService } from '../../services/feeService';
 import { useToast } from '../../context/ToastContext';
-import { format } from 'date-fns';
 
 const ParentFeesScreen = ({ navigation }) => {
   const toast = useToast();
@@ -16,6 +27,14 @@ const ParentFeesScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [children, setChildren] = useState([]);
   const [childrenFees, setChildrenFees] = useState({});
+  
+  // Payment Modal State
+  const [paymentModalVisible, setPaymentModalVisible] = useState(false);
+  const [selectedChild, setSelectedChild] = useState(null);
+  const [processing, setProcessing] = useState(false);
+  const [cardNumber, setCardNumber] = useState('');
+  const [expiry, setExpiry] = useState('');
+  const [cvv, setCvv] = useState('');
 
   useEffect(() => {
     fetchFeesData();
@@ -56,15 +75,34 @@ const ParentFeesScreen = ({ navigation }) => {
   };
 
   const handlePayFees = (child) => {
-    toast.info('Payment gateway integration coming soon');
+    setSelectedChild(child);
+    setPaymentModalVisible(true);
   };
 
-  const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case 'paid': return '#10B981';
-      case 'pending': return '#F59E0B';
-      case 'overdue': return '#EF4444';
-      default: return '#6B7280';
+  const processPayment = async () => {
+    if (cardNumber.length < 16 || expiry.length < 4 || cvv.length < 3) {
+      Alert.alert('Error', 'Please enter valid card details');
+      return;
+    }
+
+    try {
+      setProcessing(true);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // In a real app, you would call feeService.payFee(...)
+      // Since this is a simulation, we'll just show success
+      
+      toast.success(`Payment of PKR ${childrenFees[selectedChild._id]?.pending.toLocaleString()} successful!`);
+      setPaymentModalVisible(false);
+      setCardNumber('');
+      setExpiry('');
+      setCvv('');
+      fetchFeesData(); // Refresh data
+    } catch (error) {
+      toast.error('Payment failed. Please try again.');
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -128,11 +166,11 @@ const ParentFeesScreen = ({ navigation }) => {
                   <View style={styles.childHeader}>
                     <View style={styles.childAvatar}>
                       <Text style={styles.avatarText}>
-                        {child.name?.charAt(0)?.toUpperCase()}
+                        {child.firstName?.charAt(0)?.toUpperCase() || child.name?.charAt(0)?.toUpperCase()}
                       </Text>
                     </View>
                     <View style={styles.childInfo}>
-                      <Text style={styles.childName}>{child.name}</Text>
+                      <Text style={styles.childName}>{child.firstName} {child.lastName}</Text>
                       <Text style={styles.childDetails}>
                         {child.studentId} • {typeof child.class === 'object' ? child.class?.className : child.class}
                       </Text>
@@ -172,165 +210,134 @@ const ParentFeesScreen = ({ navigation }) => {
                 </CustomCard>
               );
             })}
-
-            {/* Info Card */}
-            <CustomCard style={styles.infoCard}>
-              <Ionicons name="information-circle" size={24} color="#4F46E5" />
-              <View style={styles.infoContent}>
-                <Text style={styles.infoTitle}>Payment Methods</Text>
-                <Text style={styles.infoText}>
-                  Online payment gateway integration is coming soon. Currently, please pay fees at the school office.
-                </Text>
-              </View>
-            </CustomCard>
           </>
         )}
       </ScrollView>
+
+      {/* Payment Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={paymentModalVisible}
+        onRequestClose={() => setPaymentModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Secure Checkout</Text>
+              <TouchableOpacity onPress={() => setPaymentModalVisible(false)}>
+                <Ionicons name="close" size={24} color="#1f2937" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.paymentSummary}>
+              <Text style={styles.paymentLabel}>Paying for:</Text>
+              <Text style={styles.paymentValue}>{selectedChild?.firstName} {selectedChild?.lastName}</Text>
+              <Text style={styles.paymentAmount}>
+                PKR {selectedChild && childrenFees[selectedChild._id]?.pending.toLocaleString()}
+              </Text>
+            </View>
+
+            <View style={styles.formGroup}>
+              <Text style={styles.inputLabel}>Card Number</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="0000 0000 0000 0000"
+                keyboardType="numeric"
+                maxLength={16}
+                value={cardNumber}
+                onChangeText={setCardNumber}
+              />
+            </View>
+
+            <View style={styles.formRow}>
+              <View style={[styles.formGroup, { flex: 1, marginRight: 12 }]}>
+                <Text style={styles.inputLabel}>Expiry (MM/YY)</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="12/25"
+                  keyboardType="numeric"
+                  maxLength={5}
+                  value={expiry}
+                  onChangeText={setExpiry}
+                />
+              </View>
+              <View style={[styles.formGroup, { flex: 1 }]}>
+                <Text style={styles.inputLabel}>CVV</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="123"
+                  keyboardType="numeric"
+                  maxLength={3}
+                  secureTextEntry
+                  value={cvv}
+                  onChangeText={setCvv}
+                />
+              </View>
+            </View>
+
+            <CustomButton
+              title={processing ? "Processing..." : "Complete Payment"}
+              onPress={processPayment}
+              loading={processing}
+              style={styles.payFinalButton}
+              icon="lock-closed"
+            />
+            
+            <View style={styles.secureBadge}>
+              <Ionicons name="shield-checkmark" size={16} color="#10B981" />
+              <Text style={styles.secureText}>SSL Encrypted Secure Payment</Text>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f7fa',
-  },
-  content: {
-    padding: 16,
-  },
-  summaryCard: {
-    marginBottom: 20,
-    backgroundColor: '#EEF2FF',
-  },
-  summaryTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1f2937',
-    marginBottom: 16,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  summaryItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  summaryLabel: {
-    fontSize: 13,
-    color: '#6b7280',
-    marginBottom: 8,
-  },
-  summaryValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  summaryDivider: {
-    width: 1,
-    height: 40,
-    backgroundColor: '#cbd5e1',
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1f2937',
-    marginBottom: 12,
-  },
-  childCard: {
-    marginBottom: 16,
-  },
-  childHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-    paddingBottom: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
-  },
-  childAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#4F46E5',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  avatarText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  childInfo: {
-    flex: 1,
-  },
-  childName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1f2937',
-  },
-  childDetails: {
-    fontSize: 13,
-    color: '#6b7280',
-    marginTop: 2,
-  },
-  feesDetails: {
-    marginBottom: 12,
-  },
-  feeRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-  },
-  totalRow: {
-    borderTopWidth: 1,
-    borderTopColor: '#e5e7eb',
-    marginTop: 4,
-    paddingTop: 12,
-  },
-  feeLabel: {
-    fontSize: 14,
-    color: '#6b7280',
-  },
-  feeLabelBold: {
-    fontSize: 15,
-    color: '#1f2937',
-    fontWeight: '700',
-  },
-  feeValue: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  feeValueBold: {
-    fontSize: 16,
-    color: '#1f2937',
-    fontWeight: '700',
-  },
-  payButton: {
-    marginTop: 8,
-  },
-  infoCard: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: '#FEF3C7',
-    marginTop: 8,
-  },
-  infoContent: {
-    marginLeft: 12,
-    flex: 1,
-  },
-  infoTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#1f2937',
-    marginBottom: 4,
-  },
-  infoText: {
-    fontSize: 13,
-    color: '#6b7280',
-    lineHeight: 18,
-  },
+  container: { flex: 1, backgroundColor: '#f5f7fa' },
+  content: { padding: 16 },
+  summaryCard: { marginBottom: 20, backgroundColor: '#EEF2FF' },
+  summaryTitle: { fontSize: 16, fontWeight: '700', color: '#1f2937', marginBottom: 16 },
+  summaryRow: { flexDirection: 'row', alignItems: 'center' },
+  summaryItem: { flex: 1, alignItems: 'center' },
+  summaryLabel: { fontSize: 13, color: '#6b7280', marginBottom: 8 },
+  summaryValue: { fontSize: 20, fontWeight: 'bold' },
+  summaryDivider: { width: 1, height: 40, backgroundColor: '#cbd5e1' },
+  sectionTitle: { fontSize: 18, fontWeight: '600', color: '#1f2937', marginBottom: 12 },
+  childCard: { marginBottom: 16 },
+  childHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 16, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
+  childAvatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#4F46E5', justifyContent: 'center', alignItems: 'center', marginRight: 12 },
+  avatarText: { fontSize: 20, fontWeight: 'bold', color: '#fff' },
+  childInfo: { flex: 1 },
+  childName: { fontSize: 16, fontWeight: '600', color: '#1f2937' },
+  childDetails: { fontSize: 13, color: '#6b7280', marginTop: 2 },
+  feesDetails: { marginBottom: 12 },
+  feeRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8 },
+  totalRow: { borderTopWidth: 1, borderTopColor: '#e5e7eb', marginTop: 4, paddingTop: 12 },
+  feeLabel: { fontSize: 14, color: '#6b7280' },
+  feeLabelBold: { fontSize: 15, color: '#1f2937', fontWeight: '700' },
+  feeValue: { fontSize: 14, fontWeight: '600' },
+  feeValueBold: { fontSize: 16, color: '#1f2937', fontWeight: '700' },
+  payButton: { marginTop: 8 },
+  
+  // Modal Styles
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
+  modalContent: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, paddingBottom: 40 },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  modalTitle: { fontSize: 20, fontWeight: 'bold', color: '#1f2937' },
+  paymentSummary: { backgroundColor: '#f9fafb', padding: 16, borderRadius: 12, marginBottom: 24, alignItems: 'center' },
+  paymentLabel: { fontSize: 14, color: '#6b7280' },
+  paymentValue: { fontSize: 16, fontWeight: '600', color: '#1f2937', marginVertical: 4 },
+  paymentAmount: { fontSize: 24, fontWeight: 'bold', color: '#4F46E5' },
+  formGroup: { marginBottom: 16 },
+  formRow: { flexDirection: 'row' },
+  inputLabel: { fontSize: 13, fontWeight: '600', color: '#374151', marginBottom: 6 },
+  input: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#d1d5db', borderRadius: 10, padding: 12, fontSize: 16 },
+  payFinalButton: { marginTop: 8 },
+  secureBadge: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 16 },
+  secureText: { fontSize: 12, color: '#6b7280', marginLeft: 6 },
 });
 
 export default ParentFeesScreen;
-

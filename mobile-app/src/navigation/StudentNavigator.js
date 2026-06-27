@@ -9,6 +9,7 @@ import GradesScreen from '../screens/student/GradesScreen';
 import AssignmentsScreen from '../screens/student/AssignmentsScreen';
 import AnnouncementsScreen from '../screens/shared/AnnouncementsScreen';
 import NotificationsScreen from '../screens/shared/NotificationsScreen';
+import MessagesScreen from '../screens/shared/MessagesScreen';
 import ProfileScreen from '../screens/student/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
@@ -33,6 +34,9 @@ const StudentNavigator = () => {
               break;
             case 'Announcements':
               iconName = focused ? 'megaphone' : 'megaphone-outline';
+              break;
+            case 'Messages':
+              iconName = focused ? 'mail' : 'mail-outline';
               break;
             case 'Profile':
               iconName = focused ? 'person' : 'person-outline';
@@ -73,7 +77,7 @@ const StudentNavigator = () => {
       />
       <Tab.Screen name="Grades" component={GradesScreen} />
       <Tab.Screen name="Notifications" component={NotificationsScreen} />
-      <Tab.Screen name="Announcements" component={AnnouncementsScreen} />
+      <Tab.Screen name="Messages" component={MessagesScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );

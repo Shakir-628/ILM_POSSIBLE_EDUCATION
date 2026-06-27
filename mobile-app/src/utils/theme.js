@@ -2,13 +2,13 @@ import { MD3LightTheme, MD3DarkTheme } from 'react-native-paper';
 
 // Brand colors matching your web app
 const brandColors = {
-  primary: '#4F46E5',
-  secondary: '#8B5CF6',
-  accent: '#06b6d4',
-  success: '#22c55e',
-  warning: '#f59e0b',
-  danger: '#ef4444',
-  info: '#3b82f6',
+  primary: '#6366F1',      // Indigo
+  secondary: '#10B981',    // Emerald
+  accent: '#F43F5E',       // Rose
+  success: '#10B981',
+  warning: '#F59E0B',
+  danger: '#F43F5E',
+  info: '#3B82F6',
 };
 
 export const theme = {
@@ -22,11 +22,11 @@ export const theme = {
     warning: brandColors.warning,
     error: brandColors.danger,
     info: brandColors.info,
-    background: '#f5f7fa',
-    surface: '#ffffff',
-    text: '#1f2937',
-    textSecondary: '#6b7280',
-    border: '#e5e7eb',
+    background: '#F1F5F9',
+    surface: '#FFFFFF',
+    text: '#0F172A',
+    textSecondary: '#475569',
+    border: '#E2E8F0',
   },
   roundness: 12,
 };
@@ -35,51 +35,58 @@ export const darkTheme = {
   ...MD3DarkTheme,
   colors: {
     ...MD3DarkTheme.colors,
-    primary: brandColors.primary,
-    secondary: brandColors.secondary,
-    accent: brandColors.accent,
-    success: brandColors.success,
-    warning: brandColors.warning,
-    error: brandColors.danger,
-    background: '#0f172a',
-    surface: '#1e293b',
-    text: '#f1f5f9',
+    primary: '#818CF8',
+    secondary: '#34D399',
+    accent: '#FB7185',
+    success: '#34D399',
+    warning: '#FBBF24',
+    error: '#FB7185',
+    background: '#020617',
+    surface: '#0F172A',
+    text: '#F8FAFC',
+    textSecondary: '#CBD5E1',
+    border: '#334155',
   },
-  roundness: 12,
+  roundness: 16,
 };
 
 export const spacing = {
   xs: 4,
   sm: 8,
-  md: 16,
-  lg: 24,
-  xl: 32,
-  xxl: 48,
+  md: 12,
+  lg: 16,
+  xl: 24,
+  xxl: 32,
+  xxxl: 48,
 };
 
 export const typography = {
   h1: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    lineHeight: 40,
+    fontSize: 34,
+    fontWeight: '800',
+    lineHeight: 42,
+    letterSpacing: -1,
   },
   h2: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    lineHeight: 32,
+    fontSize: 28,
+    fontWeight: '700',
+    lineHeight: 36,
+    letterSpacing: -0.5,
   },
   h3: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '600',
-    lineHeight: 28,
+    lineHeight: 30,
   },
   body: {
     fontSize: 16,
     lineHeight: 24,
+    color: '#475569',
   },
   caption: {
-    fontSize: 12,
-    lineHeight: 16,
+    fontSize: 13,
+    lineHeight: 18,
+    color: '#94A3B8',
   },
 };
 

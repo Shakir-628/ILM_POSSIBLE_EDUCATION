@@ -16,9 +16,11 @@ import CustomInput from '../../components/CustomInput';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import BiometricService from '../../services/biometricService';
-import { colors, spacing, fontSize, fontWeight, borderRadius, gradients } from '../../utils/designSystem';
+import { useDesignSystem } from '../../utils/designSystem';
 
 const LoginScreen = ({ navigation }) => {
+  const { colors, spacing, fontSize, fontWeight, borderRadius, gradients, shadows, isDarkMode } = useDesignSystem();
+  const styles = getStyles(colors, isDarkMode, shadows, spacing, fontSize, fontWeight, borderRadius);
   const { login, isAuthenticated, user, setIsLoggingIn } = useAuth();
   const toast = useToast();
   const [email, setEmail] = useState('');
@@ -186,12 +188,18 @@ const LoginScreen = ({ navigation }) => {
             end={{ x: 1, y: 1 }}
             style={styles.header}
           >
+            {/* Background Decorative Circles */}
+            <View style={styles.headerCircle1} />
+            <View style={styles.headerCircle2} />
+
             <Animated.View style={[styles.logoContainer, { transform: [{ scale: logoScale }] }]}>
               <View style={styles.logoCircle}>
-                <Ionicons name="school" size={48} color={colors.white} />
+                <Ionicons name="school" size={56} color={colors.white} />
               </View>
               <Text style={styles.appName}>ILM Possible</Text>
-              <Text style={styles.appTagline}>Education Management System</Text>
+              <View style={styles.taglineBadge}>
+                <Text style={styles.appTagline}>EDUCATION MANAGEMENT SYSTEM</Text>
+              </View>
             </Animated.View>
           </LinearGradient>
         </Animated.View>
@@ -211,7 +219,7 @@ const LoginScreen = ({ navigation }) => {
             <Text style={styles.subtitleText}>Sign in to continue your learning journey</Text>
           </View>
 
-          {/* Quick Fill Buttons for Testing */}
+          {/* Form Content */}
           <View style={styles.inputsContainer}>
             <CustomInput
               label="Email Address"
@@ -245,7 +253,7 @@ const LoginScreen = ({ navigation }) => {
 
           <View style={styles.buttonsContainer}>
             <CustomButton
-              title={loading ? 'Signing In...' : 'Sign In'}
+              title={loading ? 'SIGNING IN...' : 'SIGN IN'}
               onPress={handleLogin}
               loading={loading}
               fullWidth
@@ -258,40 +266,46 @@ const LoginScreen = ({ navigation }) => {
                 style={styles.biometricButton}
                 onPress={handleBiometricLogin}
                 disabled={loading}
+                activeOpacity={0.7}
               >
-                <Ionicons name="finger-print" size={24} color={colors.primary} />
-                <Text style={styles.biometricText}>
-                  Sign in with {biometricTypeName}
-                </Text>
+                <LinearGradient
+                  colors={['rgba(99, 102, 241, 0.1)', 'rgba(99, 102, 241, 0.05)']}
+                  style={styles.biometricGradient}
+                >
+                  <Ionicons name="finger-print" size={28} color={colors.primary} />
+                  <Text style={styles.biometricText}>
+                    Sign in with {biometricTypeName}
+                  </Text>
+                </LinearGradient>
               </TouchableOpacity>
             )}
 
-            <CustomButton
-              title="Forgot Password?"
+            <TouchableOpacity
               onPress={() => navigation.navigate('ForgotPassword')}
-              variant="outline"
-              fullWidth
-              icon="help-circle-outline"
-              style={styles.forgotButton}
-            />
+              style={styles.forgotButtonContainer}
+            >
+              <Text style={styles.forgotText}>Forgot Password?</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or</Text>
+            <Text style={styles.dividerText}>OR CONTINUE WITH</Text>
             <View style={styles.dividerLine} />
           </View>
 
           <View style={styles.registerContainer}>
             <Text style={styles.registerText}>Don't have an account? </Text>
             <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-              <Text style={styles.registerLink}>Register Now →</Text>
+              <Text style={styles.registerLink}>Register Now</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.footer}>
-            <Ionicons name="shield-checkmark" size={18} color={colors.success} />
-            <Text style={styles.footerText}>  Secure Login</Text>
+            <View style={styles.secureBadge}>
+              <Ionicons name="shield-checkmark" size={16} color={colors.success} />
+              <Text style={styles.footerText}>SECURE LOGIN</Text>
+            </View>
           </View>
 
           <View style={styles.copyright}>
@@ -304,10 +318,10 @@ const LoginScreen = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors, isDarkMode, shadows, spacing, fontSize, fontWeight, borderRadius) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.primaryDark,
   },
   scrollView: {
     flex: 1,
@@ -316,141 +330,202 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   header: {
-    paddingTop: spacing.xxxl,
-    paddingBottom: spacing.xxl + spacing.md,
+    paddingTop: spacing.xxxl + 20,
+    paddingBottom: spacing.xxxl + 20,
     alignItems: 'center',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  headerCircle1: {
+    position: 'absolute',
+    top: -50,
+    right: -50,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  headerCircle2: {
+    position: 'absolute',
+    bottom: -30,
+    left: -30,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
   },
   logoContainer: {
     alignItems: 'center',
+    zIndex: 1,
   },
   logoCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: spacing.md,
+    marginBottom: spacing.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+    ...shadows.medium,
   },
   appName: {
-    fontSize: fontSize.xxxl,
-    fontWeight: fontWeight.extrabold,
+    fontSize: 42,
+    fontWeight: fontWeight.black,
     color: colors.white,
-    marginBottom: spacing.xs / 2,
-    letterSpacing: 0.5,
+    marginBottom: spacing.xs,
+    letterSpacing: -1,
+  },
+  taglineBadge: {
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    paddingHorizontal: spacing.md,
+    paddingVertical: 4,
+    borderRadius: borderRadius.full,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   appTagline: {
-    fontSize: fontSize.sm,
-    color: 'rgba(255, 255, 255, 0.95)',
-    fontWeight: fontWeight.medium,
+    fontSize: 10,
+    color: colors.white,
+    fontWeight: fontWeight.bold,
+    letterSpacing: 2,
   },
   formContainer: {
     flex: 1,
-    backgroundColor: colors.white,
-    borderTopLeftRadius: borderRadius.xl + 8,
-    borderTopRightRadius: borderRadius.xl + 8,
-    marginTop: -spacing.xl,
+    backgroundColor: colors.background,
+    borderTopLeftRadius: borderRadius.xl + 12,
+    borderTopRightRadius: borderRadius.xl + 12,
+    marginTop: -spacing.xl - 10,
+    paddingTop: spacing.xxl,
     paddingBottom: spacing.xxl,
+    ...shadows.large,
   },
   welcomeContainer: {
-    marginBottom: spacing.md,
-    paddingTop: spacing.md,
+    marginBottom: spacing.xl,
     paddingHorizontal: spacing.xxl,
   },
   welcomeText: {
     fontSize: fontSize.xxl,
-    fontWeight: fontWeight.bold,
+    fontWeight: fontWeight.black,
     color: colors.textPrimary,
     marginBottom: spacing.xs,
+    letterSpacing: -0.5,
   },
   subtitleText: {
-    fontSize: fontSize.md,
+    fontSize: fontSize.base,
     color: colors.textSecondary,
-    lineHeight: 22,
+    lineHeight: 24,
+    fontWeight: fontWeight.medium,
   },
   inputsContainer: {
     paddingHorizontal: spacing.xxl,
   },
   buttonsContainer: {
     paddingHorizontal: spacing.xxl,
-  },
-  loginButton: {
     marginTop: spacing.sm,
   },
+  loginButton: {
+    ...shadows.medium,
+  },
   biometricButton: {
+    marginTop: spacing.lg,
+    borderRadius: borderRadius.lg,
+    overflow: 'hidden',
+    borderWidth: 1.5,
+    borderColor: 'rgba(99, 102, 241, 0.2)',
+  },
+  biometricGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: spacing.md,
-    marginTop: spacing.md,
-    borderRadius: borderRadius.lg,
-    backgroundColor: `${colors.primary}10`,
-    borderWidth: 1,
-    borderColor: `${colors.primary}30`,
-    gap: spacing.sm,
+    paddingVertical: spacing.lg,
+    gap: spacing.md,
   },
   biometricText: {
     fontSize: fontSize.md,
     color: colors.primary,
-    fontWeight: fontWeight.semibold,
+    fontWeight: fontWeight.bold,
+    letterSpacing: 0.5,
   },
-  forgotButton: {
-    marginTop: spacing.sm,
+  forgotButtonContainer: {
+    alignItems: 'center',
+    marginTop: spacing.xl,
+  },
+  forgotText: {
+    color: colors.primary,
+    fontWeight: fontWeight.bold,
+    fontSize: fontSize.base,
   },
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: spacing.md,
+    marginVertical: spacing.xl,
     paddingHorizontal: spacing.xxl,
   },
   dividerLine: {
     flex: 1,
-    height: 1,
+    height: 1.5,
     backgroundColor: colors.gray200,
   },
   dividerText: {
     marginHorizontal: spacing.lg,
-    fontSize: fontSize.sm,
+    fontSize: 11,
+    fontWeight: fontWeight.black,
     color: colors.textTertiary,
+    letterSpacing: 1.5,
   },
   registerContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: spacing.sm,
+    marginBottom: spacing.xxl,
   },
   registerText: {
-    fontSize: fontSize.md,
+    fontSize: fontSize.base,
     color: colors.textSecondary,
+    fontWeight: fontWeight.medium,
   },
   registerLink: {
-    fontSize: fontSize.md,
+    fontSize: fontSize.base,
     color: colors.primary,
-    fontWeight: fontWeight.semibold,
+    fontWeight: fontWeight.bold,
+    textDecorationLine: 'underline',
   },
   footer: {
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: spacing.md,
+    marginBottom: spacing.xl,
+  },
+  secureBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.successLight,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: 6,
+    borderRadius: borderRadius.full,
+    gap: spacing.xs,
   },
   footerText: {
-    fontSize: fontSize.sm,
-    color: colors.textSecondary,
+    fontSize: 10,
+    color: colors.success,
+    fontWeight: fontWeight.black,
+    letterSpacing: 1,
   },
   copyright: {
     alignItems: 'center',
-    paddingVertical: spacing.sm,
-    paddingBottom: spacing.md,
+    paddingBottom: spacing.xl,
   },
   copyrightText: {
-    fontSize: fontSize.sm,
+    fontSize: fontSize.xs,
     color: colors.textTertiary,
+    fontWeight: fontWeight.medium,
   },
   copyrightSubtext: {
-    fontSize: fontSize.xs,
+    fontSize: 10,
     color: colors.gray400,
-    marginTop: spacing.xs,
+    marginTop: 4,
+    fontWeight: fontWeight.medium,
   },
 });
 

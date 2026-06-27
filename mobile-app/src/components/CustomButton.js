@@ -2,12 +2,12 @@ import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, fontSize, fontWeight, borderRadius, gradients } from '../utils/designSystem';
+import { colors, spacing, fontSize, fontWeight, borderRadius, gradients, shadows } from '../utils/designSystem';
 
 const CustomButton = ({
   title,
   onPress,
-  variant = 'primary', // primary, secondary, outline, danger
+  variant = 'primary', // primary, secondary, accent, outline, danger
   size = 'medium', // small, medium, large
   icon,
   loading = false,
@@ -17,31 +17,55 @@ const CustomButton = ({
 }) => {
   const getButtonStyle = () => {
     const baseStyle = [styles.button];
-    
+
     if (size === 'small') baseStyle.push(styles.buttonSmall);
     if (size === 'large') baseStyle.push(styles.buttonLarge);
     if (fullWidth) baseStyle.push(styles.fullWidth);
     if (disabled) baseStyle.push(styles.disabled);
-    
+
     if (variant === 'secondary') baseStyle.push(styles.secondary);
+    if (variant === 'accent') baseStyle.push(styles.accent);
     if (variant === 'outline') baseStyle.push(styles.outline);
     if (variant === 'danger') baseStyle.push(styles.danger);
-    
+
     return baseStyle;
   };
 
   const getTextStyle = () => {
     const baseStyle = [styles.text];
-    
+
     if (size === 'small') baseStyle.push(styles.textSmall);
     if (size === 'large') baseStyle.push(styles.textLarge);
-    
+
     if (variant === 'outline') baseStyle.push(styles.outlineText);
-    
+
     return baseStyle;
   };
 
-  if (variant === 'primary' && !disabled) {
+  const renderGradient = (colors_list) => (
+    <LinearGradient
+      colors={colors_list}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+      style={styles.gradient}
+    >
+      {loading ? (
+        <ActivityIndicator color="#fff" />
+      ) : (
+        <View style={styles.content}>
+          {icon && <Ionicons name={icon} size={20} color={colors.white} style={styles.icon} />}
+          <Text style={getTextStyle()}>{title}</Text>
+        </View>
+      )}
+    </LinearGradient>
+  );
+
+  if ((variant === 'primary' || variant === 'secondary' || variant === 'accent' || variant === 'danger') && !disabled) {
+    let gradientColors = gradients.primary;
+    if (variant === 'secondary') gradientColors = gradients.secondary;
+    if (variant === 'accent') gradientColors = gradients.accent;
+    if (variant === 'danger') gradientColors = gradients.error;
+
     return (
       <TouchableOpacity
         onPress={onPress}
@@ -49,21 +73,7 @@ const CustomButton = ({
         style={[getButtonStyle(), style]}
         activeOpacity={0.8}
       >
-        <LinearGradient
-          colors={gradients.primary}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.gradient}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <View style={styles.content}>
-              {icon && <Ionicons name={icon} size={20} color={colors.white} style={styles.icon} />}
-              <Text style={getTextStyle()}>{title}</Text>
-            </View>
-          )}
-        </LinearGradient>
+        {renderGradient(gradientColors)}
       </TouchableOpacity>
     );
   }
@@ -96,21 +106,19 @@ const CustomButton = ({
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: borderRadius.md,
+    borderRadius: borderRadius.lg,
     overflow: 'hidden',
   },
   buttonSmall: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xs,
   },
   buttonLarge: {
     paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.xxl,
   },
   gradient: {
-    paddingVertical: spacing.md + 2,
-    paddingHorizontal: spacing.xl,
-    borderRadius: borderRadius.md,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.xxl,
+    borderRadius: borderRadius.lg,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -124,27 +132,28 @@ const styles = StyleSheet.create({
   },
   text: {
     color: colors.white,
-    fontSize: fontSize.lg,
-    fontWeight: fontWeight.semibold,
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.bold,
+    letterSpacing: 0.5,
   },
   textSmall: {
-    fontSize: fontSize.base,
+    fontSize: fontSize.sm,
   },
   textLarge: {
-    fontSize: fontSize.xl,
+    fontSize: fontSize.lg,
   },
   secondary: {
     backgroundColor: colors.secondary,
-    paddingVertical: spacing.md + 2,
-    paddingHorizontal: spacing.xl,
-    alignItems: 'center',
+  },
+  accent: {
+    backgroundColor: colors.accent,
   },
   outline: {
     backgroundColor: 'transparent',
     borderWidth: 2,
     borderColor: colors.primary,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.lg - 2,
+    paddingHorizontal: spacing.xxl,
     alignItems: 'center',
   },
   outlineText: {
@@ -152,9 +161,6 @@ const styles = StyleSheet.create({
   },
   danger: {
     backgroundColor: colors.error,
-    paddingVertical: spacing.md + 2,
-    paddingHorizontal: spacing.xl,
-    alignItems: 'center',
   },
   disabled: {
     opacity: 0.5,

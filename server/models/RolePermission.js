@@ -30,7 +30,7 @@ const rolePermissionSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true, // This already creates an index
-      enum: ['superadmin', 'admin', 'subadmin', 'teacher', 'student', 'parent'],
+      enum: ['superadmin', 'admin', 'subadmin', 'teacher', 'student', 'parent', 'accountant', 'librarian', 'receptionist'],
     },
     displayName: {
       type: String,

@@ -1,6 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, Animated } from 'react-native';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  ScrollView, 
+  RefreshControl, 
+  TouchableOpacity, 
+  Animated, 
+  Modal, 
+  Alert,
+  ActivityIndicator
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as DocumentPicker from 'expo-document-picker';
 import CustomCard from '../../components/CustomCard';
 import CustomButton from '../../components/CustomButton';
 import Loading from '../../components/Loading';
@@ -8,8 +20,7 @@ import EmptyState from '../../components/EmptyState';
 import { assignmentService } from '../../services/assignmentService';
 import { useToast } from '../../context/ToastContext';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, fontSize, fontWeight, borderRadius, gradients, getStatusColor } from '../../utils/designSystem';
-import { format } from 'date-fns';
+import { colors, spacing, fontSize, fontWeight, borderRadius, gradients } from '../../utils/designSystem';
 
 const AssignmentsScreen = () => {
   const toast = useToast();
@@ -18,6 +29,12 @@ const AssignmentsScreen = () => {
   const [assignments, setAssignments] = useState([]);
   const [filter, setFilter] = useState('all'); // all, pending, submitted
   
+  // Submission Modal State
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedAssignment, setSelectedAssignment] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+
   // Animations
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -56,6 +73,53 @@ const AssignmentsScreen = () => {
   const onRefresh = () => {
     setRefreshing(true);
     fetchAssignments();
+  };
+
+  const handlePickDocument = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: '*/*',
+        copyToCacheDirectory: true,
+      });
+
+      if (!result.canceled) {
+        setSelectedFile(result.assets[0]);
+      }
+    } catch (err) {
+      console.error('Error picking document:', err);
+      Alert.alert('Error', 'Failed to pick document');
+    }
+  };
+
+  const handleSubmitAssignment = async () => {
+    if (!selectedFile) {
+      Alert.alert('Error', 'Please select a file first');
+      return;
+    }
+
+    try {
+      setUploading(true);
+      
+      const formData = new FormData();
+      formData.append('assignmentId', selectedAssignment._id);
+      formData.append('files', {
+        uri: selectedFile.uri,
+        name: selectedFile.name,
+        type: selectedFile.mimeType || 'application/octet-stream',
+      });
+
+      await assignmentService.submitAssignment(formData);
+      
+      toast.success('Assignment submitted successfully');
+      setModalVisible(false);
+      setSelectedFile(null);
+      fetchAssignments(); // Refresh list
+    } catch (error) {
+      console.error('Error submitting assignment:', error);
+      Alert.alert('Error', error.response?.data?.message || 'Failed to submit assignment');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const filteredAssignments = assignments.filter(a => {
@@ -134,61 +198,120 @@ const AssignmentsScreen = () => {
           <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
             {filteredAssignments.map((assignment, index) => (
               <CustomCard key={index} style={styles.assignmentCard}>
-                <TouchableOpacity 
-                  onPress={() => toast.info(`Viewing ${assignment.title}`)}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.assignment}>
-                    <View style={styles.assignmentHeader}>
-                      <Text style={styles.assignmentTitle}>{assignment.title}</Text>
-                      <View
-                        style={[
-                          styles.statusBadge,
-                          { backgroundColor: getAssignmentStatusColor(assignment) },
-                        ]}
-                      >
-                        <Text style={styles.statusText}>{getStatusText(assignment)}</Text>
-                      </View>
+                <View style={styles.assignment}>
+                  <View style={styles.assignmentHeader}>
+                    <Text style={styles.assignmentTitle}>{assignment.title}</Text>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        { backgroundColor: getAssignmentStatusColor(assignment) },
+                      ]}
+                    >
+                      <Text style={styles.statusText}>{getStatusText(assignment)}</Text>
                     </View>
+                  </View>
 
-                <Text style={styles.assignmentDesc} numberOfLines={2}>
-                  {assignment.description}
-                </Text>
+                  <Text style={styles.assignmentDesc} numberOfLines={2}>
+                    {assignment.description}
+                  </Text>
 
-                <View style={styles.assignmentDetails}>
-                  <View style={styles.detailItem}>
-                    <Ionicons name="book-outline" size={16} color="#6b7280" />
-                    <Text style={styles.detailText}>{assignment.subject?.subjectName}</Text>
+                  <View style={styles.assignmentDetails}>
+                    <View style={styles.detailItem}>
+                      <Ionicons name="book-outline" size={16} color="#6b7280" />
+                      <Text style={styles.detailText}>{assignment.subject?.subjectName || 'General'}</Text>
+                    </View>
+                    <View style={styles.detailItem}>
+                      <Ionicons name="calendar-outline" size={16} color="#6b7280" />
+                      <Text style={styles.detailText}>
+                        Due: {new Date(assignment.dueDate).toLocaleDateString()}
+                      </Text>
+                    </View>
                   </View>
-                  <View style={styles.detailItem}>
-                    <Ionicons name="calendar-outline" size={16} color="#6b7280" />
-                    <Text style={styles.detailText}>
-                      Due: {new Date(assignment.dueDate).toLocaleDateString()}
-                    </Text>
-                  </View>
-                  <View style={styles.detailItem}>
-                    <Ionicons name="star-outline" size={16} color="#6b7280" />
-                    <Text style={styles.detailText}>{assignment.totalMarks} marks</Text>
-                  </View>
+
+                  {!assignment.submitted && (
+                    <CustomButton
+                      title="Submit Now"
+                      onPress={() => {
+                        setSelectedAssignment(assignment);
+                        setModalVisible(true);
+                      }}
+                      size="small"
+                      fullWidth
+                      icon="cloud-upload-outline"
+                      style={styles.submitButton}
+                    />
+                  )}
+                  
+                  {assignment.submitted && assignment.grade && (
+                    <View style={styles.gradeInfo}>
+                      <Text style={styles.gradeLabel}>Grade: </Text>
+                      <Text style={styles.gradeValue}>{assignment.grade}/{assignment.totalMarks}</Text>
+                    </View>
+                  )}
                 </View>
-
-                {!assignment.submitted && (
-                  <CustomButton
-                    title="Submit Assignment"
-                    onPress={() => toast.info('Use web app to submit files')}
-                    size="small"
-                    fullWidth
-                    icon="cloud-upload-outline"
-                    style={styles.submitButton}
-                  />
-                )}
-              </View>
-                </TouchableOpacity>
-            </CustomCard>
+              </CustomCard>
             ))}
           </Animated.View>
         )}
       </ScrollView>
+
+      {/* Submission Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Submit Assignment</Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Ionicons name="close" size={24} color={colors.textPrimary} />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.modalAssignmentTitle}>{selectedAssignment?.title}</Text>
+            
+            <TouchableOpacity 
+              style={styles.filePicker} 
+              onPress={handlePickDocument}
+              disabled={uploading}
+            >
+              <Ionicons 
+                name={selectedFile ? "document-attach" : "cloud-upload-outline"} 
+                size={40} 
+                color={selectedFile ? colors.success : colors.primary} 
+              />
+              <Text style={styles.filePickerText}>
+                {selectedFile ? selectedFile.name : "Select Document/PDF/Image"}
+              </Text>
+              {selectedFile && (
+                <Text style={styles.fileSize}>
+                  {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                </Text>
+              )}
+            </TouchableOpacity>
+
+            <View style={styles.modalFooter}>
+              <CustomButton
+                title="Cancel"
+                onPress={() => setModalVisible(false)}
+                variant="outline"
+                style={{ flex: 1, marginRight: 8 }}
+                disabled={uploading}
+              />
+              <CustomButton
+                title={uploading ? "Uploading..." : "Submit"}
+                onPress={handleSubmitAssignment}
+                style={{ flex: 1 }}
+                loading={uploading}
+                disabled={!selectedFile || uploading}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -248,9 +371,6 @@ const styles = StyleSheet.create({
   assignmentCard: {
     marginBottom: spacing.md,
   },
-  assignment: {
-    // padding already in CustomCard
-  },
   assignmentHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -296,7 +416,79 @@ const styles = StyleSheet.create({
   submitButton: {
     marginTop: spacing.sm,
   },
+  gradeInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: spacing.sm,
+    paddingTop: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: colors.gray100,
+  },
+  gradeLabel: {
+    fontSize: fontSize.sm,
+    color: colors.textSecondary,
+  },
+  gradeValue: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.bold,
+    color: colors.success,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: fontSize.xl,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
+  },
+  modalAssignmentTitle: {
+    fontSize: fontSize.base,
+    color: colors.textSecondary,
+    marginBottom: 20,
+  },
+  filePicker: {
+    borderWidth: 2,
+    borderColor: colors.gray200,
+    borderStyle: 'dashed',
+    borderRadius: borderRadius.md,
+    padding: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  filePickerText: {
+    marginTop: 10,
+    fontSize: fontSize.base,
+    color: colors.textSecondary,
+    textAlign: 'center',
+  },
+  fileSize: {
+    fontSize: fontSize.xs,
+    color: colors.gray400,
+    marginTop: 4,
+  },
+  modalFooter: {
+    flexDirection: 'row',
+  },
 });
 
 export default AssignmentsScreen;
-

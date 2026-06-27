@@ -14,6 +14,7 @@ import { gradeService } from '../../services/gradeService';
 import { feeService } from '../../services/feeService';
 import { announcementService } from '../../services/announcementService';
 import { timetableService } from '../../services/timetableService';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useDesignSystem, spacing, fontSize, fontWeight, borderRadius, shadows } from '../../utils/designSystem';
 
@@ -102,6 +103,8 @@ const StudentDashboardScreen = ({ navigation }) => {
     return <Loading message="Loading your dashboard..." />;
   }
 
+  const styles = getStyles(colors, isDarkMode);
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar style="light" translucent backgroundColor="transparent" />
@@ -170,68 +173,90 @@ const StudentDashboardScreen = ({ navigation }) => {
             ]}
           >
             <View style={styles.sectionHeader}>
-              <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Today's Schedule</Text>
+              <Text style={styles.sectionTitle}>Today's Schedule</Text>
               <TouchableOpacity onPress={() => navigation.navigate('Timetable')}>
-                <Text style={[styles.viewAllText, { color: colors.primary }]}>Full View →</Text>
+                <Text style={[styles.viewAllText, { color: colors.primary }]}>View Full →</Text>
               </TouchableOpacity>
             </View>
             {todaySchedule.length > 0 ? (
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
                 {todaySchedule.map((item, index) => (
-                  <CustomCard key={index} style={styles.scheduleCard}>
-                    <View style={[styles.periodTag, { backgroundColor: colors.primary + '20' }]}>
-                      <Text style={[styles.periodText, { color: colors.primary }]}>Period {item.period || index + 1}</Text>
+                  <LinearGradient
+                    key={index}
+                    colors={isDarkMode ? ['#1E293B', '#0F172A'] : ['#FFFFFF', '#F8FAFC']}
+                    style={[styles.scheduleCard, shadows.medium]}
+                  >
+                    <View style={[styles.periodTag, { backgroundColor: colors.primary + '15' }]}>
+                      <Text style={[styles.periodText, { color: colors.primary }]}>PERIOD {item.period || index + 1}</Text>
                     </View>
-                    <Text style={[styles.subjectName, { color: colors.textPrimary }]}>{item.subject}</Text>
+                    <Text style={[styles.subjectName, { color: colors.textPrimary }]} numberOfLines={1}>{item.subject}</Text>
                     <View style={styles.timeRow}>
-                      <Ionicons name="time-outline" size={14} color={colors.textSecondary} />
+                      <Ionicons name="time" size={14} color={colors.primary} />
                       <Text style={[styles.timeText, { color: colors.textSecondary }]}>{item.startTime} - {item.endTime}</Text>
                     </View>
-                  </CustomCard>
+                    <View style={styles.roomRow}>
+                      <Ionicons name="location" size={14} color={colors.textTertiary} />
+                      <Text style={[styles.roomText, { color: colors.textTertiary }]}>Room {item.room || 'A1'}</Text>
+                    </View>
+                  </LinearGradient>
                 ))}
               </ScrollView>
             ) : (
-              <CustomCard>
+              <LinearGradient
+                colors={isDarkMode ? ['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.02)'] : ['#FFFFFF', '#F1F5F9']}
+                style={[styles.emptyScheduleCard, shadows.small]}
+              >
                 <View style={styles.emptySchedule}>
-                  <Ionicons name="calendar-outline" size={32} color={colors.gray300} />
-                  <Text style={{ color: colors.textSecondary, marginTop: 8 }}>No classes scheduled for today.</Text>
+                  <View style={styles.emptyIconContainer}>
+                    <Ionicons name="calendar" size={32} color={colors.gray300} />
+                  </View>
+                  <Text style={[styles.emptyText, { color: colors.textSecondary }]}>No classes scheduled for today.</Text>
                 </View>
-              </CustomCard>
+              </LinearGradient>
             )}
           </Animated.View>
 
           {/* Quick Actions */}
           <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Quick Actions</Text>
+            <Text style={styles.sectionTitle}>Learning Center</Text>
             <View style={styles.quickActionsGrid}>
               <TouchableOpacity
-                style={[styles.quickActionButton, { backgroundColor: colors.cardBackground, ...shadows.small }]}
-                onPress={() => navigation.navigate('Attendance')}
+                style={[styles.quickActionButton, { backgroundColor: colors.cardBackground }]}
+                onPress={() => navigation.navigate('Assignments')}
               >
-                <View style={[styles.quickActionIcon, { backgroundColor: colors.success + '15' }]}>
-                  <Ionicons name="checkmark-done" size={24} color={colors.success} />
-                </View>
-                <Text style={[styles.quickActionText, { color: colors.textPrimary }]}>Attendance</Text>
+                <LinearGradient
+                  colors={['rgba(99, 102, 241, 0.15)', 'rgba(99, 102, 241, 0.05)']}
+                  style={styles.quickActionIcon}
+                >
+                  <Ionicons name="document-text" size={26} color={colors.primary} />
+                </LinearGradient>
+                <Text style={[styles.quickActionText, { color: colors.textPrimary }]}>Homework</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.quickActionButton, { backgroundColor: colors.cardBackground, ...shadows.small }]}
+                style={[styles.quickActionButton, { backgroundColor: colors.cardBackground }]}
                 onPress={() => navigation.navigate('Grades')}
               >
-                <View style={[styles.quickActionIcon, { backgroundColor: colors.primary + '15' }]}>
-                  <Ionicons name="school" size={24} color={colors.primary} />
-                </View>
-                <Text style={[styles.quickActionText, { color: colors.textPrimary }]}>Grades</Text>
+                <LinearGradient
+                  colors={['rgba(139, 92, 246, 0.15)', 'rgba(139, 92, 246, 0.05)']}
+                  style={styles.quickActionIcon}
+                >
+                  <Ionicons name="trophy" size={26} color="#8B5CF6" />
+                </LinearGradient>
+                <Text style={[styles.quickActionText, { color: colors.textPrimary }]}>Results</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.quickActionButton, { backgroundColor: colors.cardBackground, ...shadows.small }]}
-                onPress={() => navigation.navigate('Announcements')}
+                style={[styles.quickActionButton, { backgroundColor: colors.cardBackground }]}
+                onPress={() => navigation.navigate('Timetable')}
               >
-                <View style={[styles.quickActionIcon, { backgroundColor: '#F59E0B15' }]}>
-                  <Ionicons name="megaphone" size={24} color="#F59E0B" />
-                </View>
-                <Text style={[styles.quickActionText, { color: colors.textPrimary }]}>Notices</Text>
+                <LinearGradient
+                  colors={['rgba(245, 158, 11, 0.15)', 'rgba(245, 158, 11, 0.05)']}
+                  style={styles.quickActionIcon}
+                >
+                  <Ionicons name="calendar" size={26} color="#F59E0B" />
+                </LinearGradient>
+                <Text style={[styles.quickActionText, { color: colors.textPrimary }]}>Schedule</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -240,7 +265,10 @@ const StudentDashboardScreen = ({ navigation }) => {
           {announcements.length > 0 && (
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
-                <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Latest Notices</Text>
+                <Text style={styles.sectionTitle}>School News</Text>
+                <TouchableOpacity onPress={() => navigation.navigate('Announcements')}>
+                  <Text style={[styles.viewAllText, { color: colors.primary }]}>See All →</Text>
+                </TouchableOpacity>
               </View>
               {announcements.map((announcement) => (
                 <AnnouncementCard
@@ -257,7 +285,7 @@ const StudentDashboardScreen = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors, isDarkMode) => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -268,7 +296,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   overlapContent: {
-    marginTop: -45,
+    marginTop: -55,
     zIndex: 10,
   },
   statsContainer: {
@@ -291,73 +319,111 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    letterSpacing: 0.5,
+    fontSize: 20,
+    fontWeight: '800',
+    letterSpacing: -0.5,
+    color: colors.textPrimary,
   },
   viewAllText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   horizontalScroll: {
     marginHorizontal: -20,
     paddingHorizontal: 20,
+    paddingBottom: 10,
   },
   scheduleCard: {
-    width: 160,
+    width: 170,
     marginRight: 12,
-    padding: 12,
+    padding: 16,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   periodTag: {
     alignSelf: 'flex-start',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
-    marginBottom: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+    marginBottom: 12,
   },
   periodText: {
     fontSize: 10,
-    fontWeight: '700',
+    fontWeight: '800',
+    letterSpacing: 1,
   },
   subjectName: {
-    fontSize: 14,
-    fontWeight: '700',
-    marginBottom: 4,
+    fontSize: 16,
+    fontWeight: '800',
+    marginBottom: 8,
+    letterSpacing: -0.2,
   },
   timeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
+    marginBottom: 4,
   },
   timeText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  roomRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  roomText: {
     fontSize: 11,
     fontWeight: '500',
   },
+  emptyScheduleCard: {
+    borderRadius: 24,
+    padding: 24,
+  },
   emptySchedule: {
     alignItems: 'center',
-    padding: 20,
+    justifyContent: 'center',
+  },
+  emptyIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'rgba(148, 163, 184, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  emptyText: {
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
   },
   quickActionsGrid: {
     flexDirection: 'row',
     gap: 12,
+    marginTop: 16,
   },
   quickActionButton: {
     flex: 1,
-    padding: 12,
-    borderRadius: 20,
+    padding: 16,
+    borderRadius: 24,
     alignItems: 'center',
+    ...shadows.medium,
   },
   quickActionIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
+    width: 56,
+    height: 56,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   quickActionText: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '800',
+    letterSpacing: -0.2,
   },
 });
 

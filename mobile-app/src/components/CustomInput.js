@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, fontSize, fontWeight, borderRadius } from '../utils/designSystem';
+import { colors, spacing, fontSize, fontWeight, borderRadius, shadows } from '../utils/designSystem';
 
 const CustomInput = ({
   label,
@@ -20,6 +20,7 @@ const CustomInput = ({
   style,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   return (
     <View style={[styles.container, style]}>
@@ -29,29 +30,40 @@ const CustomInput = ({
           {required && <Text style={styles.required}> *</Text>}
         </Text>
       )}
-      <View style={[styles.inputContainer, error && styles.inputError]}>
+      <View style={[
+        styles.inputContainer,
+        error && styles.inputError,
+        isFocused && styles.inputFocused
+      ]}>
         {icon && (
-          <Ionicons name={icon} size={20} color="#9ca3af" style={styles.icon} />
+          <Ionicons
+            name={icon}
+            size={22}
+            color={isFocused ? colors.primary : "#94A3B8"}
+            style={styles.icon}
+          />
         )}
         <TextInput
           style={[styles.input, multiline && styles.multiline]}
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor="#9ca3af"
+          placeholderTextColor="#94A3B8"
           secureTextEntry={secureTextEntry && !showPassword}
           keyboardType={keyboardType}
           autoCapitalize={autoCapitalize}
           multiline={multiline}
           numberOfLines={numberOfLines}
           editable={editable}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
         />
         {secureTextEntry && (
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
             <Ionicons
               name={showPassword ? 'eye-off-outline' : 'eye-outline'}
-              size={20}
-              color="#9ca3af"
+              size={22}
+              color="#94A3B8"
             />
           </TouchableOpacity>
         )}
@@ -63,13 +75,16 @@ const CustomInput = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: spacing.md,
+    marginBottom: spacing.lg,
   },
   label: {
-    fontSize: fontSize.base,
-    fontWeight: fontWeight.semibold,
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.bold,
     color: colors.gray700,
     marginBottom: spacing.sm,
+    marginLeft: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   required: {
     color: colors.error,
@@ -77,12 +92,16 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.md,
-    borderWidth: 1,
+    backgroundColor: colors.gray50,
+    borderRadius: borderRadius.lg,
+    borderWidth: 2,
     borderColor: colors.gray200,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: Platform.OS === 'ios' ? spacing.lg : spacing.md,
+  },
+  inputFocused: {
+    borderColor: colors.primary,
+    backgroundColor: colors.white,
   },
   inputError: {
     borderColor: colors.error,
@@ -92,18 +111,20 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    fontSize: fontSize.lg,
+    fontSize: fontSize.base,
     color: colors.textPrimary,
+    fontWeight: fontWeight.medium,
   },
   multiline: {
-    minHeight: 80,
+    minHeight: 100,
     textAlignVertical: 'top',
   },
   errorText: {
-    fontSize: fontSize.sm,
+    fontSize: fontSize.xs,
     color: colors.error,
     marginTop: spacing.xs,
-    marginLeft: spacing.xs,
+    marginLeft: spacing.sm,
+    fontWeight: fontWeight.medium,
   },
 });
 

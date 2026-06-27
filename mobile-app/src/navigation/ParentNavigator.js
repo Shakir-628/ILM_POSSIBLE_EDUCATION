@@ -9,6 +9,7 @@ import ChildrenScreen from '../screens/parent/ChildrenScreen';
 import ChildDetailsScreen from '../screens/parent/ChildDetailsScreen';
 import ParentFeesScreen from '../screens/parent/ParentFeesScreen';
 import NotificationsScreen from '../screens/shared/NotificationsScreen';
+import MessagesScreen from '../screens/shared/MessagesScreen';
 import ParentProfileScreen from '../screens/parent/ParentProfileScreen';
 
 const Tab = createBottomTabNavigator();
@@ -34,6 +35,9 @@ const ParentTabNavigator = () => {
               break;
             case 'Notifications':
               iconName = focused ? 'notifications' : 'notifications-outline';
+              break;
+            case 'Messages':
+              iconName = focused ? 'mail' : 'mail-outline';
               break;
             case 'Profile':
               iconName = focused ? 'person' : 'person-outline';
@@ -66,7 +70,7 @@ const ParentTabNavigator = () => {
       <Tab.Screen name="Dashboard" component={ParentDashboardScreen} />
       <Tab.Screen name="Children" component={ChildrenScreen} />
       <Tab.Screen name="Fees" component={ParentFeesScreen} />
-      <Tab.Screen name="Notifications" component={NotificationsScreen} />
+      <Tab.Screen name="Messages" component={MessagesScreen} />
       <Tab.Screen name="Profile" component={ParentProfileScreen} />
     </Tab.Navigator>
   );
