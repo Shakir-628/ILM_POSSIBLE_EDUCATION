@@ -9,6 +9,7 @@ import CurvedHeader from '../../components/CurvedHeader';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { announcementService } from '../../services/announcementService';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useDesignSystem, spacing, fontSize, fontWeight, borderRadius, shadows } from '../../utils/designSystem';
 
@@ -107,7 +108,7 @@ const TeacherDashboardScreen = ({ navigation }) => {
       >
         <CurvedHeader
           title={`Hi, ${user?.name?.split(' ')[0]}! 👋`}
-          subtitle="Excellence in every lesson."
+          subtitle="Ready to inspire today's learners?"
         />
 
         <View style={styles.overlapContent}>
@@ -126,7 +127,7 @@ const TeacherDashboardScreen = ({ navigation }) => {
                 color="blue"
               />
               <StatCard
-                title="Students"
+                title="Total Students"
                 value={stats.totalStudents.toString()}
                 icon="people"
                 color="green"
@@ -134,13 +135,13 @@ const TeacherDashboardScreen = ({ navigation }) => {
             </View>
             <View style={styles.statsRow}>
               <StatCard
-                title="Pending Grades"
+                title="Pending Tasks"
                 value={stats.pendingGrades.toString()}
                 icon="create"
                 color="orange"
               />
               <StatCard
-                title="Today's Periods"
+                title="Active Periods"
                 value={stats.todayPeriods.toString()}
                 icon="time"
                 color="purple"
@@ -155,52 +156,64 @@ const TeacherDashboardScreen = ({ navigation }) => {
               { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
             ]}
           >
-            <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Quick Actions</Text>
+            <Text style={styles.sectionTitle}>Quick Actions</Text>
             <View style={styles.actionsGrid}>
               <TouchableOpacity
-                style={[styles.actionCard, { backgroundColor: colors.cardBackground, ...shadows.small }]}
+                style={[styles.actionCard, { backgroundColor: colors.cardBackground }]}
                 onPress={() => navigation.navigate('Attendance')}
                 activeOpacity={0.7}
               >
-                <View style={[styles.actionIcon, { backgroundColor: colors.primary + '15' }]}>
-                  <Ionicons name="checkbox-outline" size={28} color={colors.primary} />
-                </View>
-                <Text style={[styles.actionText, { color: colors.textPrimary }]}>Attendance</Text>
+                <LinearGradient
+                  colors={['rgba(99, 102, 241, 0.15)', 'rgba(99, 102, 241, 0.05)']}
+                  style={styles.actionIcon}
+                >
+                  <Ionicons name="checkbox" size={28} color={colors.primary} />
+                </LinearGradient>
+                <Text style={styles.actionText}>Attendance</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.actionCard, { backgroundColor: colors.cardBackground, ...shadows.small }]}
+                style={[styles.actionCard, { backgroundColor: colors.cardBackground }]}
                 onPress={() => navigation.navigate('Grades')}
                 activeOpacity={0.7}
               >
-                <View style={[styles.actionIcon, { backgroundColor: colors.success + '15' }]}>
-                  <Ionicons name="create-outline" size={28} color={colors.success} />
-                </View>
-                <Text style={[styles.actionText, { color: colors.textPrimary }]}>Enter Grades</Text>
+                <LinearGradient
+                  colors={['rgba(16, 185, 129, 0.15)', 'rgba(16, 185, 129, 0.05)']}
+                  style={styles.actionIcon}
+                >
+                  <Ionicons name="create" size={28} color={colors.success} />
+                </LinearGradient>
+                <Text style={styles.actionText}>Grades</Text>
               </TouchableOpacity>
             </View>
 
             <View style={[styles.actionsGrid, { marginTop: spacing.md }]}>
               <TouchableOpacity
-                style={[styles.actionCard, { backgroundColor: colors.cardBackground, ...shadows.small }]}
+                style={[styles.actionCard, { backgroundColor: colors.cardBackground }]}
                 onPress={() => navigation.navigate('Notifications')}
                 activeOpacity={0.7}
               >
-                <View style={[styles.actionIcon, { backgroundColor: '#F43F5E15' }]}>
-                  <Ionicons name="notifications-outline" size={28} color="#F43F5E" />
-                </View>
-                <Text style={[styles.actionText, { color: colors.textPrimary }]}>Alerts</Text>
+                <LinearGradient
+                  colors={['rgba(244, 63, 94, 0.15)', 'rgba(244, 63, 94, 0.05)']}
+                  style={styles.actionIcon}
+                >
+                  <Ionicons name="notifications" size={28} color="#F43F5E" />
+                </LinearGradient>
+                <Text style={styles.actionText}>Alerts</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.actionCard, { backgroundColor: colors.cardBackground, ...shadows.small }]}
+                style={[styles.actionCard, { backgroundColor: colors.cardBackground }]}
                 onPress={() => navigation.navigate('Profile')}
                 activeOpacity={0.7}
               >
-                <View style={[styles.actionIcon, { backgroundColor: '#8B5CF615' }]}>
-                  <Ionicons name="person-outline" size={28} color="#8B5CF6" />
-                </View>
-                <Text style={[styles.actionText, { color: colors.textPrimary }]}>Profile</Text>
+                <LinearGradient
+                  colors={['rgba(139, 92, 246, 0.15)', 'rgba(139, 92, 246, 0.05)']}
+                  style={styles.actionIcon}
+                >
+                  <Ionicons name="person" size={28} color="#8B5CF6" />
+                </LinearGradient>
+                <Text style={styles.actionText}>Profile</Text>
               </TouchableOpacity>
             </View>
           </Animated.View>
@@ -214,7 +227,7 @@ const TeacherDashboardScreen = ({ navigation }) => {
               ]}
             >
               <View style={styles.sectionHeader}>
-                <Text style={[styles.sectionTitle, { color: colors.textPrimary, marginBottom: 0 }]}>Latest Notices</Text>
+                <Text style={[styles.sectionTitle, { marginBottom: 0 }]}>Updates & Notices</Text>
                 <TouchableOpacity onPress={() => navigation.navigate('Announcements')}>
                   <Text style={[styles.viewAllText, { color: colors.primary }]}>View All →</Text>
                 </TouchableOpacity>
@@ -231,12 +244,15 @@ const TeacherDashboardScreen = ({ navigation }) => {
 
           {/* Info Card */}
           <View style={styles.section}>
-            <CustomCard style={[styles.infoCard, { backgroundColor: isDarkMode ? colors.primary + '20' : colors.primary + '10' }]}>
+            <LinearGradient
+              colors={isDarkMode ? ['rgba(99, 102, 241, 0.2)', 'rgba(99, 102, 241, 0.1)'] : ['rgba(99, 102, 241, 0.1)', 'rgba(99, 102, 241, 0.05)']}
+              style={styles.infoCard}
+            >
               <Ionicons name="information-circle" size={24} color={colors.primary} />
               <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-                Use the web app for full class management and detailed reporting features.
+                Need advanced features? Access the Teacher Portal on your desktop for detailed reports.
               </Text>
-            </CustomCard>
+            </LinearGradient>
           </View>
         </View>
       </ScrollView>
@@ -255,7 +271,7 @@ const getStyles = (colors, isDarkMode) => StyleSheet.create({
     paddingBottom: 40,
   },
   overlapContent: {
-    marginTop: -45,
+    marginTop: -55,
     zIndex: 10,
   },
   statsContainer: {
@@ -278,13 +294,15 @@ const getStyles = (colors, isDarkMode) => StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    letterSpacing: 0.5,
+    fontSize: 20,
+    fontWeight: '800',
+    letterSpacing: -0.5,
+    color: colors.textPrimary,
+    marginBottom: 16,
   },
   viewAllText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   actionsGrid: {
     flexDirection: 'row',
@@ -292,37 +310,42 @@ const getStyles = (colors, isDarkMode) => StyleSheet.create({
   },
   actionCard: {
     flex: 1,
-    padding: 16,
-    borderRadius: 20,
+    padding: 20,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
+    ...shadows.medium,
+    borderWidth: 1,
+    borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
   },
   actionIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
+    width: 64,
+    height: 64,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
   },
   actionText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '700',
+    color: colors.textPrimary,
+    letterSpacing: 0.2,
   },
   infoCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.primary + '30',
+    padding: 20,
+    borderRadius: 24,
+    borderWidth: 1.5,
+    borderColor: colors.primary + '20',
   },
   infoText: {
-    fontSize: 13,
+    fontSize: 14,
     marginLeft: 12,
     flex: 1,
-    lineHeight: 18,
-    fontWeight: '500',
+    lineHeight: 20,
+    fontWeight: '600',
   },
 });
 

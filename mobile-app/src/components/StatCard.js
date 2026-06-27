@@ -5,25 +5,18 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useDesignSystem } from '../utils/designSystem';
 
 const StatCard = ({ title, value, icon, color = 'blue', onPress, subtitle }) => {
-  const { colors, spacing, fontSize, fontWeight, borderRadius, shadows, isDarkMode } = useDesignSystem();
+  const { colors, spacing, fontSize, fontWeight, borderRadius, shadows, gradients, isDarkMode } = useDesignSystem();
 
   const getGradientColors = () => {
-    // Amader School Aesthetic: Blue & Green Harmony (Theme Aware)
-    const amaderBlue = isDarkMode ? ['#3B82F6', '#1E3A8A'] : ['#2563EB', '#1E40AF'];
-    const amaderGreen = isDarkMode ? ['#10B981', '#047857'] : ['#10B981', '#059669'];
-    const amaderRed = isDarkMode ? ['#F87171', '#EF4444'] : ['#EF4444', '#DC2626'];
-    const amaderOrange = isDarkMode ? ['#FBBF24', '#F59E0B'] : ['#F59E0B', '#D97706'];
-    const amaderIndigo = isDarkMode ? ['#818CF8', '#4F46E5'] : ['#6366F1', '#4338CA'];
-
-    const gradients = {
-      blue: amaderBlue,
-      indigo: amaderIndigo,
-      green: amaderGreen,
-      red: amaderRed,
-      orange: amaderOrange,
-      yellow: amaderOrange,
+    const colorMap = {
+      blue: gradients.primary,
+      indigo: gradients.parent,
+      green: gradients.success,
+      red: gradients.error,
+      orange: gradients.warning,
+      purple: gradients.parent,
     };
-    return gradients[color] || amaderBlue;
+    return colorMap[color] || gradients.primary;
   };
 
   const Component = onPress ? TouchableOpacity : View;
@@ -40,18 +33,32 @@ const StatCard = ({ title, value, icon, color = 'blue', onPress, subtitle }) => 
         end={{ x: 1, y: 1 }}
         style={[styles.gradient, { borderRadius: borderRadius.lg }, shadows.medium]}
       >
-        <View style={styles.iconContainer}>
-          <Ionicons name={icon} size={28} color="#fff" />
+        <View style={styles.headerRow}>
+          <View style={styles.iconContainer}>
+            <Ionicons name={icon} size={24} color="#fff" />
+          </View>
+          <Ionicons name="ellipsis-horizontal" size={20} color="rgba(255, 255, 255, 0.5)" />
         </View>
-        <Text
-          style={styles.value}
-          numberOfLines={1}
-          adjustsFontSizeToFit
-        >
-          {value}
-        </Text>
-        <Text style={styles.title} numberOfLines={1}>{title}</Text>
-        {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+
+        <View style={styles.content}>
+          <Text
+            style={styles.value}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
+            {value}
+          </Text>
+          <Text style={styles.title} numberOfLines={1}>{title}</Text>
+          {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+        </View>
+
+        {/* Decorative Background Icon */}
+        <Ionicons
+          name={icon}
+          size={80}
+          color="rgba(255, 255, 255, 0.08)"
+          style={styles.bgIcon}
+        />
       </LinearGradient>
     </Component>
   );
@@ -60,43 +67,59 @@ const StatCard = ({ title, value, icon, color = 'blue', onPress, subtitle }) => 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginBottom: 12,
+    marginBottom: 8,
   },
   gradient: {
-    padding: 16,
-    height: 160,
-    justifyContent: 'center',
-    alignItems: 'center',
+    padding: 18,
+    height: 140,
+    justifyContent: 'space-between',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    zIndex: 2,
   },
   iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  content: {
+    zIndex: 2,
   },
   value: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 32,
+    fontWeight: '800',
     color: '#FFFFFF',
-    marginBottom: 4,
-    textAlign: 'center',
+    letterSpacing: -0.5,
   },
   title: {
     fontSize: 12,
     color: 'rgba(255, 255, 255, 0.9)',
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: '700',
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 1,
+    marginTop: 2,
   },
   subtitle: {
     fontSize: 11,
     color: 'rgba(255, 255, 255, 0.7)',
     marginTop: 2,
-    textAlign: 'center',
+    fontWeight: '500',
+  },
+  bgIcon: {
+    position: 'absolute',
+    bottom: -15,
+    right: -15,
+    zIndex: 1,
   },
 });
 

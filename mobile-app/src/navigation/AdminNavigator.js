@@ -13,6 +13,7 @@ import ParentsListScreen from '../screens/admin/ParentsListScreen';
 import AnnouncementsScreen from '../screens/admin/AnnouncementsScreen';
 import AnnouncementDetailScreen from '../screens/admin/AnnouncementDetailScreen';
 import NotificationsScreen from '../screens/shared/NotificationsScreen';
+import MessagesScreen from '../screens/shared/MessagesScreen';
 import FinanceScreen from '../screens/admin/FinanceScreen';
 import FeeManagementScreen from '../screens/admin/FeeManagementScreen';
 import ClassGradeHistoryScreen from '../screens/admin/ClassGradeHistoryScreen';
@@ -45,6 +46,9 @@ const AdminTabNavigator = () => {
             case 'Notifications':
               iconName = focused ? 'notifications' : 'notifications-outline';
               break;
+            case 'Messages':
+              iconName = focused ? 'mail' : 'mail-outline';
+              break;
             case 'Profile':
               iconName = focused ? 'person' : 'person-outline';
               break;
@@ -75,7 +79,7 @@ const AdminTabNavigator = () => {
     >
       <Tab.Screen name="Dashboard" component={AdminDashboardScreen} />
       <Tab.Screen name="Students" component={StudentsListScreen} />
-      <Tab.Screen name="Notifications" component={NotificationsScreen} />
+      <Tab.Screen name="Messages" component={MessagesScreen} />
       <Tab.Screen name="Profile" component={AdminProfileScreen} />
     </Tab.Navigator>
   );

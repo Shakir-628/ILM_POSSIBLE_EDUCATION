@@ -10,6 +10,7 @@
     "seed": "node seeders/seed.js",
     "seed:destroy": "node seeders/seed.js -d",
     "seed:certificates": "node seeders/seedCertificates.js",
+    "seed:export": "node seeders/exportFromDB.js",
     "list-users": "node scripts/listUsers.js",
     "create-superadmin": "node scripts/createSuperAdmin.js",
     "test:email": "node scripts/testEmail.js"

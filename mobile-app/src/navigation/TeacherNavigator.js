@@ -9,6 +9,7 @@ import MarkAttendanceScreen from '../screens/teacher/MarkAttendanceScreen';
 import GradeEntryScreen from '../screens/teacher/GradeEntryScreen';
 import TeacherClassGradesScreen from '../screens/teacher/TeacherClassGradesScreen';
 import NotificationsScreen from '../screens/shared/NotificationsScreen';
+import MessagesScreen from '../screens/shared/MessagesScreen';
 import TeacherProfileScreen from '../screens/teacher/TeacherProfileScreen';
 
 const Tab = createBottomTabNavigator();
@@ -34,6 +35,9 @@ const TeacherTabNavigator = () => {
               break;
             case 'Notifications':
               iconName = focused ? 'notifications' : 'notifications-outline';
+              break;
+            case 'Messages':
+              iconName = focused ? 'mail' : 'mail-outline';
               break;
             case 'Profile':
               iconName = focused ? 'person' : 'person-outline';
@@ -66,7 +70,7 @@ const TeacherTabNavigator = () => {
       <Tab.Screen name="Dashboard" component={TeacherDashboardScreen} />
       <Tab.Screen name="Attendance" component={MarkAttendanceScreen} options={{ title: 'Mark Attendance', tabBarLabel: 'Attendance' }} />
       <Tab.Screen name="Grades" component={GradeEntryScreen} />
-      <Tab.Screen name="Notifications" component={NotificationsScreen} />
+      <Tab.Screen name="Messages" component={MessagesScreen} />
       <Tab.Screen name="Profile" component={TeacherProfileScreen} />
     </Tab.Navigator>
   );

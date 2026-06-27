@@ -3,37 +3,39 @@
  * Centralized design tokens for consistent UI across all screens
  */
 
-// Light Theme Colors
+// Light Theme Colors - Premium Palette
 const lightColors = {
-  // Brand Colors - Amader School Style (Blue & Green Harmony)
-  primary: '#2563EB',      // Royal Blue - Trust
-  primaryDark: '#1E40AF',  // Navy - Stability
-  primaryLight: '#60A5FA', // Sky - Openness
-
-  // Secondary is now Green to match the aesthetic description
-  secondary: '#10B981',    // Emerald - Growth/Freshness
+  // Brand Colors - Modern Indigo & Emerald Harmony
+  primary: '#6366F1',      // Indigo - Innovation
+  primaryDark: '#4F46E5',  // Deep Indigo - Stability
+  primaryLight: '#818CF8', // Soft Indigo - Approachable
+  
+  secondary: '#10B981',    // Emerald - Growth
   secondaryDark: '#059669',
   secondaryLight: '#34D399',
 
+  accent: '#F43F5E',       // Rose - Interactive/Action
+  accentLight: '#FB7185',
+
   // Semantic Colors
-  success: '#10B981',      // Emerald Green
-  successLight: '#6EE7B7',
-  error: '#EF4444',        // Red
-  errorLight: '#FCA5A5',
-  warning: '#F59E0B',      // Amber/Orange
-  warningLight: '#FCD34D',
-  info: '#3B82F6',         // Blue
-  infoLight: '#93C5FD',
+  success: '#10B981',
+  successLight: '#D1FAE5',
+  error: '#F43F5E',
+  errorLight: '#FFE4E6',
+  warning: '#F59E0B',
+  warningLight: '#FEF3C7',
+  info: '#3B82F6',
+  infoLight: '#DBEAFE',
 
   // Status Colors
   active: '#10B981',
-  inactive: '#EF4444',
+  inactive: '#94A3B8',
   pending: '#F59E0B',
   paid: '#10B981',
-  unpaid: '#EF4444',
-  overdue: '#EF4444',
+  unpaid: '#F43F5E',
+  overdue: '#F43F5E',
 
-  // Neutral Colors
+  // Neutral Colors - Slate Scale
   white: '#FFFFFF',
   black: '#000000',
   gray50: '#F8FAFC',
@@ -47,62 +49,59 @@ const lightColors = {
   gray800: '#1E293B',
   gray900: '#0F172A',
 
-  // Background
-  background: '#F8FAFC', // Crisp Light Grey
+  // Background & Surface
+  background: '#F1F5F9',   // Slightly deeper for better card contrast
   cardBackground: '#FFFFFF',
+  glassBackground: 'rgba(255, 255, 255, 0.7)',
 
   // Text
-  textPrimary: '#0F172A',   // Slate 900
-  textSecondary: '#475569', // Slate 600
-  textTertiary: '#94A3B8',  // Slate 400
+  textPrimary: '#0F172A',
+  textSecondary: '#475569',
+  textTertiary: '#94A3B8',
   textLight: '#FFFFFF',
 
-  // Priority Colors
-  urgent: '#EF4444',
-  high: '#F59E0B',
-  medium: '#2563EB',
-  low: '#10B981',
-
-  // Role Colors - Unified Blue/Green Theme
-  admin: '#2563EB',    // Blue
-  teacher: '#10B981',  // Green (Growth)
-  student: '#2563EB',  // Blue
-  parent: '#10B981',   // Green
+  // Role Colors
+  admin: '#6366F1',
+  teacher: '#10B981',
+  student: '#3B82F6',
+  parent: '#8B5CF6',
 };
 
-// Dark Theme Colors
+// Dark Theme Colors - Deep Space Palette
 const darkColors = {
-  // Brand Colors - Adjusted for dark mode
-  primary: '#3B82F6',      // Brighter Blue for visibility
-  primaryDark: '#1E3A8A',  // Darker Navy
-  primaryLight: '#60A5FA',
+  primary: '#818CF8',
+  primaryDark: '#6366F1',
+  primaryLight: '#A5B4FC',
 
-  secondary: '#10B981',    // Emerald stays vibrant
-  secondaryDark: '#047857',
-  secondaryLight: '#34D399',
+  secondary: '#34D399',
+  secondaryDark: '#10B981',
+  secondaryLight: '#6EE7B7',
 
-  // Semantic Colors
-  success: '#10B981',
-  successLight: '#6EE7B7',
-  error: '#F87171',        // Softer red
-  errorLight: '#FCA5A5',
-  warning: '#FBBF24',      // Brighter amber
-  warningLight: '#FCD34D',
+  accent: '#FB7185',
+  accentLight: '#FDA4AF',
+
+  // Semantic
+  success: '#34D399',
+  successLight: 'rgba(52, 211, 153, 0.2)',
+  error: '#FB7185',
+  errorLight: 'rgba(251, 113, 133, 0.2)',
+  warning: '#FBBF24',
+  warningLight: 'rgba(251, 191, 36, 0.2)',
   info: '#60A5FA',
-  infoLight: '#93C5FD',
+  infoLight: 'rgba(96, 165, 250, 0.2)',
 
-  // Status Colors
-  active: '#10B981',
-  inactive: '#F87171',
+  // Status
+  active: '#34D399',
+  inactive: '#475569',
   pending: '#FBBF24',
-  paid: '#10B981',
-  unpaid: '#F87171',
-  overdue: '#F87171',
+  paid: '#34D399',
+  unpaid: '#FB7185',
+  overdue: '#FB7185',
 
-  // Neutral Colors
+  // Neutral
   white: '#FFFFFF',
   black: '#000000',
-  gray50: '#0F172A',       // Inverted
+  gray50: '#0F172A',
   gray100: '#1E293B',
   gray200: '#334155',
   gray300: '#475569',
@@ -114,26 +113,21 @@ const darkColors = {
   gray900: '#F8FAFC',
 
   // Background
-  background: '#0F172A',   // Dark slate
-  cardBackground: '#1E293B', // Slightly lighter
+  background: '#020617',   // Deeper black-blue
+  cardBackground: '#0F172A',
+  glassBackground: 'rgba(15, 23, 42, 0.7)',
 
   // Text
-  textPrimary: '#F8FAFC',   // Light for readability
+  textPrimary: '#F8FAFC',
   textSecondary: '#CBD5E1',
   textTertiary: '#64748B',
   textLight: '#FFFFFF',
 
-  // Priority Colors
-  urgent: '#F87171',
-  high: '#FBBF24',
-  medium: '#3B82F6',
-  low: '#10B981',
-
-  // Role Colors
-  admin: '#3B82F6',
-  teacher: '#10B981',
-  student: '#3B82F6',
-  parent: '#10B981',
+  // Role
+  admin: '#818CF8',
+  teacher: '#34D399',
+  student: '#60A5FA',
+  parent: '#A78BFA',
 };
 
 import { useTheme } from '../context/ThemeContext';
@@ -144,36 +138,40 @@ export const getColors = (isDarkMode = false) => {
 };
 
 const lightGradients = {
-  // Amader School Style Gradients (Blue & Green dominant)
-  primary: ['#2563EB', '#1E40AF'], // Royal Blue -> Navy
+  // Premium Modern Gradients
+  primary: ['#6366F1', '#4F46E5'], // Indigo -> Deep Indigo
   secondary: ['#10B981', '#059669'], // Emerald -> Dark Emerald
+  accent: ['#F43F5E', '#E11D48'], // Rose -> Crimson
   success: ['#10B981', '#059669'],
   warning: ['#F59E0B', '#D97706'],
-  error: ['#EF4444', '#DC2626'],
+  error: ['#F43F5E', '#E11D48'],
   info: ['#3B82F6', '#2563EB'],
   card: ['#FFFFFF', '#F8FAFC'],
+  glass: ['rgba(255, 255, 255, 0.8)', 'rgba(255, 255, 255, 0.4)'],
 
   // Role Gradients
-  admin: ['#2563EB', '#1E40AF'],
+  admin: ['#6366F1', '#4F46E5'],
   teacher: ['#10B981', '#059669'],
   student: ['#3B82F6', '#2563EB'],
-  parent: ['#10B981', '#059669'],
+  parent: ['#8B5CF6', '#7C3AED'],
 };
 
 const darkGradients = {
-  primary: ['#3B82F6', '#1E3A8A'], // Brighter blue for dark mode
-  secondary: ['#10B981', '#047857'],
-  success: ['#10B981', '#047857'],
+  primary: ['#818CF8', '#6366F1'],
+  secondary: ['#34D399', '#10B981'],
+  accent: ['#FB7185', '#F43F5E'],
+  success: ['#34D399', '#10B981'],
   warning: ['#FBBF24', '#F59E0B'],
-  error: ['#F87171', '#EF4444'],
+  error: ['#FB7185', '#F43F5E'],
   info: ['#60A5FA', '#3B82F6'],
-  card: ['#1E293B', '#0F172A'],
+  card: ['#0F172A', '#020617'],
+  glass: ['rgba(15, 23, 42, 0.8)', 'rgba(15, 23, 42, 0.4)'],
 
   // Role Gradients
-  admin: ['#3B82F6', '#1E3A8A'],
-  teacher: ['#10B981', '#047857'],
+  admin: ['#818CF8', '#6366F1'],
+  teacher: ['#34D399', '#10B981'],
   student: ['#60A5FA', '#3B82F6'],
-  parent: ['#10B981', '#047857'],
+  parent: ['#A78BFA', '#8B5CF6'],
 };
 
 // Function to get gradients based on theme
@@ -183,26 +181,33 @@ export const getGradients = (isDarkMode = false) => {
 
 export const getShadows = (isDarkMode = false) => ({
   small: {
-    shadowColor: isDarkMode ? '#000000' : '#0f172a',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: isDarkMode ? 0.3 : 0.05,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowColor: isDarkMode ? '#000000' : '#6366F1',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: isDarkMode ? 0.4 : 0.08,
+    shadowRadius: 4,
+    elevation: 3,
   },
   medium: {
-    shadowColor: isDarkMode ? '#000000' : '#0f172a',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: isDarkMode ? 0.4 : 0.1,
-    shadowRadius: 6,
-    elevation: 4,
+    shadowColor: isDarkMode ? '#000000' : '#4F46E5',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: isDarkMode ? 0.5 : 0.12,
+    shadowRadius: 12,
+    elevation: 8,
   },
   large: {
-    shadowColor: isDarkMode ? '#000000' : '#0f172a',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: isDarkMode ? 0.5 : 0.1,
-    shadowRadius: 15,
-    elevation: 10,
+    shadowColor: isDarkMode ? '#000000' : '#4F46E5',
+    shadowOffset: { width: 0, height: 16 },
+    shadowOpacity: isDarkMode ? 0.6 : 0.15,
+    shadowRadius: 24,
+    elevation: 16,
   },
+  inner: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 0,
+  }
 });
 
 export const useDesignSystem = () => {
@@ -233,30 +238,30 @@ export const spacing = {
   sm: 8,
   md: 12,
   lg: 16,
-  xl: 20,
-  xxl: 24,
-  xxxl: 32,
+  xl: 24,
+  xxl: 32,
+  xxxl: 48,
 };
 
 export const borderRadius = {
-  sm: 6,
-  md: 8,
-  lg: 12,
-  xl: 16,
+  sm: 8,
+  md: 12,
+  lg: 20,
+  xl: 28,
   full: 9999,
 };
 
 export const fontSize = {
-  xs: 11,
-  sm: 13,
-  base: 15,
-  md: 16,
-  lg: 18,
-  xl: 20,
-  xxl: 24,
-  xxxl: 30,
-  display: 36,
-  hero: 40,
+  xs: 12,
+  sm: 14,
+  base: 16,
+  md: 17,
+  lg: 19,
+  xl: 22,
+  xxl: 28,
+  xxxl: 34,
+  display: 42,
+  hero: 48,
 };
 
 export const fontWeight = {
@@ -265,47 +270,61 @@ export const fontWeight = {
   semibold: '600',
   bold: '700',
   extrabold: '800',
+  black: '900',
 };
 
 // Common component styles
 export const componentStyles = {
   card: {
     backgroundColor: colors.cardBackground,
-    borderRadius: borderRadius.md,
-    padding: spacing.lg,
+    borderRadius: borderRadius.lg,
+    padding: spacing.xl,
     ...shadows.medium,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+
+  glassCard: {
+    backgroundColor: colors.glassBackground,
+    borderRadius: borderRadius.lg,
+    padding: spacing.xl,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
 
   button: {
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.xxl,
     borderRadius: borderRadius.md,
     alignItems: 'center',
     justifyContent: 'center',
+    ...shadows.small,
   },
 
   input: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.gray50,
     borderRadius: borderRadius.md,
-    padding: spacing.md,
+    padding: spacing.lg,
     fontSize: fontSize.md,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: colors.gray200,
+    color: colors.textPrimary,
   },
 
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
+    ...shadows.small,
   },
 
   badge: {
-    paddingHorizontal: spacing.sm + 2,
+    paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
-    borderRadius: borderRadius.md,
+    borderRadius: borderRadius.full,
   },
 
   header: {
@@ -315,14 +334,15 @@ export const componentStyles = {
   },
 
   section: {
-    padding: spacing.lg,
+    padding: spacing.xl,
   },
 
   sectionTitle: {
     fontSize: fontSize.xl,
-    fontWeight: fontWeight.semibold,
+    fontWeight: fontWeight.bold,
     color: colors.textPrimary,
-    marginBottom: spacing.md,
+    marginBottom: spacing.lg,
+    letterSpacing: -0.5,
   },
 };
 
