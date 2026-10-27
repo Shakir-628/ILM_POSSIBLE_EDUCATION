@@ -30,8 +30,9 @@ npm install
 Create a `.env` file in the root of the client directory:
 
 ```env
-REACT_APP_API_URL=http://localhost:5000/api
+REACT_APP_API_URL= http://localhost:5000/api
 ```
+REACT_APP_API_URL= 'https://ilm-possible-education.onrender.com/api'
 
 ### Running the Application
 
