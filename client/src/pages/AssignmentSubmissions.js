@@ -139,7 +139,7 @@ const AssignmentSubmissions = () => {
         <div className="flex space-x-2">
           {row.files && row.files.length > 0 && (
             <button
-              onClick={() => window.open(`${process.env.REACT_APP_API_URL?.replace('/api', '')}${row.files[0].path}`, '_blank')}
+              onClick={() => window.open(`${'https://ilm-possible-education.onrender.com/api'}?.replace('/api', '')}${row.files[0].path}`, '_blank')}
               className="text-indigo-600 hover:text-indigo-900 text-sm"
             >
               View
@@ -264,7 +264,7 @@ const AssignmentSubmissions = () => {
                       <li key={idx} className="text-sm flex items-center">
                         <PaperClipIcon className="h-4 w-4 text-gray-400 mr-2" />
                         <a
-                          href={`${process.env.REACT_APP_API_URL?.replace('/api', '')}${file.path}`}
+                          href={`${'https://ilm-possible-education.onrender.com'}${file.path}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:text-blue-900"

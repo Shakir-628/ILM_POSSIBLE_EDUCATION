@@ -1191,7 +1191,7 @@ const Students = () => {
                         </div>
                         <div className="flex space-x-2">
                           <a
-                            href={`${process.env.REACT_APP_API_URL?.replace('/api', '')}${doc.path}`}
+                            href={`${'https://ilm-possible-education.onrender.com'}${doc.path}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-indigo-600 hover:text-indigo-900 text-sm"

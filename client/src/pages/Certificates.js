@@ -229,9 +229,10 @@ const Certificates = () => {
       
       const data = await certificateService.downloadCertificate(certificate._id);
       // Remove /api from the URL since uploads are served directly from root
-      const baseUrl = process.env.REACT_APP_API_URL 
-        ? process.env.REACT_APP_API_URL.replace('/api', '')
-        : 'http://localhost:5001';
+      const baseUrl = 'https://ilm-possible-education.onrender.com';
+      // process.env.REACT_APP_API_URL 
+      //   ? process.env.REACT_APP_API_URL.replace('/api', '')
+      //   : 'http://localhost:5001';
       const pdfUrl = `${baseUrl}${data.downloadUrl}`;
       window.open(pdfUrl, '_blank');
       toast.success('Certificate opened in new tab');
