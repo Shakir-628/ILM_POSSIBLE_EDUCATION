@@ -17,9 +17,9 @@ const Parents = () => {
           </p>
         </div>
 
-        <Card className="p-6">
-          <p className="text-gray-600">Parent management module coming soon...</p>
-        </Card>
+        <div className="bg-white dark:bg-dark-800 shadow rounded-lg p-6">
+          <p className="text-gray-600 dark:text-gray-400">Parent management module coming soon...</p>
+        </div>
       </div>
     </Layout>
   );

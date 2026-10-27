@@ -1,0 +1,4 @@
+2026/10/06-01:43:10.859 6e90 Creating DB C:\Users\Shakir\Desktop\Education Android App\ILM_POSSIBLE_EDUCATION\server\.wwebjs_auth\session\Default\Sync Data\LevelDB since it was missing.
+2026/10/06-01:43:10.908 6e90 Reusing MANIFEST C:\Users\Shakir\Desktop\Education Android App\ILM_POSSIBLE_EDUCATION\server\.wwebjs_auth\session\Default\Sync Data\LevelDB/MANIFEST-000001
+2026/10/06-01:43:10.929 6e90 Recovering log #3
+2026/10/06-01:43:10.930 6e90 Reusing old log C:\Users\Shakir\Desktop\Education Android App\ILM_POSSIBLE_EDUCATION\server\.wwebjs_auth\session\Default\Sync Data\LevelDB/000003.log 

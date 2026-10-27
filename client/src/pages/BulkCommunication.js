@@ -15,7 +15,7 @@ import communicationService from '../services/communicationService';
 const BulkCommunication = () => {
   const toast = useToast();
   const { isAdmin } = useAuth();
-  const [type, setType] = useState('notification'); // 'notification', 'email', 'sms'
+  const [type, setType] = useState('notification'); // 'notification', 'email', 'whatsapp'
   const [formData, setFormData] = useState({
     targetAudience: 'all',
     title: '',
@@ -78,6 +78,17 @@ const BulkCommunication = () => {
           toast.success(response.message);
           setFormData({ targetAudience: 'all', title: '', message: '', notificationType: 'info' });
         }
+      } else if (type === 'whatsapp') {
+        const response = await communicationService.sendBulkWhatsApp({
+          targetAudience: formData.targetAudience,
+          title: formData.title,
+          message: formData.message
+        });
+
+        if (response.success) {
+          toast.success(response.message);
+          setFormData({ targetAudience: 'all', title: '', message: '', notificationType: 'info' });
+        }
       } else {
         toast.warning(`${type.toUpperCase()} functionality coming soon!`);
       }
@@ -118,12 +129,12 @@ const BulkCommunication = () => {
             className={`cursor-pointer ${type === 'email' ? 'ring-2 ring-primary-500' : ''}`}
           />
           <Card
-            title="SMS"
-            value="Coming Soon"
+            title="WhatsApp"
+            value="Active"
             icon={DevicePhoneMobileIcon}
-            color="purple"
-            onClick={() => setType('sms')}
-            className={`cursor-pointer ${type === 'sms' ? 'ring-2 ring-primary-500' : ''}`}
+            color="green"
+            onClick={() => setType('whatsapp')}
+            className={`cursor-pointer ${type === 'whatsapp' ? 'ring-2 ring-primary-500' : ''}`}
           />
         </div>
 
@@ -131,7 +142,7 @@ const BulkCommunication = () => {
         <div className="bg-white dark:bg-dark-800 shadow rounded-lg p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
             {type === 'notification' ? 'Send Push Notification' :
-              type === 'email' ? 'Send Email' : 'Send SMS'}
+              type === 'email' ? 'Send Email' : 'Send WhatsApp Message'}
           </h2>
 
           <form onSubmit={handleSend} className="space-y-4">
@@ -182,7 +193,7 @@ const BulkCommunication = () => {
 
             <div className="flex justify-end">
               <Button type="submit" icon={PaperAirplaneIcon} disabled={loading}>
-                {loading ? 'Sending...' : `Send ${type === 'notification' ? 'Notification' : type === 'email' ? 'Email' : 'SMS'}`}
+                {loading ? 'Sending...' : `Send ${type === 'notification' ? 'Notification' : type === 'email' ? 'Email' : 'WhatsApp'}`}
               </Button>
             </div>
           </form>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Card = ({ title, value, icon: Icon, color = 'blue', subtitle, className = '' }) => {
+const Card = ({ title, value, icon: Icon, color = 'blue', subtitle, className = '', onClick }) => {
   const colorClasses = {
     blue: {
       gradient: 'from-primary-500 to-primary-600',
@@ -37,7 +37,7 @@ const Card = ({ title, value, icon: Icon, color = 'blue', subtitle, className = 
   const colorClass = colorClasses[color] || colorClasses.blue;
 
   return (
-    <div className={`bg-white dark:bg-dark-800 overflow-hidden rounded-2xl border border-gray-100 dark:border-dark-700 transition-all duration-300 hover:shadow-large hover:-translate-y-1 hover:scale-[1.02] animate-fade-in-up group ${className}`}>
+    <div onClick={onClick} className={`bg-white dark:bg-dark-800 overflow-hidden rounded-2xl border border-gray-100 dark:border-dark-700 transition-all duration-300 hover:shadow-large hover:-translate-y-1 hover:scale-[1.02] animate-fade-in-up group ${className}`}>
       <div className="p-6">
         <div className="flex items-center">
           <div className="flex-shrink-0">

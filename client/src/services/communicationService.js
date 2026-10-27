@@ -5,6 +5,10 @@ export const communicationService = {
         const response = await api.post('/communication/email/bulk', data);
         return response.data;
     },
+    sendBulkWhatsApp: async (data) => {
+        const response = await api.post('/communication/whatsapp/bulk', data);
+        return response.data;
+    },
 };
 
 export default communicationService;

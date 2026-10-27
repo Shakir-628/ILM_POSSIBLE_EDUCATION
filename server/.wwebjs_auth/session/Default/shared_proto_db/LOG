@@ -1,0 +1,4 @@
+2026/10/06-01:43:10.960 4f90 Creating DB C:\Users\Shakir\Desktop\Education Android App\ILM_POSSIBLE_EDUCATION\server\.wwebjs_auth\session\Default\shared_proto_db since it was missing.
+2026/10/06-01:43:10.977 4f90 Reusing MANIFEST C:\Users\Shakir\Desktop\Education Android App\ILM_POSSIBLE_EDUCATION\server\.wwebjs_auth\session\Default\shared_proto_db/MANIFEST-000001
+2026/10/06-01:43:10.988 4f90 Recovering log #3
+2026/10/06-01:43:10.989 4f90 Reusing old log C:\Users\Shakir\Desktop\Education Android App\ILM_POSSIBLE_EDUCATION\server\.wwebjs_auth\session\Default\shared_proto_db/000003.log 

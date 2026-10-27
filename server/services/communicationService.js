@@ -1,4 +1,5 @@
 import { sendEmail as sendBaseEmail } from './mailService.js';
+import { sendWhatsAppMessage } from './whatsappService.js';
 
 /**
  * Communication Service
@@ -22,12 +23,11 @@ export const sendSMS = async (to, message) => {
   }
 };
 
-// WhatsApp handler (Stub for integration)
+
+// WhatsApp handler
 export const sendWhatsApp = async (to, message) => {
   try {
-    console.log(`[WhatsApp Service] Sending to WhatsApp ${to}: ${message}`);
-    // Integration point for WhatsApp Business API (e.g., Twilio WhatsApp, MessageBird)
-    return { success: true, provider: 'Simulated WhatsApp' };
+    return await sendWhatsAppMessage(to, message);
   } catch (error) {
     console.error('[WhatsApp Service] Error:', error);
     return { success: false, error: error.message };
